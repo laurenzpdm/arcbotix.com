@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inverse Kinematics Explained: How Robotic Arms Solve for Joint Angles – RoboWire</title>
+  <meta name="description" content="Inverse kinematics explained with math and code: how a robotic arm computes joint angles from a target end-effector position, plus common solving methods.">
+  <meta name="keywords" content="inverse kinematics explained, inverse kinematics robotic arm, IK solver robotics, forward vs inverse kinematics">
+  <meta property="og:title" content="Inverse Kinematics Explained: How Robotic Arms Solve for Joint Angles">
+  <meta property="og:description" content="Inverse kinematics explained with math and code: how a robotic arm computes joint angles from a target end-effector position, plus common solving methods.">
+  <meta property="og:image" content="/blog/posts/img/inverse-kinematics-explained.webp">
+  <meta property="og:url" content="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/inverse-kinematics-explained.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/inverse-kinematics-explained.html">
+  <link rel="alternate" type="application/rss+xml" title="RoboWire" href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">RoboWire</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-03">July 3, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">Inverse Kinematics Explained: How Robotic Arms Solve for Joint Angles</h1>
+    <p class="blog-post-subtitle">Turning a target position into the joint angles that get your arm there</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/inverse-kinematics-explained.webp" alt="Isometric technical illustration of a robotic arm with joint angles highlighted, reaching toward a target point, dark blue and cyan lighting" loading="lazy">
+    </div>
+
+    <p>Inverse kinematics explained simply: it is the math a robotic arm uses to figure out which joint angles will place its end effector at a specific position and orientation. You tell the arm where you want the gripper to be, and inverse kinematics tells the motors how far to rotate to get it there. This is the opposite problem of forward kinematics, which starts from known joint angles and computes where the end effector ends up.</p>
+
+<p>Forward kinematics is straightforward: chain a series of rotation and translation matrices together, one per joint, and you get the end-effector pose. Inverse kinematics inverts that chain, and that inversion is where things get mathematically messy.</p>
+
+<h2>Why inverse kinematics is harder than forward kinematics</h2>
+<p>Forward kinematics is a single deterministic function: one set of joint angles always produces exactly one end-effector pose. Inverse kinematics is not so clean, for three reasons.</p>
+<ul>
+<li><strong>Multiple solutions.</strong> A 6-DOF arm can often reach the same point with its elbow up or elbow down, or with the wrist rotated a different way. There can be zero, one, or infinitely many valid joint configurations for a single target.</li>
+<li><strong>Unreachable targets.</strong> If the target lies outside the arm's workspace, no solution exists at all. The solver has to detect this rather than return garbage.</li>
+<li><strong>Nonlinear equations.</strong> The forward kinematics chain is full of sines and cosines of joint angles, so solving it backward means solving a system of nonlinear equations, not a simple linear inverse.</li>
+</ul>
+
+<h2>Analytical (closed-form) solutions</h2>
+<p>For simple arms, usually 2 or 3 DOF operating in a plane, you can derive an exact formula using trigonometry. Consider a 2-link planar arm with link lengths <code>L1</code> and <code>L2</code>, base at the origin, and target point <code>(x, y)</code>. The angle at the elbow comes from the law of cosines:</p>
+<pre><code>d2 = x*x + y*y
+cos_theta2 = (d2 - L1*L1 - L2*L2) / (2 * L1 * L2)
+theta2 = acos(cos_theta2)          # elbow angle, +/- for elbow-up or elbow-down
+
+k1 = L1 + L2 * cos(theta2)
+k2 = L2 * sin(theta2)
+theta1 = atan2(y, x) - atan2(k2, k1)   # shoulder angle
+</code></pre>
+<p>This gives you both elbow-up and elbow-down solutions depending on the sign you choose for <code>theta2</code>. Closed-form solutions like this are fast, exact, and cheap enough to run at full control-loop rate, which is why they are still used for simple pick-and-place arms and for the wrist sub-chain of larger manipulators. The catch is that deriving them by hand only stays practical up to about 3 DOF; beyond that the algebra becomes unmanageable.</p>
+
+<h2>Jacobian-based numerical methods</h2>
+<p>For arms with more joints, the standard approach is iterative and uses the manipulator Jacobian, a matrix that relates small changes in joint angles to small changes in end-effector position and orientation:</p>
+<pre><code>delta_x = J(theta) * delta_theta</code></pre>
+<p>To move toward a target, you invert this relationship at each iteration:</p>
+<pre><code>error = target_pose - current_pose
+delta_theta = J_pseudo_inverse(theta) * error
+theta = theta + step_size * delta_theta</code></pre>
+<p>You recompute the Jacobian, take a small step, check the new error, and repeat until the end effector converges on the target. Since a true inverse only exists for a square, non-singular Jacobian, most implementations use the Moore-Penrose pseudoinverse or a damped least-squares version (often called Damped Least Squares or Levenberg-Marquardt IK) to stay stable near singularities, where the arm loses a degree of freedom in some direction and the Jacobian becomes ill-conditioned.</p>
+<p>This is the general-purpose workhorse behind IK solvers in ROS2's MoveIt, in most robot simulators, and in animation rigs. It handles arbitrary DOF counts and redundant arms, at the cost of needing several iterations per solve and a reasonable initial guess to converge on the right local solution.</p>
+
+<h2>CCD and FABRIK: lightweight alternatives</h2>
+<p>Cyclic Coordinate Descent (CCD) skips the Jacobian entirely. It works backward from the end effector, adjusting one joint at a time to reduce the distance to the target, then moves to the next joint up the chain and repeats. It is simple to implement and cheap per iteration, though it can produce less natural-looking joint configurations than Jacobian methods.</p>
+<p>FABRIK (Forward And Backward Reaching Inverse Kinematics) treats the arm as a chain of rigid segments and repositions joints along straight lines toward the target in a forward pass, then a backward pass back to the fixed base, iterating until the chain satisfies both the target and the fixed base constraint. It avoids matrix inversion altogether and tends to converge in very few iterations for chain-like structures, which makes it popular in game character rigs and some low-power embedded arms.</p>
+
+<h2>Practical considerations when implementing inverse kinematics</h2>
+<ul>
+<li><strong>Joint limits.</strong> A mathematically valid solution can still be physically impossible if it requires a joint to rotate past its mechanical stop. Clamp or reject solutions that violate limits.</li>
+<li><strong>Singularities.</strong> Near full arm extension or certain wrist orientations, small Cartesian movements can require very large joint velocities. Damped least-squares Jacobian methods handle this more gracefully than a plain pseudoinverse.</li>
+<li><strong>Solution selection.</strong> When multiple valid configurations exist, pick the one closest to the arm's current joint angles to avoid sudden, large movements between control cycles.</li>
+<li><strong>Orientation, not just position.</strong> Full 6-DOF IK needs to match both end-effector position and orientation, which roughly doubles the number of constraints the solver must satisfy compared to a position-only solve.</li>
+</ul>
+
+<p>If you are tuning the resulting joint controllers after your IK solver produces target angles, the underlying position loop is typically still a standard <a href="pid-controller-tuning-for-robotic-arms.html">PID controller</a>, so getting that loop well tuned matters just as much as getting the kinematics right.</p>
+
+<h2>Choosing an approach</h2>
+<p>For a 2 or 3 DOF arm confined to a plane, derive the closed-form solution: it is exact and fast enough for any control loop. For a general-purpose serial arm with 5 or more DOF, reach for a Jacobian-based numerical solver, since libraries like KDL, TRAC-IK, and MoveIt already implement damped least-squares IK you can call directly. For character animation or very low-power embedded chains where matrix math is expensive, CCD or FABRIK are lighter alternatives that trade some solution quality for simplicity.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>RoboWire publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">RoboWire</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About RoboWire</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <div class="footer-meta"><span>Written with AI, reviewed for accuracy</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts/modern-tech.js"></script>
+</body>
+</html>
