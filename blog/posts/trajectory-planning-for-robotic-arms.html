@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion – RoboWire</title>
+  <meta name="description" content="Trajectory planning for robotic arms explained: joint-space vs Cartesian trajectories, trapezoidal and S-curve profiles, and how to avoid jerky motion.">
+  <meta name="keywords" content="trajectory planning for robotic arms, robot trajectory planning, trapezoidal velocity profile, joint space trajectory">
+  <meta property="og:title" content="Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion">
+  <meta property="og:description" content="Trajectory planning for robotic arms explained: joint-space vs Cartesian trajectories, trapezoidal and S-curve profiles, and how to avoid jerky motion.">
+  <meta property="og:image" content="/blog/posts/img/trajectory-planning-for-robotic-arms.webp">
+  <meta property="og:url" content="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/trajectory-planning-for-robotic-arms.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/trajectory-planning-for-robotic-arms.html">
+  <link rel="alternate" type="application/rss+xml" title="RoboWire" href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">RoboWire</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-03">July 3, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion</h1>
+    <p class="blog-post-subtitle">How a robot arm turns a start point and an end point into a motion that is fast, smooth, and safe for the hardware.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/trajectory-planning-for-robotic-arms.webp" alt="Isometric illustration of a robotic arm joint following a glowing curved motion trajectory" loading="lazy">
+    </div>
+
+    <p>Trajectory planning for robotic arms is the step between knowing where a joint needs to end up and actually commanding it to move there. An inverse kinematics solver or a motion planner gives you a target pose. On its own, that target is useless to a real actuator: you cannot simply tell a motor "go to 47 degrees" and expect smooth, safe motion. Something has to generate the full time-parameterized path, position, velocity, and acceleration at every control cycle, between where the joint is now and where it needs to be.</p>
+
+<p>This article covers the two main planning spaces, the velocity profiles used to keep motion smooth, and the practical failure modes that show up when trajectory planning is done poorly.</p>
+
+<h2>What Trajectory Planning Actually Produces</h2>
+
+<p>A trajectory is not just a path. A path is a set of geometric points in space. A trajectory adds the time dimension: it specifies position, velocity, and acceleration as continuous functions of time, sampled at the controller's update rate (often 100 Hz to 1 kHz depending on the platform).</p>
+
+<p>For a single joint moving from angle <code>q0</code> to <code>q1</code>, the planner must produce a function <code>q(t)</code> such that:</p>
+
+<ul>
+<li><code>q(0) = q0</code> and <code>q(T) = q1</code></li>
+<li>Velocity starts and ends at zero (or matches a specified boundary condition)</li>
+<li>Velocity and acceleration never exceed the actuator's physical limits</li>
+<li>The resulting motion is continuous enough that the joint's PID or torque controller can actually track it</li>
+</ul>
+
+<p>This last point matters more than it sounds. A trajectory that jumps in velocity or acceleration creates a tracking error spike that a well-tuned <a href="/blog/posts/pid-controller-tuning-for-robotic-arms.html">PID controller</a> will fight against, often producing overshoot or audible motor strain.</p>
+
+<h2>Joint Space vs Cartesian Space Planning</h2>
+
+<p>There are two fundamentally different places to plan a trajectory: in joint space or in Cartesian (task) space.</p>
+
+<h3>Joint Space Trajectories</h3>
+
+<p>In joint space planning, you compute a separate time-parameterized trajectory for each joint independently, then run them concurrently so all joints start and finish at the same time. This is the simpler and more common approach for point-to-point moves.</p>
+
+<p>Advantages:</p>
+<ul>
+<li>No singularities: joint space has no configuration where the math breaks down, unlike Cartesian space near a wrist singularity</li>
+<li>Computationally cheap: each joint is planned independently with simple closed-form profiles</li>
+<li>Naturally respects joint velocity and acceleration limits, since you plan directly in those units</li>
+</ul>
+
+<p>Disadvantage: the end effector's path through 3D space is not controlled directly. Moving from one pose to another in joint space can cause the end effector to sweep through an unexpected arc, which is a problem if there is an obstacle or a table surface in the way.</p>
+
+<h3>Cartesian Space Trajectories</h3>
+
+<p>Here you plan the end effector's position and orientation directly, for example a straight line from point A to point B, then use an <a href="/blog/posts/inverse-kinematics-explained.html">inverse kinematics solver</a> at each timestep to convert the desired Cartesian pose back into joint angles.</p>
+
+<p>This is necessary whenever the path itself matters, welding a straight seam, drawing a line, moving through a narrow gap, but it is more expensive and can run into two problems: IK solutions that vary discontinuously between nearby poses, and singularities where a small Cartesian motion requires an infinite joint velocity.</p>
+
+<p>A practical rule: use joint space planning for free-space point-to-point moves, and switch to Cartesian planning only when the task genuinely requires control over the end effector's path shape.</p>
+
+<h2>Velocity Profiles: Trapezoidal and S-Curve</h2>
+
+<p>Once you know the space you are planning in, you need a profile that defines how velocity changes over time during the move. Two profiles dominate industrial and hobbyist robotics.</p>
+
+<h3>Trapezoidal Velocity Profile</h3>
+
+<p>The trapezoidal profile is the default choice for most point-to-point moves. It has three phases:</p>
+
+<ol>
+<li><strong>Acceleration phase</strong>: constant acceleration from zero to a cruise velocity</li>
+<li><strong>Constant velocity phase</strong>: cruise at maximum allowed velocity</li>
+<li><strong>Deceleration phase</strong>: constant deceleration back to zero</li>
+</ol>
+
+<p>Plotted, velocity over time looks like a trapezoid, hence the name. For a move of distance <code>d</code> with maximum velocity <code>v_max</code> and maximum acceleration <code>a_max</code>, the time to reach cruise velocity is <code>t_acc = v_max / a_max</code>. If the distance covered during acceleration and deceleration exceeds <code>d</code>, the profile becomes triangular instead, meaning the joint never reaches <code>v_max</code> before it must start decelerating.</p>
+
+<p>The trapezoidal profile is simple to compute and respects hard velocity and acceleration limits, but it has a discontinuous acceleration: at the transition from acceleration to cruise, acceleration jumps instantly from <code>a_max</code> to zero. That instantaneous jump is what causes the physical jerk (rate of change of acceleration) that shows up as a small shudder in real hardware.</p>
+
+<h3>S-Curve Velocity Profile</h3>
+
+<p>An S-curve profile adds a jerk-limited ramp to both the acceleration and deceleration phases, so acceleration itself changes smoothly instead of jumping. Instead of three phases, there are seven: jerk up, constant acceleration, jerk down, cruise, jerk down (into deceleration), constant deceleration, jerk up (back to zero).</p>
+
+<p>The tradeoff is straightforward: S-curves take slightly longer to execute the same move because ramping acceleration smoothly costs time, but they produce noticeably smoother motion, less mechanical wear, and lower peak torque demand on the motor. For arms handling fragile payloads, or with backlash-prone gearboxes such as those discussed when <a href="/blog/posts/harmonic-drive-vs-planetary-gearbox.html">comparing harmonic drives to planetary gearboxes</a>, the reduction in jerk is often worth the small time penalty.</p>
+
+<blockquote>A rough heuristic: if your arm makes an audible clunk or visible shudder at the start or end of a move, you are almost certainly running a trapezoidal profile and hitting its acceleration discontinuity. Switching to an S-curve or a quintic polynomial blend usually fixes it without touching the PID gains at all.</blockquote>
+
+<h2>Polynomial Trajectories</h2>
+
+<p>An alternative to piecewise velocity profiles is fitting a single polynomial to the whole move. A cubic polynomial <code>q(t) = a0 + a1*t + a2*t^2 + a3*t^3</code> can satisfy position and velocity boundary conditions at both ends (four constraints, four coefficients). A quintic (5th-order) polynomial adds two more coefficients, letting you also specify acceleration at the start and end, which is what you want for smoothly chaining multiple trajectory segments together without a velocity or acceleration discontinuity at the boundary.</p>
+
+<p>Quintic polynomials are common in academic robotics and in multi-segment trajectories where several waypoints must be visited without stopping at each one. The cost is that peak velocity and acceleration are harder to bound directly since they are a byproduct of the polynomial coefficients rather than a planned parameter, so you typically compute the polynomial first and then verify it does not exceed actuator limits.</p>
+
+<h2>Multi-Joint Synchronization</h2>
+
+<p>When multiple joints move at once, each joint has its own maximum velocity and acceleration, and its own distance to travel. If you plan each joint at its own maximum speed, the joints will finish at different times, and the end effector's path becomes unpredictable.</p>
+
+<p>The standard fix is time scaling: compute the minimum time each joint would need at its own limits, take the slowest joint as the limiting factor, then scale down every other joint's trajectory to match that same total duration. All joints start and stop together, and the one that was already going to take the longest sets the pace for the whole move.</p>
+
+<h2>Practical Checklist</h2>
+
+<ul>
+<li>Plan in joint space for free-space moves, Cartesian space only when the path shape matters</li>
+<li>Use trapezoidal profiles as a fast default, switch to S-curve or quintic polynomials if you see jerk-related vibration or wear</li>
+<li>Always scale multi-joint trajectories to a common duration set by the slowest joint</li>
+<li>Verify computed peak velocity and acceleration against actuator datasheet limits before deploying, especially for polynomial-based trajectories</li>
+<li>Re-check trajectories whenever payload changes, since added mass reduces the safe acceleration limit for a given motor</li>
+</ul>
+
+<h2>Summary</h2>
+
+<p>Trajectory planning for robotic arms turns a start and end configuration into a smooth, time-parameterized motion that the joint controllers can actually track. Joint space planning is simpler and avoids singularities; Cartesian planning is necessary when the end effector's path matters. Trapezoidal profiles are the practical default, while S-curve and quintic polynomial profiles trade a small amount of execution time for significantly smoother, lower-jerk motion. Getting this layer right often solves motion quality problems that look like they need PID retuning but are actually caused by a discontinuous trajectory feeding the controller a signal it cannot follow cleanly.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>RoboWire publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">RoboWire</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About RoboWire</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <div class="footer-meta"><span>Written with AI, reviewed for accuracy</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts/modern-tech.js"></script>
+</body>
+</html>

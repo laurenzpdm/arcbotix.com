@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 6
+- Total articles: 7
 - Last published: 2026-07-03
-- Known slugs: 6
+- Known slugs: 7
 
 ## Current Strategy
 RoboWire is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 7 | 2026-07-03 | harmonic-drive-vs-planetary-gearbox | Harmonic Drive vs Planetary Gearbox: Choosing the Right Reduction for a Robot Joint | harmonic drive vs planetary gearbox, harmonic drive robotics, planetary gearbox robot arm, strain wave gear | Hardware  |
 | 6 | 2026-07-03 | slam-basics-for-mobile-robots | SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time | SLAM basics for mobile robots, SLAM robotics, simultaneous localization and mapping, SLAM algorithm explained | Software  |
 | 5 | 2026-07-03 | ros2-nodes-and-topics-explained | ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself | ROS2 nodes and topics explained, ROS2 topics, ROS2 nodes, ROS2 publisher subscriber | Software  |
 | 4 | 2026-07-03 | servo-vs-stepper-vs-bldc-motor-robotics | Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator | servo vs stepper vs BLDC motor for robotics, robot actuator selection, stepper motor robotics, BLDC motor robot arm | Hardware  |
@@ -83,7 +84,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
