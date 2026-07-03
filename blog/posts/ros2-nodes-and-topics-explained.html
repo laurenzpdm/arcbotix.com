@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself – RoboWire</title>
+  <meta name="description" content="ROS2 nodes and topics explained with real code: how publishers, subscribers, and the DDS middleware let robot software components communicate.">
+  <meta name="keywords" content="ROS2 nodes and topics explained, ROS2 topics, ROS2 nodes, ROS2 publisher subscriber">
+  <meta property="og:title" content="ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself">
+  <meta property="og:description" content="ROS2 nodes and topics explained with real code: how publishers, subscribers, and the DDS middleware let robot software components communicate.">
+  <meta property="og:image" content="/blog/posts/img/ros2-nodes-and-topics-explained.webp">
+  <meta property="og:url" content="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/ros2-nodes-and-topics-explained.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/ros2-nodes-and-topics-explained.html">
+  <link rel="alternate" type="application/rss+xml" title="RoboWire" href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">RoboWire</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Software</span>
+      <time datetime="2026-07-03">July 3, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself</h1>
+    <p class="blog-post-subtitle">How independent processes in a robot's software stack exchange data without knowing about each other</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/ros2-nodes-and-topics-explained.webp" alt="Isometric technical illustration of glowing nodes connected by data-flow lines representing a ROS2 communication graph" loading="lazy">
+    </div>
+
+    <p>Almost every non-trivial robot runs more than one piece of software at once: a camera driver, an object detector, a motor controller, a battery monitor. These pieces cannot be one giant program without becoming impossible to test or reuse. ROS2 (Robot Operating System 2) solves this by giving each piece its own process, called a node, and a messaging layer that lets nodes exchange data without hardcoding who talks to whom. This article explains ROS2 nodes and topics with working examples, so you understand what is actually happening under the hood rather than just copying boilerplate.</p>
+
+<h2>What a Node Actually Is</h2>
+<p>A ROS2 node is a single executable process that performs one job: reading a sensor, running a controller loop, or converting data from one format to another. A typical mobile robot might run a lidar driver node, a SLAM node, a path planner node, and a wheel controller node, each as a separate OS process. Splitting the system this way has three concrete benefits:</p>
+<ul>
+  <li>A crash in one node (say, a buggy vision node) does not take down the motor controller.</li>
+  <li>You can restart, replace, or profile a single node without touching the rest of the system.</li>
+  <li>Nodes written in Python and nodes written in C++ can run side by side and communicate normally.</li>
+</ul>
+<p>Creating a minimal node in Python with <code>rclpy</code> looks like this:</p>
+<pre><code>import rclpy
+from rclpy.node import Node
+
+class BatteryMonitor(Node):
+    def __init__(self):
+        super().__init__('battery_monitor')
+        self.get_logger().info('battery_monitor node started')
+
+def main():
+    rclpy.init()
+    node = BatteryMonitor()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+</code></pre>
+<p>Running this file starts a process named <code>battery_monitor</code> that shows up when you list active nodes with <code>ros2 node list</code>. By itself it does nothing useful yet, since it is not exchanging any data.</p>
+
+<h2>Topics: The Publish/Subscribe Backbone</h2>
+<p>A topic is a named, typed data channel. Nodes that produce data publish to a topic; nodes that consume data subscribe to it. Neither side needs to know the other exists. The battery monitor node above can publish its charge level on a topic called <code>/battery_state</code>, and any number of other nodes, a dashboard, a logger, a safety monitor, can subscribe to that same topic independently.</p>
+<p>Every topic has a fixed message type, defined in a <code>.msg</code> file, so a publisher and subscriber must agree on the data structure. Common built-in types include <code>std_msgs/Float32</code>, <code>sensor_msgs/Imu</code>, and <code>geometry_msgs/Twist</code> for velocity commands. Here is a publisher that sends a battery percentage every second:</p>
+<pre><code>from std_msgs.msg import Float32
+
+class BatteryMonitor(Node):
+    def __init__(self):
+        super().__init__('battery_monitor')
+        self.publisher = self.create_publisher(Float32, 'battery_state', 10)
+        self.timer = self.create_timer(1.0, self.publish_level)
+        self.level = 100.0
+
+    def publish_level(self):
+        msg = Float32()
+        msg.data = self.level
+        self.publisher.publish(msg)
+        self.level -= 0.5
+</code></pre>
+<p>The trailing <code>10</code> in <code>create_publisher</code> is the queue depth, how many unsent messages the publisher buffers if a subscriber falls behind. A subscriber for the same topic looks like this:</p>
+<pre><code>class BatteryLogger(Node):
+    def __init__(self):
+        super().__init__('battery_logger')
+        self.subscription = self.create_subscription(
+            Float32, 'battery_state', self.on_battery, 10)
+
+    def on_battery(self, msg):
+        self.get_logger().info(f'Battery at {msg.data:.1f}%')
+</code></pre>
+<p>You can run these two nodes in separate terminals, in any order, and they will find each other automatically. There is no configuration file listing which node connects to which; discovery happens automatically at the middleware layer.</p>
+
+<h2>How Discovery Actually Works: DDS</h2>
+<p>ROS2's communication is built on top of DDS (Data Distribution Service), an existing industrial middleware standard, rather than a custom protocol written from scratch. This is one of the biggest architectural differences from ROS1, which used a central master process that every node had to register with. In ROS2, DDS handles discovery in a decentralized way: each node broadcasts what topics it publishes and subscribes to, and any two matching nodes connect directly, peer to peer, once they discover each other on the network.</p>
+<p>Two practical consequences follow from this:</p>
+<ul>
+  <li>There is no single point of failure. If one node dies, the rest of the graph keeps running.</li>
+  <li>DDS Quality of Service (QoS) settings control delivery behavior per topic, for example whether messages should be reliable (retransmitted if dropped) or best-effort (fine for high-rate sensor data like lidar scans, where the newest reading matters more than every reading).</li>
+</ul>
+<p>A common beginner mistake is mismatched QoS: a publisher set to best-effort and a subscriber set to reliable will silently fail to connect. If two nodes should be talking but nothing arrives, checking QoS compatibility with <code>ros2 topic info /battery_state --verbose</code> is the first thing to try.</p>
+
+<h2>Inspecting the Graph at Runtime</h2>
+<p>ROS2 ships with command-line tools for inspecting a running system without touching code:</p>
+<ul>
+  <li><code>ros2 node list</code> shows every active node.</li>
+  <li><code>ros2 topic list</code> shows every active topic.</li>
+  <li><code>ros2 topic echo /battery_state</code> prints live messages as they arrive, useful for debugging without writing a subscriber.</li>
+  <li><code>ros2 topic hz /battery_state</code> measures the actual publish rate, which is useful for catching a sensor driver that is silently running slower than expected.</li>
+</ul>
+<p>These tools matter because a robot's software graph grows quickly. A modest mobile robot easily has fifteen to twenty active nodes and topics once you add localization, navigation, diagnostics, and teleoperation. Being able to inspect the live graph, rather than reading source code to guess who publishes what, is what makes debugging tractable at that scale.</p>
+
+<h2>Topics vs Services vs Actions</h2>
+<p>Topics are the right tool for continuous, one-directional data streams: sensor readings, velocity commands, state estimates. They are not the only communication pattern in ROS2. Services are for synchronous request/response calls, such as asking a node to recompute a map. Actions are for long-running tasks with feedback and cancellation, such as commanding a robot arm to move to a pose over several seconds. Choosing topics for something that is really a one-off request, or a service for continuous streaming, is a common source of awkward, brittle node code. As a rule of thumb: if data flows continuously and no one needs to confirm receipt, use a topic.</p>
+
+<h2>Conclusion</h2>
+<p>ROS2 nodes and topics give a robot's software the same kind of decoupling that microservices give a backend system: independent processes that agree only on a data contract, not on implementation details. Once you have DDS handling discovery and QoS underneath, nodes can be started, restarted, and swapped without touching the rest of the graph. That decoupling is the main reason ROS2 scales from a single Raspberry Pi hobby project to production robots running dozens of coordinated processes.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>RoboWire publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">RoboWire</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About RoboWire</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <div class="footer-meta"><span>Written with AI, reviewed for accuracy</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts/modern-tech.js"></script>
+</body>
+</html>

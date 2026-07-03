@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 3
+- Total articles: 4
 - Last published: 2026-07-03
-- Known slugs: 3
+- Known slugs: 4
 
 ## Current Strategy
 RoboWire is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 4 | 2026-07-03 | servo-vs-stepper-vs-bldc-motor-robotics | Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator | servo vs stepper vs BLDC motor for robotics, robot actuator selection, stepper motor robotics, BLDC motor robot arm | Hardware  |
 | 3 | 2026-07-03 | kalman-filter-robot-state-estimation | Kalman Filter for Robot State Estimation: A Practical Introduction | Kalman filter for robot state estimation, Kalman filter robotics, sensor fusion robot, state estimation robotics | Control Systems  |
 | 2 | 2026-07-03 | inverse-kinematics-explained | Inverse Kinematics Explained: How Robotic Arms Solve for Joint Angles | inverse kinematics explained, inverse kinematics robotic arm, IK solver robotics, forward vs inverse kinematics | Control Systems  |
 | 1 | 2026-07-03 | pid-controller-tuning-for-robotic-arms | PID Controller Tuning for Robotic Arms: A Practical Guide | PID controller tuning for robotic arms, PID tuning robotics, robot joint control, Ziegler-Nichols tuning | Control Systems  |
@@ -80,7 +81,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
