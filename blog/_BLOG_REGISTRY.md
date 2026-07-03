@@ -4,7 +4,7 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 8
+- Total articles: 9
 - Last published: 2026-07-03
 
 ## Keyword Pool (not yet used)
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 9 | 2026-07-03 | choosing-a-battery-for-a-quadruped-robot | Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide | choosing a battery for a quadruped robot, quadruped robot battery, LiPo battery robot, robot power budgeting | Build Guides | Practical sizing guide for quadruped robot batteries covering voltage matching to motor drivers, continuous current estimation, capacity calculation with usable-fraction formula, discharge rate/C-rating sizing against stance-phase current spikes, LiPo vs Li-ion vs LiFePO4 chemistry tradeoffs, mass distribution/mounting effects on gait control, and a full worked numeric example for a 10kg quadruped. |
 | 8 | 2026-07-03 | trajectory-planning-for-robotic-arms | Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion | trajectory planning for robotic arms, robot trajectory planning, trapezoidal velocity profile, joint space trajectory | Control Systems | Explains trajectory planning for robotic arms: the difference between joint-space and Cartesian-space planning, trapezoidal vs S-curve velocity profiles, quintic polynomial trajectories, multi-joint time synchronization, and a practical checklist for avoiding jerky motion. Links to the PID tuning, inverse kinematics, and harmonic drive vs planetary gearbox articles. |
 | 7 | 2026-07-03 | harmonic-drive-vs-planetary-gearbox | Harmonic Drive vs Planetary Gearbox: Choosing the Right Reduction for a Robot Joint | harmonic drive vs planetary gearbox, harmonic drive robotics, planetary gearbox robot arm, strain wave gear | Hardware | Compares harmonic drive (strain wave gear) and planetary gearbox mechanisms for robot joint reduction. Explains the mechanical operating principle and ratio formula for each, then compares backlash (harmonic drives sub-1 arcminute vs planetary 3-15 arcminutes), torsional stiffness (planetary stiffer due to rigid tooth load path vs harmonic drive's flexing thin-wall flexspline), torque density and size (harmonic drive wins per-package due to single-stage high ratio), efficiency (planetary 90-97% vs harmonic drive 65-90% due to flexspline elastic deformation losses), and cost. Ends with selection guidance: harmonic drive for precision/low-backlash joints like arm wrists, planetary for stiffness/high-torque/cost-sensitive joints like wheel hubs and legged robot hips, cycloidal drive as a middle-ground alternative. |
 | 6 | 2026-07-03 | slam-basics-for-mobile-robots | SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time | SLAM basics for mobile robots, SLAM robotics, simultaneous localization and mapping, SLAM algorithm explained | Software | Explains the SLAM (Simultaneous Localization and Mapping) problem for mobile robots: why pose estimation and map building are coupled, the state representation (robot pose plus landmarks), and the three main algorithm families (EKF-SLAM, particle filter/FastSLAM, graph-based SLAM). Covers loop closure detection and its role in correcting accumulated drift, plus practical considerations around sensor choice, compute budget, map representation, and switching from SLAM to pure localization once a map exists. Links to the Kalman filter article (predict-correct structure shared with EKF-SLAM) and the ROS2 nodes and topics article (graph-based SLAM as used in modern ROS2 stacks). |
@@ -58,3 +59,7 @@ hand-edit the table below except to fix a clear data error.
 - trajectory-planning-for-robotic-arms -> pid-controller-tuning-for-robotic-arms (trajectory discontinuities cause tracking errors that look like PID tuning problems)
 - trajectory-planning-for-robotic-arms -> inverse-kinematics-explained (Cartesian trajectories require an IK solver at each timestep)
 - trajectory-planning-for-robotic-arms -> harmonic-drive-vs-planetary-gearbox (jerk-limited profiles matter more for backlash-prone gearboxes)
+
+## Internal links (article 9)
+- choosing-a-battery-for-a-quadruped-robot -> servo-vs-stepper-vs-bldc-motor-robotics (linked actuator choice to the current profile that drives battery sizing)
+- servo-vs-stepper-vs-bldc-motor-robotics -> choosing-a-battery-for-a-quadruped-robot (backlink added in Power and Driver Considerations section where power budget for battery-powered robots is mentioned)
