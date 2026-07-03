@@ -156,7 +156,7 @@ def update(x_pred, P_pred, z):
 <li><strong>Unscented Kalman Filter (UKF)</strong> avoids linearization entirely by propagating a small set of sample points, called sigma points, through the true nonlinear functions. It tends to handle strong nonlinearity better than an EKF at a modest extra computational cost.</li>
 </ul>
 
-<p>For a robotic arm joint estimating position and velocity from a single encoder, a linear Kalman filter is usually sufficient. Once you are fusing IMU orientation with wheel odometry on a mobile base, an EKF is the more common practical choice.</p>
+<p>For a robotic arm joint estimating position and velocity from a single encoder, a linear Kalman filter is usually sufficient. Once you are fusing IMU orientation with wheel odometry on a mobile base, an EKF is the more common practical choice. See our <a href="/blog/posts/imu-sensor-fusion-basics.html">IMU sensor fusion basics</a> article for how the same predict-update idea applies specifically to combining accelerometer and gyroscope data.</p>
 
 <h2>Where State Estimation Fits in the Control Stack</h2>
 

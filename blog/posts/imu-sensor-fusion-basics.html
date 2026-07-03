@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data – RoboWire</title>
+  <meta name="description" content="IMU sensor fusion basics explained: why raw accelerometer and gyroscope data drift, and how complementary and Kalman filters combine them for stable orientation.">
+  <meta name="keywords" content="IMU sensor fusion basics, IMU sensor fusion, accelerometer gyroscope fusion, complementary filter IMU">
+  <meta property="og:title" content="IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data">
+  <meta property="og:description" content="IMU sensor fusion basics explained: why raw accelerometer and gyroscope data drift, and how complementary and Kalman filters combine them for stable orientation.">
+  <meta property="og:image" content="/blog/posts/img/imu-sensor-fusion-basics.webp">
+  <meta property="og:url" content="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/imu-sensor-fusion-basics.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/imu-sensor-fusion-basics.html">
+  <link rel="alternate" type="application/rss+xml" title="RoboWire" href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">RoboWire</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-03">July 3, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data</h1>
+    <p class="blog-post-subtitle">Why no single sensor gives you a clean orientation estimate, and how fusion fixes that</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/imu-sensor-fusion-basics.webp" alt="Isometric illustration of an IMU chip on a PCB with glowing axis arrows representing sensor fusion" loading="lazy">
+    </div>
+
+    <p>An inertial measurement unit (IMU) is the sensor most mobile robots, drones, and balancing robots rely on to know which way is up. But a raw IMU reading is not usable on its own. Understanding IMU sensor fusion basics means understanding why each individual sensor inside the IMU fails in a different way, and how combining them cancels out those failures.</p>
+
+<h2>What an IMU Actually Measures</h2>
+<p>A typical IMU used in robotics bundles two or three sensors:</p>
+<ul>
+<li><strong>Accelerometer</strong> - measures linear acceleration along X, Y, Z, including gravity.</li>
+<li><strong>Gyroscope</strong> - measures angular velocity (rate of rotation) around each axis.</li>
+<li><strong>Magnetometer</strong> (optional) - measures the local magnetic field vector, used as a heading reference.</li>
+</ul>
+<p>Neither the accelerometer nor the gyroscope directly measures orientation (roll, pitch, yaw). Orientation has to be derived, and each sensor derives it with a different flaw.</p>
+
+<h3>The Accelerometer's Problem: Noise and Motion</h3>
+<p>At rest, an accelerometer reads gravity, so you can compute roll and pitch from the gravity vector using basic trigonometry:</p>
+<pre><code>roll  = atan2(accel_y, accel_z)
+pitch = atan2(-accel_x, sqrt(accel_y^2 + accel_z^2))
+</code></pre>
+<p>This works well when the sensor is stationary. The problem is that the accelerometer measures total specific force, not gravity alone. The moment the robot accelerates, brakes, or vibrates, that motion adds directly into the reading and corrupts the tilt estimate. A robot braking hard will briefly appear to be pitching forward even if it is perfectly level. Accelerometer-only tilt estimates are also noisy on a sample-by-sample basis, especially near motors and gearboxes.</p>
+
+<h3>The Gyroscope's Problem: Drift</h3>
+<p>A gyroscope measures angular velocity, so you can integrate it over time to get orientation:</p>
+<pre><code>angle(t) = angle(t-1) + gyro_rate * dt
+</code></pre>
+<p>This is smooth and immune to linear acceleration or vibration, which makes it excellent for short-term, high-frequency motion. The catch is integration. Every gyroscope has a small constant bias error, often a fraction of a degree per second, and integrating that bias over time causes the estimated angle to drift steadily away from the true value. A cheap MEMS gyro left to integrate alone can drift tens of degrees within a minute of operation.</p>
+
+<h2>IMU Sensor Fusion Basics: Combining the Two</h2>
+<p>The core idea behind IMU sensor fusion is simple: use the gyroscope for what it is good at (fast, smooth, short-term changes) and the accelerometer for what it is good at (long-term, drift-free reference), then blend the two so each one corrects the other's weakness.</p>
+
+<h3>The Complementary Filter</h3>
+<p>The complementary filter is the simplest and most widely used fusion technique for embedded robotics, because it requires no matrix math and runs comfortably on a microcontroller. For a single axis:</p>
+<pre><code>angle = alpha * (angle + gyro_rate * dt) + (1 - alpha) * accel_angle
+</code></pre>
+<p>Here <code>alpha</code> is typically close to 0.98. The gyro-integrated angle dominates on a sample-to-sample basis (preserving responsiveness), while a small correction toward the accelerometer's angle is applied every cycle (preventing long-term drift). The two error sources are, in effect, complementary: the gyro is accurate short-term and wrong long-term, the accelerometer is the opposite, so a weighted blend suppresses both.</p>
+<p>Tuning <code>alpha</code> is a tradeoff. Push it toward 1.0 and the filter trusts the gyro more, giving a smoother but slower-to-correct estimate. Push it lower and the filter reacts faster to accelerometer corrections but becomes more sensitive to vibration and transient accelerations.</p>
+
+<h3>The Kalman Filter Approach</h3>
+<p>A Kalman filter formalizes the same idea with an explicit statistical model. Instead of a fixed blending constant, it maintains an estimate of orientation plus its uncertainty (covariance), predicts forward using the gyroscope, and updates that prediction using the accelerometer measurement weighted by how much each sensor is currently trusted. When the robot is accelerating hard, the filter can be told to reduce its confidence in the accelerometer step, so a good Kalman or extended Kalman filter (EKF) implementation, or the closely related Madgwick and Mahony filters common in flight controllers, adapts its trust in the accelerometer based on how much linear acceleration is currently present. This adaptive weighting is the main practical advantage over a fixed-alpha complementary filter, at the cost of more computation and more parameters to tune. Readers looking for the general estimation framework behind this should see our article on <a href="/blog/posts/kalman-filter-robot-state-estimation.html">Kalman filter state estimation</a>, since orientation fusion is really a special case of the same predict-update cycle used for position and velocity estimation.</p>
+
+<h2>Adding a Magnetometer for Heading</h2>
+<p>Both the complementary filter and a basic 6-axis Kalman filter can correct roll and pitch using gravity, but neither can correct yaw (heading), because gravity gives no information about rotation around the vertical axis. A magnetometer measures the ambient magnetic field vector and provides that missing heading reference, at the cost of being sensitive to nearby ferrous metal and motor currents, which is why magnetometer calibration and placement matters more than either accelerometer or gyroscope calibration.</p>
+
+<h2>Practical Considerations</h2>
+<ul>
+<li><strong>Sample rate matters.</strong> Gyroscope integration error grows with a larger <code>dt</code>, so run the fusion loop as fast as your microcontroller and IMU output data rate reasonably allow, typically 100 Hz to 1 kHz for a balancing robot or drone.</li>
+<li><strong>Calibrate the gyroscope bias at startup.</strong> Average several hundred samples while the robot is stationary and subtract that offset before integrating.</li>
+<li><strong>Watch for gimbal lock if using Euler angles.</strong> Many production fusion filters represent orientation as a quaternion internally and only convert to roll/pitch/yaw for human-readable output, because quaternions avoid the singularity that occurs when pitch approaches 90 degrees.</li>
+<li><strong>Vibration isolation helps more than filtering.</strong> No fusion algorithm fully compensates for an accelerometer that is mechanically shaking against a chassis; physically damping the IMU mount reduces noise before it ever reaches the filter.</li>
+</ul>
+
+<h2>Choosing an Approach</h2>
+<p>For a self-balancing robot, a simple drone, or a hobbyist project, a complementary filter is usually enough and is far easier to debug. For applications where GPS or other position sensors also need to be fused, or where accuracy under aggressive motion matters, an extended Kalman filter or a Madgwick filter is worth the added complexity. Either way, the underlying principle of IMU sensor fusion basics stays the same: no single inertial sensor gives you a trustworthy orientation on its own, but a gyroscope and an accelerometer blended together compensate for each other's weaknesses well enough to run real-time robot control loops.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>RoboWire publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">RoboWire</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About RoboWire</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <div class="footer-meta"><span>Written with AI, reviewed for accuracy</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts/modern-tech.js"></script>
+</body>
+</html>
