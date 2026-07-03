@@ -5,8 +5,16 @@
     <link>https://grad-notify-open-photographer.trycloudflare.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 03 Jul 2026 12:11:22 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 03 Jul 2026 12:14:17 +0000</lastBuildDate>
     <atom:link href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time</title>
+      <link>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/slam-basics-for-mobile-robots.html</link>
+      <guid>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/slam-basics-for-mobile-robots.html</guid>
+      <pubDate>Fri, 03 Jul 2026 12:14:05 +0000</pubDate>
+      <description>SLAM basics for mobile robots explained: why mapping and localization are solved together, the main algorithm families, and common pitfalls in real systems.</description>
+      <category>Software</category>
+    </item>
     <item>
       <title>ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself</title>
       <link>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/ros2-nodes-and-topics-explained.html</link>
