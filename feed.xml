@@ -5,8 +5,15 @@
     <link>https://grad-notify-open-photographer.trycloudflare.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 03 Jul 2026 10:22:34 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 03 Jul 2026 12:03:24 +0000</lastBuildDate>
     <atom:link href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml" rel="self" type="application/rss+xml"/>
-
+    <item>
+      <title>PID Controller Tuning for Robotic Arms: A Practical Guide</title>
+      <link>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/pid-controller-tuning-for-robotic-arms.html</link>
+      <guid>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/pid-controller-tuning-for-robotic-arms.html</guid>
+      <pubDate>Fri, 03 Jul 2026 12:03:02 +0000</pubDate>
+      <description>Learn how PID controller tuning works for robotic arm joints, with formulas, tuning methods, and practical fixes for overshoot, oscillation, and steady-state error.</description>
+      <category>Control Systems</category>
+    </item>
   </channel>
 </rss>
