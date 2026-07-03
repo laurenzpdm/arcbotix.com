@@ -1,0 +1,4 @@
+.env
+auto-blog.log
+__pycache__/
+*.pyc
