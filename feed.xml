@@ -5,8 +5,16 @@
     <link>https://grad-notify-open-photographer.trycloudflare.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 03 Jul 2026 12:16:11 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 03 Jul 2026 12:18:13 +0000</lastBuildDate>
     <atom:link href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion</title>
+      <link>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/trajectory-planning-for-robotic-arms.html</link>
+      <guid>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/trajectory-planning-for-robotic-arms.html</guid>
+      <pubDate>Fri, 03 Jul 2026 12:17:44 +0000</pubDate>
+      <description>Trajectory planning for robotic arms explained: joint-space vs Cartesian trajectories, trapezoidal and S-curve profiles, and how to avoid jerky motion.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Harmonic Drive vs Planetary Gearbox: Choosing the Right Reduction for a Robot Joint</title>
       <link>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/harmonic-drive-vs-planetary-gearbox.html</link>
