@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RoboWire</title>
+    <link>https://grad-notify-open-photographer.trycloudflare.com/blog/</link>
+    <description>Practical robotics engineering guides and niche technical deep-dives</description>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 03 Jul 2026 10:22:34 +0000</lastBuildDate>
+    <atom:link href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml" rel="self" type="application/rss+xml"/>
+
+  </channel>
+</rss>
