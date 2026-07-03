@@ -31,6 +31,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/ros2-nodes-and-topics-explained.html</loc>
+    <lastmod>2026-07-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://grad-notify-open-photographer.trycloudflare.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</loc>
     <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
