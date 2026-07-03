@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time – RoboWire</title>
+  <meta name="description" content="SLAM basics for mobile robots explained: why mapping and localization are solved together, the main algorithm families, and common pitfalls in real systems.">
+  <meta name="keywords" content="SLAM basics for mobile robots, SLAM robotics, simultaneous localization and mapping, SLAM algorithm explained">
+  <meta property="og:title" content="SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time">
+  <meta property="og:description" content="SLAM basics for mobile robots explained: why mapping and localization are solved together, the main algorithm families, and common pitfalls in real systems.">
+  <meta property="og:image" content="/blog/posts/img/slam-basics-for-mobile-robots.webp">
+  <meta property="og:url" content="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/slam-basics-for-mobile-robots.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/slam-basics-for-mobile-robots.html">
+  <link rel="alternate" type="application/rss+xml" title="RoboWire" href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">RoboWire</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Software</span>
+      <time datetime="2026-07-03">July 3, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time</h1>
+    <p class="blog-post-subtitle">Why a robot can't build a map without knowing where it is, and can't know where it is without a map</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/slam-basics-for-mobile-robots.webp" alt="Isometric illustration of a mobile robot building a glowing point-cloud map of a room" loading="lazy">
+    </div>
+
+    <p>SLAM basics for mobile robots start with a paradox: a robot needs a map to know where it is, but it needs to know where it is to build a map. Simultaneous Localization and Mapping (SLAM) is the family of algorithms that solves both problems at once, using the robot's own sensor data as it moves through an unknown environment.</p>
+<p>This matters for any mobile robot that has to operate somewhere it hasn't been given a map in advance: a vacuum robot in a new house, a warehouse AMR before its site is surveyed, or a drone exploring a building after a disaster. Without SLAM, the robot either needs a pre-built map or a full stop-and-scan calibration step, neither of which scales to real-world deployment.</p>
+<h2>The Core Problem: Why Mapping and Localization Are Coupled</h2>
+<p>Imagine a robot with a range sensor (LiDAR, sonar, or a depth camera) and a way to estimate its own motion (wheel encoders, an IMU, or visual odometry). At each timestep it can measure distances to nearby walls and objects, and it can estimate how far it moved since the last step.</p>
+<p>The trouble is that both of these measurements are noisy. Wheel encoders drift because of wheel slip. IMUs accumulate drift through double integration of acceleration. If the robot simply trusted its odometry and stitched sensor readings together, small errors would compound over time, and the resulting map would curl and drift away from the true geometry of the room.</p>
+<p>SLAM addresses this by treating the robot's pose (its position and orientation) and the map (the set of landmarks or occupied cells) as a single joint estimation problem. Every new sensor reading updates both the map and the belief about where the robot is, and crucially, revisiting a known area lets the algorithm correct accumulated drift in both.</p>
+<h2>State Representation: What Exactly Is Being Estimated</h2>
+<p>Most SLAM formulations track a state vector that includes:</p>
+<ul>
+<li>The robot's pose: position (x, y, and sometimes z) plus orientation (heading, or a full 3D rotation).</li>
+<li>A set of landmarks or map features: distinct points, corners, or occupied grid cells that the robot has observed.</li>
+</ul>
+<p>As the robot moves, two kinds of updates happen. A <strong>motion update</strong> predicts the new pose based on control inputs (wheel speeds, IMU readings) and adds uncertainty because motion is never perfectly known. A <strong>measurement update</strong> corrects that prediction using sensor observations of landmarks, and also refines the estimated position of those landmarks. This predict-correct cycle is the same structure used in a <a href="kalman-filter-robot-state-estimation.html">Kalman filter for robot state estimation</a>, and in fact one of the earliest and most widely taught SLAM approaches, EKF-SLAM, is a direct extension of the Extended Kalman Filter to this joint pose-and-map state.</p>
+<h2>Main Algorithm Families</h2>
+<h3>EKF-SLAM</h3>
+<p>EKF-SLAM stacks the robot pose and all landmark positions into one large state vector, then runs an Extended Kalman Filter over that vector. Its strength is a rigorous, well-understood uncertainty model: every landmark and the robot pose carry a covariance that shrinks or grows correctly as evidence accumulates. Its weakness is computational cost. The covariance matrix grows quadratically with the number of landmarks, so EKF-SLAM becomes impractical much past a few hundred landmarks.</p>
+<h3>Particle Filter SLAM (FastSLAM)</h3>
+<p>FastSLAM represents the robot's possible trajectories as a set of weighted particles, where each particle carries its own independent map estimate. Instead of one Gaussian belief over the whole state, you get many discrete hypotheses about where the robot has been, each with its own consistent map. This handles non-linear motion and non-Gaussian noise better than EKF-SLAM and scales more gracefully to larger maps, at the cost of needing enough particles to cover the space of plausible trajectories. Too few particles and the filter can lose track of the correct trajectory entirely, a failure mode called particle depletion.</p>
+<h3>Graph-Based SLAM</h3>
+<p>Graph-based SLAM is the dominant approach in modern systems (including most implementations built on ROS2, which is covered in <a href="ros2-nodes-and-topics-explained.html">ROS2 nodes and topics explained</a>). It represents robot poses over time as nodes in a graph, with edges encoding relative motion constraints from odometry and relative position constraints from sensor observations. Instead of filtering step by step, the whole graph is optimized at once (or incrementally) to find the configuration of poses that best satisfies all constraints simultaneously. This is usually solved with non-linear least squares optimization. Graph-based SLAM handles loop closures naturally and scales well because the optimization only needs to touch the parts of the graph affected by a new constraint.</p>
+<h2>Loop Closure: The Piece That Actually Fixes Drift</h2>
+<p>Loop closure is the moment a robot recognizes it has returned to a previously visited location, even though its accumulated odometry says otherwise. Detecting a loop closure typically relies on comparing current sensor data (a LiDAR scan or a camera image) against previously stored data, using techniques like scan matching or visual place recognition.</p>
+<p>Once a loop closure is detected, it becomes a new constraint in the map: this pose and that earlier pose are actually the same place. Graph-based SLAM propagates that correction backward through the whole trajectory, straightening out the accumulated drift. Without loop closure, SLAM degrades into pure dead-reckoning with occasional local corrections, and long-duration maps will visibly warp.</p>
+<p>False loop closures are a real danger. A visually repetitive environment (a warehouse with identical aisles, a featureless corridor) can trick the matching algorithm into believing the robot is somewhere it isn't, and forcing that incorrect constraint into the graph can badly corrupt the map. Robust SLAM implementations include outlier rejection specifically to guard against this.</p>
+<h3>A Minimal Pseudocode Sketch</h3>
+<pre><code>state = initial_pose, empty_map
+for each timestep:
+    control = read_odometry()
+    state.pose = predict_motion(state.pose, control)
+
+    scan = read_lidar()
+    observed_features = extract_features(scan)
+    state = update_with_observations(state, observed_features)
+
+    if loop_closure_detected(scan, state.map):
+        constraint = compute_loop_constraint(scan, state.map)
+        state = optimize_graph(state, constraint)
+</code></pre>
+<h2>Practical Considerations for a Real Robot</h2>
+<ul>
+<li><strong>Sensor choice matters more than algorithm choice.</strong> A 2D LiDAR gives clean, reliable range data for indoor flat-floor robots. Visual SLAM using a single camera is cheaper but far more sensitive to lighting and texture-poor scenes.</li>
+<li><strong>Compute budget drives the algorithm family.</strong> An embedded robot with a limited CPU often can't afford full graph optimization at high frequency, so many systems mix a fast local filter with periodic global graph optimization.</li>
+<li><strong>Map representation is a separate choice from the SLAM algorithm.</strong> Occupancy grids are simple and good for 2D navigation. Feature-based sparse maps are more compact and better suited to visual SLAM and loop closure matching.</li>
+<li><strong>SLAM is not free localization once the map is built.</strong> Many systems run SLAM once to build a map, then switch to a lighter pure localization mode (like Monte Carlo localization against the fixed map) for day-to-day operation, since re-optimizing the whole map on every run is wasteful once the environment is known.</li>
+</ul>
+<h2>Conclusion</h2>
+<p>SLAM basics for mobile robots come down to one core idea: pose and map estimation have to be solved jointly, because each depends on the other. EKF-SLAM offers a clean probabilistic model but scales poorly, particle filters handle non-linearity better, and graph-based SLAM has become the practical standard because it scales to large environments and handles loop closure cleanly. Whichever family you pick, the real-world performance hinges on sensor quality, compute budget, and how robustly the system detects and validates loop closures.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>RoboWire publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">RoboWire</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About RoboWire</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <div class="footer-meta"><span>Written with AI, reviewed for accuracy</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts/modern-tech.js"></script>
+</body>
+</html>

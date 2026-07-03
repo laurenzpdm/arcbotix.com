@@ -4,7 +4,7 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 5
+- Total articles: 6
 - Last published: 2026-07-03
 
 ## Keyword Pool (not yet used)
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 6 | 2026-07-03 | slam-basics-for-mobile-robots | SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time | SLAM basics for mobile robots, SLAM robotics, simultaneous localization and mapping, SLAM algorithm explained | Software | Explains the SLAM (Simultaneous Localization and Mapping) problem for mobile robots: why pose estimation and map building are coupled, the state representation (robot pose plus landmarks), and the three main algorithm families (EKF-SLAM, particle filter/FastSLAM, graph-based SLAM). Covers loop closure detection and its role in correcting accumulated drift, plus practical considerations around sensor choice, compute budget, map representation, and switching from SLAM to pure localization once a map exists. Links to the Kalman filter article (predict-correct structure shared with EKF-SLAM) and the ROS2 nodes and topics article (graph-based SLAM as used in modern ROS2 stacks). |
 | 5 | 2026-07-03 | ros2-nodes-and-topics-explained | ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself | ROS2 nodes and topics explained, ROS2 topics, ROS2 nodes, ROS2 publisher subscriber | Software | Practical explanation of ROS2 nodes and topics: what a node is, how the publish/subscribe model works with working rclpy Python examples (publisher and subscriber for a battery monitor topic), how DDS handles decentralized discovery and QoS (reliable vs best-effort), command-line tools for inspecting a running ROS2 graph (ros2 node list, ros2 topic echo, ros2 topic hz), and when to use topics vs services vs actions. |
 | 4 | 2026-07-03 | servo-vs-stepper-vs-bldc-motor-robotics | Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator | servo vs stepper vs BLDC motor for robotics, robot actuator selection, stepper motor robotics, BLDC motor robot arm | Hardware | Compares hobby servo motors, stepper motors, and BLDC motors for robotics actuator selection, covering torque density, positional accuracy, control complexity (open-loop vs closed-loop, FOC), cost, and power/driver sizing considerations, with a practical decision framework for picking the right motor per joint. |
 | 3 | 2026-07-03 | kalman-filter-robot-state-estimation | Kalman Filter for Robot State Estimation: A Practical Introduction | Kalman filter for robot state estimation, Kalman filter robotics, sensor fusion robot, state estimation robotics | Control Systems | Practical introduction to the Kalman filter for robot state estimation. Explains why fusing a motion model with noisy sensor measurements beats either alone, walks through the predict-update cycle and core equations (state transition F, process noise Q, measurement noise R, Kalman gain K), gives a worked 1D Python-style example, covers tuning guidance for Q and R, and explains when an Extended or Unscented Kalman Filter is needed for nonlinear motion models. Links state estimation output to downstream PID control. |
@@ -42,3 +43,7 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 4)
 - servo-vs-stepper-vs-bldc-motor-robotics -> inverse-kinematics-explained (linked stepper joint precision to feeding predictable angles into an IK solver)
 - servo-vs-stepper-vs-bldc-motor-robotics -> pid-controller-tuning-for-robotic-arms (linked BLDC FOC velocity/position loops to PID tuning concepts)
+
+## Internal links (article 6)
+- slam-basics-for-mobile-robots -> kalman-filter-robot-state-estimation (EKF-SLAM is a direct extension of the Kalman filter predict-correct cycle to a joint pose-and-map state)
+- slam-basics-for-mobile-robots -> ros2-nodes-and-topics-explained (graph-based SLAM is the dominant approach in modern ROS2-based robot stacks)
