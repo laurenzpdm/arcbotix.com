@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalman Filter for Robot State Estimation: A Practical Introduction – RoboWire</title>
+  <meta name="description" content="How the Kalman filter fuses noisy sensor data and motion models for robot state estimation, with the core equations and a worked example.">
+  <meta name="keywords" content="Kalman filter for robot state estimation, Kalman filter robotics, sensor fusion robot, state estimation robotics">
+  <meta property="og:title" content="Kalman Filter for Robot State Estimation: A Practical Introduction">
+  <meta property="og:description" content="How the Kalman filter fuses noisy sensor data and motion models for robot state estimation, with the core equations and a worked example.">
+  <meta property="og:image" content="/blog/posts/img/kalman-filter-robot-state-estimation.webp">
+  <meta property="og:url" content="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/kalman-filter-robot-state-estimation.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/kalman-filter-robot-state-estimation.html">
+  <link rel="alternate" type="application/rss+xml" title="RoboWire" href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-text">RoboWire</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-03">July 3, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Kalman Filter for Robot State Estimation: A Practical Introduction</h1>
+    <p class="blog-post-subtitle">How robots combine an imperfect motion model with noisy sensors to estimate where they actually are</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/kalman-filter-robot-state-estimation.webp" alt="Isometric illustration of a robot's predicted motion path intersecting noisy sensor measurement points converging into a fused estimate, dark background with blue and cyan lighting" loading="lazy">
+    </div>
+
+    <p>No sensor tells a robot exactly where it is or how fast it is moving. Encoders drift, IMUs accumulate bias, and GPS or vision measurements arrive noisy and sometimes late. A Kalman filter for robot state estimation solves this by combining a mathematical model of how the robot is expected to move with whatever noisy measurements are actually available, producing an estimate that is usually more accurate than either source alone.</p>
+
+<p>This article walks through why that combination works, the core predict-update equations, and a worked 1D example you can extend to a real robot joint or mobile base.</p>
+
+<h2>Why Kalman Filter Robot State Estimation Beats Using Sensors Directly</h2>
+
+<p>Consider a mobile robot estimating its position along one axis. You have two sources of information: a motion model that predicts the new position from the last known position and commanded velocity, and a sensor (say, a laser rangefinder against a wall) that measures position directly. Neither is trustworthy on its own.</p>
+
+<ul>
+<li>The motion model drifts over time. Wheel slip, uneven friction, and integration error mean the predicted position wanders further from the truth the longer you rely on it alone.</li>
+<li>The sensor measurement is noisy at any single instant, but it does not drift, since each reading is independent of the last.</li>
+</ul>
+
+<p>The Kalman filter's key insight is that if you know how much you trust each source, expressed as a variance, you can combine them into a single estimate with lower variance, meaning less uncertainty, than either the model prediction or the raw measurement alone. This is the same idea behind weighted averaging: a source you trust more gets more weight.</p>
+
+<h2>The Predict-Update Cycle</h2>
+
+<p>A Kalman filter runs in a loop of two steps, executed every control cycle:</p>
+
+<h3>1. Predict</h3>
+
+<p>Using the motion model, project the current state estimate and its uncertainty forward in time, before any new measurement arrives:</p>
+
+<blockquote>x_pred = F * x + B * u<br>P_pred = F * P * F^T + Q</blockquote>
+
+<p>Here x is the state estimate (for example, position and velocity), F is the state transition matrix describing how the state evolves, B * u accounts for a known control input like commanded velocity, P is the estimate's covariance (uncertainty), and Q is the process noise covariance, how much uncertainty the motion model itself adds each step, from wheel slip, unmodeled friction, and similar effects.</p>
+
+<h3>2. Update</h3>
+
+<p>When a new measurement z arrives, correct the prediction:</p>
+
+<blockquote>y = z - H * x_pred<br>K = P_pred * H^T * (H * P_pred * H^T + R)^-1<br>x = x_pred + K * y<br>P = (I - K * H) * P_pred</blockquote>
+
+<p>y is the innovation, the gap between what the sensor actually reported and what the model predicted it would report. H maps the state into the space of the measurement (for a direct position sensor, H is often just an identity-like matrix). R is the measurement noise covariance, how noisy the sensor is. K, the Kalman gain, decides how much weight the measurement gets relative to the prediction. When R is large (a noisy sensor), K shrinks and the filter trusts the model more. When Q is large (an unreliable model), K grows and the filter trusts the measurement more.</p>
+
+<h2>A Worked 1D Example</h2>
+
+<p>Take a simplified case: a robot moving along one axis, state x = [position, velocity], no direct control input for simplicity, sampled every dt seconds.</p>
+
+<pre><code># State transition: position updates from velocity, velocity assumed constant
+F = [[1, dt],
+     [0, 1]]
+
+# We only measure position directly
+H = [[1, 0]]
+
+# Process noise: uncertainty growth per step from unmodeled dynamics
+Q = [[0.001, 0],
+     [0, 0.001]]
+
+# Measurement noise: sensor variance, e.g. from a noisy rangefinder
+R = [[0.1]]
+
+def predict(x, P):
+    x_pred = F @ x
+    P_pred = F @ P @ F.T + Q
+    return x_pred, P_pred
+
+def update(x_pred, P_pred, z):
+    y = z - H @ x_pred
+    S = H @ P_pred @ H.T + R
+    K = P_pred @ H.T @ inv(S)
+    x = x_pred + K @ y
+    P = (I - K @ H) @ P_pred
+    return x, P
+</code></pre>
+
+<p>Run predict once per control cycle regardless of whether a measurement arrived, and run update only when a new sensor reading comes in. This is why Kalman filters handle sensors running at different rates gracefully, a wheel encoder at 100 Hz and a camera at 10 Hz can both feed the same filter, each triggering its own update step with its own H and R.</p>
+
+<h2>Tuning Q and R</h2>
+
+<p>In practice, most of the work in getting a Kalman filter to behave well is tuning Q and R rather than deriving the equations. A few practical guidelines:</p>
+
+<ul>
+<li>Start by estimating R from real sensor data: log raw measurements while the robot is stationary and compute the variance directly. This gives an honest, data-backed R rather than a guess.</li>
+<li>Q is harder to measure directly. Start small and increase it if the filter lags behind real, sudden changes in the robot's motion, since a too-small Q makes the filter overconfident in a model that can't react quickly.</li>
+<li>If the filter's estimate oscillates or reacts too strongly to individual noisy readings, R is likely too small relative to Q, the filter is trusting each measurement too much.</li>
+<li>If the filter smooths over real motion and lags behind, Q is likely too small relative to R, the filter is trusting the model too much and discounting valid new information.</li>
+</ul>
+
+<h2>When You Need an Extended or Unscented Kalman Filter</h2>
+
+<p>The standard Kalman filter assumes the state transition and measurement functions are linear, which is rarely exactly true for a robot. A mobile robot's heading-dependent motion model, for instance, involves sine and cosine terms. For these cases, two common extensions exist:</p>
+
+<ul>
+<li><strong>Extended Kalman Filter (EKF)</strong> linearizes the nonlinear functions around the current estimate at each step using a Jacobian, then applies the same predict-update structure. This is the standard choice for mobile robot localization and is well supported in ROS2 packages like robot_localization.</li>
+<li><strong>Unscented Kalman Filter (UKF)</strong> avoids linearization entirely by propagating a small set of sample points, called sigma points, through the true nonlinear functions. It tends to handle strong nonlinearity better than an EKF at a modest extra computational cost.</li>
+</ul>
+
+<p>For a robotic arm joint estimating position and velocity from a single encoder, a linear Kalman filter is usually sufficient. Once you are fusing IMU orientation with wheel odometry on a mobile base, an EKF is the more common practical choice.</p>
+
+<h2>Where State Estimation Fits in the Control Stack</h2>
+
+<p>State estimation and control are separate concerns that feed into each other. A Kalman filter produces the best estimate of position, velocity, or orientation available at each control cycle, and that estimate is what a controller like a <a href="/blog/posts/pid-controller-tuning-for-robotic-arms.html">PID loop</a> actually uses as its measured value when computing the error against the setpoint. A well-tuned PID controller cannot compensate for a noisy or laggy state estimate feeding it, so getting the estimation stage right upstream tends to pay off more than further PID tuning once the sensor signal itself is the bottleneck.</p>
+
+<h2>Summary</h2>
+
+<p>A Kalman filter for robot state estimation works by alternating between predicting the next state from a motion model and correcting that prediction with a noisy sensor measurement, weighting each source according to how much you trust it. The core loop, predict then update, is straightforward to implement even in 1D, and the real engineering work is honestly estimating your process noise Q and measurement noise R rather than the matrix algebra itself. For most mobile robots with nonlinear motion models, an Extended or Unscented Kalman Filter extends the same core idea to handle heading and orientation correctly.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>RoboWire publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">RoboWire</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About RoboWire</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <div class="footer-meta"><span>Written with AI, reviewed for accuracy</span></div>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts/modern-tech.js"></script>
+</body>
+</html>
