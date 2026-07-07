@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Power Budgeting for Mobile Robots: From Component List to Wire Gauge – Arcbotix</title>
+  <meta name="description" content="Learn how to build a real power budget for a mobile robot: peak vs average current, battery capacity, wire gauge, and fuse sizing with worked numbers.">
+  <meta name="keywords" content="power budgeting for mobile robots, robot power budget, peak vs average current robot, wire gauge robot wiring">
+  <meta property="og:title" content="Power Budgeting for Mobile Robots: From Component List to Wire Gauge">
+  <meta property="og:description" content="Learn how to build a real power budget for a mobile robot: peak vs average current, battery capacity, wire gauge, and fuse sizing with worked numbers.">
+  <meta property="og:image" content="/blog/posts/img/power-budgeting-for-mobile-robots.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/power-budgeting-for-mobile-robots.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/power-budgeting-for-mobile-robots.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Build Guides</span>
+      <time datetime="2026-07-07">July 7, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Power Budgeting for Mobile Robots: From Component List to Wire Gauge</h1>
+    <p class="blog-post-subtitle">How to turn a component list into a current budget, then into wire gauge and fuse sizing that won't brown out under load.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/power-budgeting-for-mobile-robots.webp" alt="Minimalist isometric illustration of a mobile robot power distribution board with fused wiring branches to motors, compute, and sensors" loading="lazy">
+    </div>
+
+    <p>Power budgeting for mobile robots is usually explained as "list your components, add up the current, add margin." That advice is not wrong, but it skips the two steps that actually determine whether your robot works reliably: separating peak current from average current, and using the resulting numbers to size your wiring and fusing, not just your battery. A robot that browns out its main compute board every time the drive motors stall against an obstacle has a wiring problem, not a battery problem, and no amount of extra battery capacity fixes it.</p>
+
+<p>This guide walks through building a real power budget for a mobile robot: listing components with both average and peak current, summing them correctly, sizing battery capacity and discharge rate, and then carrying those numbers through to wire gauge and fuse selection.</p>
+
+<h2>Step 1: Build a Component Current Table</h2>
+<p>Start by listing every current-drawing subsystem on the robot, with two numbers for each: typical average current during normal operation, and peak current during the worst case that subsystem will actually hit. Peak is not a vague safety margin, it is a specific physical event: motor stall current, sensor power-on inrush, or a compute board's brief current spike under full CPU/GPU load.</p>
+<table>
+<tr><th>Component</th><th>Typical Average</th><th>Peak</th><th>Peak Cause</th></tr>
+<tr><td>2x drive motors (12V DC gear motors)</td><td>3.0 A total</td><td>14.0 A total</td><td>Stall against an obstacle</td></tr>
+<tr><td>Compute board (SBC + small GPU)</td><td>2.5 A</td><td>4.0 A</td><td>Full CPU/GPU load burst</td></tr>
+<tr><td>2D LiDAR</td><td>0.4 A</td><td>0.9 A</td><td>Motor spin-up on power-on</td></tr>
+<tr><td>IMU + microcontroller</td><td>0.2 A</td><td>0.3 A</td><td>Negligible, listed for completeness</td></tr>
+<tr><td>Wi-Fi / comms module</td><td>0.3 A</td><td>0.8 A</td><td>Transmit burst</td></tr>
+</table>
+<p>Get motor stall current from the motor's datasheet, not the running current, since a wheel jammed against a curb or a leg pinned mid-stride draws several times its normal current for as long as the stall lasts. If a datasheet number is not available, measure it directly: hold the motor shaft stationary with a bench supply and current meter in line, for a few seconds only, to avoid overheating the winding.</p>
+
+<h2>Step 2: Sum Average and Peak Separately</h2>
+<p>Two sums matter, and they answer two different questions. Average current, summed across every component's typical draw, tells you how long the battery will last. Worst-case peak current, summed as if every component hit its peak at the same instant, tells you what the battery, main fuse, and main wiring harness must survive without sagging or tripping.</p>
+<pre><code>I_avg  = 3.0 + 2.5 + 0.4 + 0.2 + 0.3 = 6.4 A
+I_peak = 14.0 + 4.0 + 0.9 + 0.3 + 0.8 = 20.0 A</code></pre>
+<p>Treating every component's peak as simultaneous is deliberately conservative. In practice a LiDAR spin-up rarely coincides exactly with a motor stall, but sizing the main harness and fuse for the simultaneous worst case is cheap insurance against an intermittent brownout that is painful to debug later. If you have telemetry from a working prototype, you can refine this with a logged peak instead of the summed worst case, but do that only after the first build has run long enough to trust the log.</p>
+
+<h2>Step 3: Size Battery Capacity and Discharge Rate</h2>
+<p>Capacity follows from average current and your runtime target, with a usable-fraction correction since you should not fully discharge most rechargeable chemistries in normal use:</p>
+<pre><code>Capacity (Ah) = I_avg x Target Runtime (h) / Usable Fraction</code></pre>
+<p>For the robot above with a 6.4 A average draw and a 90-minute runtime target, using an 80 percent usable fraction typical for LiPo:</p>
+<pre><code>Capacity = 6.4 x 1.5 / 0.8 = 12.0 Ah</code></pre>
+<p>Discharge rate is a separate check against the peak sum, not the average. A pack's maximum current is its C-rating multiplied by capacity:</p>
+<pre><code>Max Current (A) = C-rating x Capacity (Ah)</code></pre>
+<p>A 12Ah pack needs at least a 20A/12Ah = 1.7C rating to cover the 20A peak without voltage sag, but most off-the-shelf packs are rated well above the minimum, so a 5C to 10C pack gives real headroom rather than running at the edge of its rating on every stall event.</p>
+
+<h2>Step 4: Translate the Budget into Wire Gauge</h2>
+<p>Once you know the peak current each branch of the harness must carry, wire gauge follows from standard ampacity tables, not guesswork. For short robot wiring runs (under about 1 meter) with a small allowance above continuous-duty ratings, common choices are:</p>
+<ul>
+<li><strong>22 AWG:</strong> up to about 3 A, fine for the IMU/microcontroller branch.</li>
+<li><strong>18 AWG:</strong> up to about 7 A, adequate for the compute board and comms branches.</li>
+<li><strong>14 AWG:</strong> up to about 15 A, needed for a single drive motor's stall current.</li>
+<li><strong>12 AWG or heavier:</strong> for the main battery-to-distribution-board harness, which must carry the full 20A peak sum from Step 2.</li>
+</ul>
+<p>Undersized wire does not fail cleanly, it heats up and drops voltage under load, which shows up as an intermittent brownout on whatever component shares that rail, exactly the kind of bug that is hard to reproduce on a bench where you are not stalling a motor against a curb. Size the main harness for the worst-case peak sum, and size each branch for that branch's own peak, not the whole robot's average.</p>
+
+<h2>Step 5: Size the Main Fuse or Breaker</h2>
+<p>The main fuse protects the wiring, not the battery, so it should be rated above your worst-case peak sum but below the wire's ampacity. For the 20A peak sum on 12 AWG wire (rated around 20 to 25A for a short run), a 25A fast-blow fuse is a reasonable choice: it will not nuisance-trip on a normal stall event but will still open before the wire insulation is damaged by a genuine short circuit.</p>
+<p>Branch-level fusing or resettable polyfuses on individual subsystems (compute board, sensor rail) are worth adding on top of the main fuse, since a single main fuse sized for the whole robot will not protect an 18 AWG sensor branch from a short on that branch specifically, it will just let the wire on that branch overheat before the main fuse ever sees enough current to open.</p>
+
+<h2>A Note on Actuator Choice</h2>
+<p>The peak current numbers in Step 1 depend heavily on which actuators you picked in the first place. A stepper motor draws its rated current continuously, even while holding position at zero speed, which changes the average sum more than the peak sum, while a BLDC motor's ESC needs current ratings sized for peak acceleration current that can be several times its steady-state draw. See <a href="/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html">servo vs stepper vs BLDC motor for robotics</a> for how actuator type shapes the current profile you are budgeting for in the first place.</p>
+
+<blockquote>The most common power budgeting mistake is sizing the battery for average draw and stopping there. The battery, the main harness, and the main fuse each need to survive the worst-case peak, not the typical case, or the first hard stall event becomes an intermittent brownout that is much harder to debug than a budget mistake caught on paper.</blockquote>
+
+<h2>Conclusion</h2>
+<p>A real power budget for a mobile robot has two separate sums, average current for runtime and battery capacity, and worst-case peak current for the main harness, fuse, and discharge-rate check. Build the component table with both numbers, size the battery from the average, then size wire gauge and fusing from the peak, branch by branch. Skipping the peak-vs-average split is why a robot can pass a bench test on a regulated supply and still brown out in the field the first time a wheel catches on something.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
