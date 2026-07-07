@@ -5,14 +5,34 @@
 #
 # Usage:
 #   ./arcbotix-blog.sh batch 10     Run 10 cycles back-to-back, no waiting, then exit.
-#   ./arcbotix-blog.sh loop         Run forever with INTERVAL_SECONDS between cycles (for systemd).
+#   ./arcbotix-blog.sh loop         Run forever: 2 posts/day for the first week, 3/day after (for systemd).
 #   ./arcbotix-blog.sh              Same as "loop", started in a tmux session (manual/dev use only).
 
 set -euo pipefail
 
 REPO_DIR="/home/opc/Arcbotix-Blog"
 LOG_FILE="$REPO_DIR/auto-blog.log"
-INTERVAL_SECONDS=28800  # 8 hours, same cadence as production Nachhilfe-Mentor blog
+LAUNCH_MARKER="$REPO_DIR/blog/_LAUNCH_DATE.txt"
+
+# Posting cadence: 2 posts/day for the first 7 days after first launch, then
+# 3 posts/day from day 8 onward. Expressed as an interval between cycles.
+WEEK1_INTERVAL_SECONDS=43200   # 86400 / 2 = every 12h -> 2 posts/day
+STEADY_INTERVAL_SECONDS=28800  # 86400 / 3 = every 8h  -> 3 posts/day
+
+current_interval_seconds() {
+    if [ ! -f "$LAUNCH_MARKER" ]; then
+        date +%Y-%m-%d > "$LAUNCH_MARKER"
+    fi
+    local launch_epoch now_epoch days_elapsed
+    launch_epoch=$(date -d "$(cat "$LAUNCH_MARKER")" +%s)
+    now_epoch=$(date +%s)
+    days_elapsed=$(( (now_epoch - launch_epoch) / 86400 ))
+    if [ "$days_elapsed" -lt 7 ]; then
+        echo "$WEEK1_INTERVAL_SECONDS"
+    else
+        echo "$STEADY_INTERVAL_SECONDS"
+    fi
+}
 
 # ─── The Prompt given to Claude Code ─────────────────────────────────────────
 
@@ -20,9 +40,11 @@ BLOG_PROMPT='You are the autonomous blog manager for Arcbotix, an English-langua
 
 ## PRODUCTION NOTE
 This site is live at https://arcbotix.com (GitHub Pages, repo github.com/laurenzpdm/arcbotix.com).
+The human operator has explicitly authorized this script to push directly to
+the main branch on every cycle - this is standing authorization, not a
+one-off approval, so push without asking or hesitating once step 8 is done.
 - Do NOT run blog/_update_seo.py with --ping unless the human operator has explicitly asked for a search-engine submission run.
 - Do NOT post to Pinterest or any other external service.
-- Do NOT push to the git remote yourself. Commit locally only; a human reviews and pushes. This may change later if a human operator explicitly enables auto-push for this script.
 - Do NOT modify the PostHog consent banner, analytics.js, or the Content-Security-Policy meta tag in blog/_template.html.
 
 ## Core principle
@@ -117,11 +139,16 @@ Quality requirements for content_html:
 - This updates blog/index.html and blog/_BLOG_REGISTRY.md.
 - If it aborts due to a duplicate, pick a new topic.
 
-### 8. Git commit (local only, no push)
+### 8. Git commit and push
 - git add all changed and new files except auto-blog.log
 - git commit with a descriptive English message.
 - No Co-Authored-By tag, no AI signature.
-- Do NOT push. The human operator reviews and pushes commits to github.com/laurenzpdm/arcbotix.com.
+- git push origin main. This is standing-authorized (see PRODUCTION NOTE) -
+  push every cycle that produced a commit, do not skip this or ask first.
+- If the push is rejected (e.g. remote has new commits), run git pull
+  --rebase origin main once and retry the push. If it still fails, leave the
+  work committed locally and note the failure in the completion protocol -
+  do not force-push.
 
 ### 9. Self-improve the strategy (roughly every 5 published articles)
 - Check "Total articles" in blog/_BLOG_CONTEXT_COMPACT.md. If it is not a
@@ -149,7 +176,7 @@ Quality requirements for content_html:
 - Do not read all existing articles.
 - Do not run blog/_update_seo.py with --ping.
 - Do not post to Pinterest or any other external service.
-- Do not push to git.
+- Do not force-push, and do not push to any branch other than main.
 - Do not edit the Goal, Content Guidelines, or cluster taxonomy in blog/_BLOG_STRATEGY.md - only the "Topic Priority (agent-adjustable)" section, and only in step 9.
 - Do not report search-result counts or discussion activity as if they were real keyword-volume data.
 
@@ -162,7 +189,7 @@ RUN COMPLETE:
 [ ] Cover image generated: blog/posts/img/<SLUG>.webp
 [ ] Publish script run: python3 blog/_publish_article.py <SLUG>
 [ ] Crosslinks set: yes/no (where)
-[ ] Git commit: done (local only, no push)
+[ ] Git commit: done, pushed to origin main: yes/no (why not, if not)
 [ ] Strategy audit: skipped (not a multiple of 5) / no change / changed (what)
 
 Start now with step 1.'
@@ -174,6 +201,8 @@ run_blog_cycle() {
     echo "[$timestamp] Starting blog cycle..." | tee -a "$LOG_FILE"
 
     cd "$REPO_DIR"
+    local pre_cycle_head
+    pre_cycle_head=$(git rev-parse HEAD)
 
     # Build a compact context snapshot so Claude does not need to read the
     # full registry and strategy on every cycle.
@@ -191,6 +220,22 @@ run_blog_cycle() {
         echo "[$timestamp] Blog cycle failed with exit code $exit_code." | tee -a "$LOG_FILE"
     fi
 
+    # Image verification: every commit made since the cycle started must pair
+    # each new/changed blog/posts/<slug>.html with blog/posts/img/<slug>.webp.
+    # _publish_article.py already hard-fails on a missing image at publish
+    # time; this is an independent supervisor-side check so a missing image
+    # is never silently pushed live.
+    cd "$REPO_DIR"
+    for post in $(git log --name-only --diff-filter=AM --pretty=format: "${pre_cycle_head}..HEAD" -- 'blog/posts/*.html' 2>/dev/null | sort -u); do
+        slug=$(basename "$post" .html)
+        img="blog/posts/img/${slug}.webp"
+        if [ ! -f "$img" ]; then
+            echo "[$timestamp] WARNING: $post has no matching cover image ($img missing)." | tee -a "$LOG_FILE"
+        else
+            echo "[$timestamp] Image check OK: $slug" | tee -a "$LOG_FILE"
+        fi
+    done
+
     # Commit fallback: commit any Blog Agent output Claude forgot to commit.
     cd "$REPO_DIR"
     git add blog/ 2>/dev/null || true
@@ -206,6 +251,18 @@ run_blog_cycle() {
     python3 blog/_update_seo.py 2>&1 | tee -a "$LOG_FILE"
     git add sitemap.xml feed.xml 2>/dev/null || true
     git diff --cached --quiet || git commit -m "chore: SEO safety update (sitemap + feed)" 2>&1 | tee -a "$LOG_FILE"
+
+    # Push fallback: in case the agent committed but did not push (e.g. it
+    # forgot, or the supervisor made a commit of its own above), push here
+    # too so nothing new ever sits unpublished after a cycle.
+    cd "$REPO_DIR"
+    if [ -n "$(git log origin/main..HEAD 2>/dev/null)" ]; then
+        if git push origin main 2>&1 | tee -a "$LOG_FILE"; then
+            echo "[$timestamp] Supervisor push OK." | tee -a "$LOG_FILE"
+        else
+            echo "[$timestamp] Supervisor push FAILED - work is committed locally, needs manual push." | tee -a "$LOG_FILE"
+        fi
+    fi
 
     echo "[$timestamp] Cycle finished." | tee -a "$LOG_FILE"
     echo "---" | tee -a "$LOG_FILE"
@@ -237,7 +294,6 @@ fi
 
 # Loop mode (intended to run under systemd, same pattern as autoblog.service)
 echo "Arcbotix auto-blog loop started at $(date)" | tee -a "$LOG_FILE"
-echo "Interval: ${INTERVAL_SECONDS}s ($((INTERVAL_SECONDS/3600))h)" | tee -a "$LOG_FILE"
 
 WAKE_SIGNAL="/tmp/arcbotix-blog-wake"
 
@@ -256,6 +312,8 @@ _interruptible_sleep() {
 
 while true; do
     run_blog_cycle
-    echo "$(date) Next cycle in $((INTERVAL_SECONDS/3600))h - touch $WAKE_SIGNAL to run early" | tee -a "$LOG_FILE"
-    _interruptible_sleep "$INTERVAL_SECONDS"
+    interval=$(current_interval_seconds)
+    posts_per_day=$((86400 / interval))
+    echo "$(date) Next cycle in $((interval/3600))h (~${posts_per_day} posts/day cadence) - touch $WAKE_SIGNAL to run early" | tee -a "$LOG_FILE"
+    _interruptible_sleep "$interval"
 done
