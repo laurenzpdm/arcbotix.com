@@ -99,6 +99,10 @@ def scan_pages():
     if os.path.exists(privacy):
         pages["main"].append(("privacy.html", privacy, 0.3, "yearly"))
 
+    impressum = os.path.join(SITE_DIR, "impressum.html")
+    if os.path.exists(impressum):
+        pages["main"].append(("impressum.html", impressum, 0.3, "yearly"))
+
     blog_index = os.path.join(SITE_DIR, "blog", "index.html")
     if os.path.exists(blog_index):
         pages["blog_index"] = ("blog/", blog_index, 0.9, "daily")
