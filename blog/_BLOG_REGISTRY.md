@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 10
-- Last published: 2026-07-03
+- Total articles: 11
+- Last published: 2026-07-07
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 11 | 2026-07-07 | quadrature-encoder-wiring-6dof-robot-arm | Quadrature Encoder Wiring for a 6-DOF Robot Arm: A Practical Guide | quadrature encoder wiring 6-DOF robot arm, quadrature encoder robotics, encoder wiring robot arm, CPR to angle conversion | Build Guides | Practical wiring and decoding guide for quadrature encoders on a 6-DOF robot arm: channel A/B/index wiring, noise mitigation on long cable runs, interrupt-based vs hardware quadrature decoding (LS7366R, MCU peripherals), the CPR-and-gear-ratio math for converting raw counts to joint angle, and index-pulse homing for a repeatable zero reference. |
 | 10 | 2026-07-03 | imu-sensor-fusion-basics | IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data | IMU sensor fusion basics, IMU sensor fusion, accelerometer gyroscope fusion, complementary filter IMU | Control Systems | Explains IMU sensor fusion basics: why accelerometer readings are noisy and motion-corrupted while gyroscope integration drifts over time, then covers the complementary filter formula (with alpha tuning tradeoffs) and Kalman/Madgwick filter approaches for combining them into a stable orientation estimate. Also covers magnetometer use for heading correction and practical tips (sample rate, gyro bias calibration, quaternions vs Euler angles, vibration isolation). Links to the Kalman filter state estimation article as the general estimation framework. |
 | 9 | 2026-07-03 | choosing-a-battery-for-a-quadruped-robot | Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide | choosing a battery for a quadruped robot, quadruped robot battery, LiPo battery robot, robot power budgeting | Build Guides | Practical sizing guide for quadruped robot batteries covering voltage matching to motor drivers, continuous current estimation, capacity calculation with usable-fraction formula, discharge rate/C-rating sizing against stance-phase current spikes, LiPo vs Li-ion vs LiFePO4 chemistry tradeoffs, mass distribution/mounting effects on gait control, and a full worked numeric example for a 10kg quadruped. |
 | 8 | 2026-07-03 | trajectory-planning-for-robotic-arms | Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion | trajectory planning for robotic arms, robot trajectory planning, trapezoidal velocity profile, joint space trajectory | Control Systems | Explains trajectory planning for robotic arms: the difference between joint-space and Cartesian-space planning, trapezoidal vs S-curve velocity profiles, quintic polynomial trajectories, multi-joint time synchronization, and a practical checklist for avoiding jerky motion. Links to the PID tuning, inverse kinematics, and harmonic drive vs planetary gearbox articles. |
@@ -67,3 +68,8 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 10)
 - imu-sensor-fusion-basics -> kalman-filter-robot-state-estimation (Orientation fusion is a special case of the predict-update Kalman cycle explained in that article)
+
+## Internal links (article 11)
+- quadrature-encoder-wiring-6dof-robot-arm -> pid-controller-tuning-for-robotic-arms (linked interrupt-driven encoder decoding load to control loop timing jitter concerns)
+- quadrature-encoder-wiring-6dof-robot-arm -> harmonic-drive-vs-planetary-gearbox (linked output-shaft vs motor-shaft encoder placement to gearbox type)
+- quadrature-encoder-wiring-6dof-robot-arm -> inverse-kinematics-explained (linked index-pulse homing repeatability to IK error compounding)

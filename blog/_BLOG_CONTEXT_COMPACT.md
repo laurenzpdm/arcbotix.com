@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 10
-- Last published: 2026-07-03
-- Known slugs: 10
+- Total articles: 11
+- Last published: 2026-07-07
+- Known slugs: 11
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 11 | 2026-07-07 | quadrature-encoder-wiring-6dof-robot-arm | Quadrature Encoder Wiring for a 6-DOF Robot Arm: A Practical Guide | quadrature encoder wiring 6-DOF robot arm, quadrature encoder robotics, encoder wiring robot arm, CPR to angle conversion | Build Guides  |
 | 10 | 2026-07-03 | imu-sensor-fusion-basics | IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data | IMU sensor fusion basics, IMU sensor fusion, accelerometer gyroscope fusion, complementary filter IMU | Control Systems  |
 | 9 | 2026-07-03 | choosing-a-battery-for-a-quadruped-robot | Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide | choosing a battery for a quadruped robot, quadruped robot battery, LiPo battery robot, robot power budgeting | Build Guides  |
 | 8 | 2026-07-03 | trajectory-planning-for-robotic-arms | Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion | trajectory planning for robotic arms, robot trajectory planning, trapezoidal velocity profile, joint space trajectory | Control Systems  |
@@ -87,7 +88,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -99,7 +100,11 @@ subject (e.g. a robotic arm joint, a PCB, a control-loop diagram rendered
 as a scene). Keep prompts specific to the article's actual subject matter.
 
 ## Recent SEO Research (last 5 entries)
-(none yet)
+- Candidates checked: real-time considerations in robot control loops, Gazebo vs PyBullet simulation choice, encoder wiring for a 6-DOF arm.
+- Real-time control loops: decent existing coverage (one strong independent blog, forum threads, patents) - gap is smaller than expected.
+- Gazebo vs PyBullet: already well covered by roboticsknowledgebase.com and academic comparison papers - saturated for a first-pass explainer.
+- Chose "quadrature encoder wiring for a 6-DOF robot arm": top-ranking pages are hobby-servo tutorials (potentiometer-based RC servos or generic single-motor Arduino rotary encoder demos), none walk through real quadrature decoding math, CPR-to-angle conversion after a gear ratio, or index-pulse homing for a full 6-axis arm using real encoder-equipped DC/BLDC motors.
+- Weakness in current top pages: they conflate hobby servos (no real encoder feedback) with actual encoder-based joint control, and skip the interrupt/timer-based decoding code entirely.
 
 ## Recent Strategy Adjustments (last 3 entries)
 (none yet)
