@@ -5,8 +5,24 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Jul 2026 12:02:51 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jul 2026 21:52:45 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide</title>
+      <link>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</link>
+      <guid>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</guid>
+      <pubDate>Tue, 07 Jul 2026 21:52:27 +0000</pubDate>
+      <description>Learn how to size and choose a battery for a quadruped robot, covering chemistry, voltage, capacity, discharge rate, and mounting tradeoffs.</description>
+      <category>Build Guides</category>
+    </item>
+    <item>
+      <title>Power Budgeting for Mobile Robots: From Component List to Wire Gauge</title>
+      <link>https://arcbotix.com/blog/posts/power-budgeting-for-mobile-robots.html</link>
+      <guid>https://arcbotix.com/blog/posts/power-budgeting-for-mobile-robots.html</guid>
+      <pubDate>Tue, 07 Jul 2026 21:52:17 +0000</pubDate>
+      <description>Learn how to build a real power budget for a mobile robot: peak vs average current, battery capacity, wire gauge, and fuse sizing with worked numbers.</description>
+      <category>Build Guides</category>
+    </item>
     <item>
       <title>Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator</title>
       <link>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</link>
@@ -77,14 +93,6 @@
       <guid>https://arcbotix.com/blog/posts/quadrature-encoder-wiring-6dof-robot-arm.html</guid>
       <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>Wire and decode quadrature encoders for a 6-DOF robot arm: channel A/B wiring, CPR-to-angle math after gearing, debouncing, and index-pulse homing.</description>
-      <category>Build Guides</category>
-    </item>
-    <item>
-      <title>Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide</title>
-      <link>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</link>
-      <guid>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</guid>
-      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
-      <description>Learn how to size and choose a battery for a quadruped robot, covering chemistry, voltage, capacity, discharge rate, and mounting tradeoffs.</description>
       <category>Build Guides</category>
     </item>
     <item>
