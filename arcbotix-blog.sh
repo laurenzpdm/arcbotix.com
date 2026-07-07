@@ -44,7 +44,7 @@ The human operator has explicitly authorized this script to push directly to
 the main branch on every cycle - this is standing authorization, not a
 one-off approval, so push without asking or hesitating once step 8 is done.
 - Do NOT run blog/_update_seo.py with --ping unless the human operator has explicitly asked for a search-engine submission run.
-- Do NOT post to Pinterest or any other external service.
+- Do not post to Pinterest yourself. The supervisor fallback pins every new article automatically after your run via Postiz - you do not need to do anything for this.
 - Do NOT modify the PostHog consent banner, analytics.js, or the Content-Security-Policy meta tag in blog/_template.html.
 
 ## Core principle
@@ -175,7 +175,7 @@ Quality requirements for content_html:
 - Do not read the full blog/_BLOG_REGISTRY.md unless a script error cannot be debugged without it, or you are doing the step 9 audit.
 - Do not read all existing articles.
 - Do not run blog/_update_seo.py with --ping.
-- Do not post to Pinterest or any other external service.
+- Do not post to Pinterest yourself, and do not post to any other external service - the supervisor fallback handles Pinterest.
 - Do not force-push, and do not push to any branch other than main.
 - Do not edit the Goal, Content Guidelines, or cluster taxonomy in blog/_BLOG_STRATEGY.md - only the "Topic Priority (agent-adjustable)" section, and only in step 9.
 - Do not report search-result counts or discussion activity as if they were real keyword-volume data.
@@ -251,6 +251,13 @@ run_blog_cycle() {
     python3 blog/_update_seo.py 2>&1 | tee -a "$LOG_FILE"
     git add sitemap.xml feed.xml 2>/dev/null || true
     git diff --cached --quiet || git commit -m "chore: SEO safety update (sitemap + feed)" 2>&1 | tee -a "$LOG_FILE"
+
+    # Pinterest safety fallback: pins any article not yet on Pinterest via Postiz.
+    echo "[$timestamp] Running Pinterest safety fallback..." | tee -a "$LOG_FILE"
+    cd "$REPO_DIR"
+    python3 blog/_pinterest_fallback.py 2>&1 | tee -a "$LOG_FILE"
+    git add blog/_pinterest_done.txt 2>/dev/null || true
+    git diff --cached --quiet || git commit -m "chore: Pinterest fallback (pinned tracking)" 2>&1 | tee -a "$LOG_FILE"
 
     # Push fallback: in case the agent committed but did not push (e.g. it
     # forgot, or the supervisor made a commit of its own above), push here
