@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish one structured blog article into the RoboWire static site.
+"""Publish one structured blog article into the Arcbotix static site.
 
 Input: blog/articles/<slug>.json
 
@@ -61,7 +61,7 @@ def domain() -> str:
         value = DOMAIN_FILE.read_text(encoding="utf-8").strip()
         if value:
             return value.rstrip("/")
-    return "https://robowire.preview"
+    return "https://arcbotix.preview"
 
 
 def read_article(slug: str) -> dict[str, Any]:

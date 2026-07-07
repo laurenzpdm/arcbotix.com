@@ -1,4 +1,5 @@
 .env
 auto-blog.log
+batch-run.out
 __pycache__/
 *.pyc

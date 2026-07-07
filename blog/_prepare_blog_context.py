@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a compact context file for the autonomous RoboWire blog writer.
+"""Build a compact context file for the autonomous Arcbotix blog writer.
 
 Claude should not reread the full registry and strategy on every run. This
 script extracts only the parts needed for safe topic selection and quality.

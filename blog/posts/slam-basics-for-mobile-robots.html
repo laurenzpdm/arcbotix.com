@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time – RoboWire</title>
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time – Arcbotix</title>
   <meta name="description" content="SLAM basics for mobile robots explained: why mapping and localization are solved together, the main algorithm families, and common pitfalls in real systems.">
   <meta name="keywords" content="SLAM basics for mobile robots, SLAM robotics, simultaneous localization and mapping, SLAM algorithm explained">
   <meta property="og:title" content="SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time">
   <meta property="og:description" content="SLAM basics for mobile robots explained: why mapping and localization are solved together, the main algorithm families, and common pitfalls in real systems.">
   <meta property="og:image" content="/blog/posts/img/slam-basics-for-mobile-robots.webp">
-  <meta property="og:url" content="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/slam-basics-for-mobile-robots.html">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/slam-basics-for-mobile-robots.html">
   <meta property="og:type" content="article">
-  <link rel="canonical" href="https://grad-notify-open-photographer.trycloudflare.com/blog/posts/slam-basics-for-mobile-robots.html">
-  <link rel="alternate" type="application/rss+xml" title="RoboWire" href="https://grad-notify-open-photographer.trycloudflare.com/feed.xml">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/slam-basics-for-mobile-robots.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +31,7 @@
 <nav class="navbar scrolled" id="navbar">
   <div class="nav-container">
     <a href="/" class="nav-logo">
-      <span class="nav-logo-text">RoboWire</span>
+      <span class="nav-logo-text">Arcbotix</span>
     </a>
     <div class="nav-links">
       <a href="/" class="nav-link">Home</a>
@@ -117,7 +121,7 @@ for each timestep:
 
     <div class="blog-cta">
       <h3>Building or studying robotics?</h3>
-      <p>RoboWire publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
       <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         <a href="/blog/" class="btn-store" style="text-decoration:none;">
           <div class="btn-store-inner">
@@ -135,20 +139,28 @@ for each timestep:
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="footer-logo">
-          <span class="footer-logo-text">RoboWire</span>
+          <span class="footer-logo-text">Arcbotix</span>
         </div>
         <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
       </div>
       <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
-      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About RoboWire</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a></div>
     </div>
     <div class="footer-bottom">
-      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
       <div class="footer-meta"><span>Written with AI, reviewed for accuracy</span></div>
     </div>
   </div>
 </footer>
 
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
 <script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
 </body>
 </html>

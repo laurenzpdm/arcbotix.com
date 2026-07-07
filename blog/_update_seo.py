@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SEO automation for the RoboWire blog (preview build).
+SEO automation for the Arcbotix blog (preview build).
 ======================================================
 Generates sitemap.xml and feed.xml from the existing HTML files.
 
@@ -11,7 +11,7 @@ Usage:
 IndexNow submission defaults to OFF in this preview build: the site is served
 from a temporary tunnel URL that changes on restart, so submitting it to real
 search engines would be pointless (and would need re-doing once a real domain
-is chosen). Pass --ping explicitly once RoboWire has a permanent domain.
+is chosen). Pass --ping explicitly once Arcbotix has a permanent domain.
 """
 
 import os
@@ -27,7 +27,7 @@ SITE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOMAIN_FILE = os.path.join(SITE_DIR, "DOMAIN.txt")
 SITEMAP_PATH = os.path.join(SITE_DIR, "sitemap.xml")
 FEED_PATH = os.path.join(SITE_DIR, "feed.xml")
-INDEXNOW_KEY = "robowire2026indexnow"
+INDEXNOW_KEY = "arcbotix2026indexnow"
 
 
 def site_url():
@@ -35,7 +35,7 @@ def site_url():
         value = open(DOMAIN_FILE, encoding="utf-8").read().strip()
         if value:
             return value.rstrip("/")
-    return "https://robowire.preview"
+    return "https://arcbotix.preview"
 
 
 def get_lastmod(filepath):
@@ -69,7 +69,7 @@ def extract_title(filepath):
         match = re.search(r"<title>([^<]+)</title>", content)
         if match:
             title = match.group(1)
-            title = re.sub(r"\s*[–—–—]\s*RoboWire.*$", "", title)
+            title = re.sub(r"\s*[–—–—]\s*Arcbotix.*$", "", title)
             return title.strip()
     except Exception:
         pass
@@ -94,6 +94,10 @@ def scan_pages():
     index = os.path.join(SITE_DIR, "index.html")
     if os.path.exists(index):
         pages["main"].append(("", index, 1.0, "weekly"))
+
+    privacy = os.path.join(SITE_DIR, "privacy.html")
+    if os.path.exists(privacy):
+        pages["main"].append(("privacy.html", privacy, 0.3, "yearly"))
 
     blog_index = os.path.join(SITE_DIR, "blog", "index.html")
     if os.path.exists(blog_index):
@@ -173,7 +177,7 @@ def generate_feed(pages, site_url_value):
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
         "  <channel>\n"
-        "    <title>RoboWire</title>\n"
+        "    <title>Arcbotix</title>\n"
         f"    <link>{site_url_value}/blog/</link>\n"
         "    <description>Practical robotics engineering guides and niche technical deep-dives</description>\n"
         "    <language>en-us</language>\n"
@@ -213,7 +217,7 @@ def submit_indexnow(changed_urls, site_url_value):
     try:
         req = urllib.request.Request("https://api.indexnow.org/indexnow", data=payload, method="POST")
         req.add_header("Content-Type", "application/json; charset=utf-8")
-        req.add_header("User-Agent", "RoboWire-SEO-Bot/1.0")
+        req.add_header("User-Agent", "Arcbotix-SEO-Bot/1.0")
         with urllib.request.urlopen(req, timeout=15) as resp:
             print(f"[SEO] IndexNow: HTTP {resp.status} - {len(changed_urls)} URLs submitted")
             return resp.status in (200, 202)

@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RoboWire – Robotics Engineering Guides</title>
-  <meta name="description" content="RoboWire publishes practical robotics engineering guides, control systems explainers and niche technical deep-dives.">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Arcbotix – Robotics Engineering Guides</title>
+  <meta name="description" content="Arcbotix publishes practical robotics engineering guides, control systems explainers and niche technical deep-dives.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +20,7 @@
 <nav class="navbar scrolled" id="navbar">
   <div class="nav-container">
     <a href="/" class="nav-logo">
-      <span class="nav-logo-text">RoboWire</span>
+      <span class="nav-logo-text">Arcbotix</span>
     </a>
     <div class="nav-links">
       <a href="/" class="nav-link active">Home</a>
@@ -29,7 +33,7 @@
 <section class="hero" style="min-height:80vh;display:flex;align-items:center;">
   <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
   <div class="container" style="text-align:center;">
-    <div class="eyebrow">Preview build</div>
+    <div class="eyebrow">Arcbotix</div>
     <h1 class="section-title" style="font-size:3rem;">Robotics Engineering,<br><span class="grad-text">Explained Properly</span></h1>
     <p class="section-subtitle" style="max-width:640px;margin:1.5rem auto;">Practical guides, control systems deep-dives and niche technical write-ups for people who actually build robots.</p>
     <a href="/blog/" class="btn-store" style="text-decoration:none;display:inline-block;margin-top:1rem;">
@@ -41,11 +45,19 @@
 <footer class="footer">
   <div class="container">
     <div class="footer-bottom">
-      <p class="footer-copy">&copy; 2026 RoboWire. Preview build — not yet public.</p>
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
     </div>
   </div>
 </footer>
 
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
 <script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
 </body>
 </html>

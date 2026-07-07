@@ -1,5 +1,5 @@
 ## Goal
-RoboWire is an English-language robotics blog. It targets people who actually
+Arcbotix is an English-language robotics blog. It targets people who actually
 build, study or work with robots: hobbyists building their first arm or rover,
 students in mechatronics/robotics programs, and engineers looking for a
 sharper explanation of a specific control-systems or hardware concept than
@@ -16,7 +16,7 @@ correct, niche content - not generic "top 10 robots of 2026" listicles.
 - Prefer concrete, checkable content: real formulas, real component names,
   real code snippets (pseudo-code or Python/C++ where relevant), real
   numbers. Avoid vague marketing language.
-- 1-2 internal links to other RoboWire articles where a natural connection
+- 1-2 internal links to other Arcbotix articles where a natural connection
   exists. Do not force a link if none fits.
 - No CTA block, no navigation, no footer, no analytics code - the template
   adds those.

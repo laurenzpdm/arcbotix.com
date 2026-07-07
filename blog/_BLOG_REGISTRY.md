@@ -1,4 +1,4 @@
-# RoboWire Blog Registry
+# Arcbotix Blog Registry
 
 This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.

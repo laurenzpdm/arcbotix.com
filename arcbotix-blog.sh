@@ -1,28 +1,29 @@
 #!/usr/bin/env bash
-# Auto-Blog Engine for RoboWire (robotics blog, English, preview build)
+# Auto-Blog Engine for Arcbotix (robotics blog, English, live on arcbotix.com)
 # Mirrors the Nachhilfe-Mentor auto-blog.sh mechanics exactly, adapted for a
-# different topic/brand and a temporary preview domain (no real posting).
+# different topic/brand, now live on the arcbotix.com domain via GitHub Pages.
 #
 # Usage:
-#   ./robowire-blog.sh batch 10     Run 10 cycles back-to-back, no waiting, then exit.
-#   ./robowire-blog.sh loop         Run forever with INTERVAL_SECONDS between cycles (for systemd).
-#   ./robowire-blog.sh              Same as "loop", started in a tmux session (manual/dev use only).
+#   ./arcbotix-blog.sh batch 10     Run 10 cycles back-to-back, no waiting, then exit.
+#   ./arcbotix-blog.sh loop         Run forever with INTERVAL_SECONDS between cycles (for systemd).
+#   ./arcbotix-blog.sh              Same as "loop", started in a tmux session (manual/dev use only).
 
 set -euo pipefail
 
-REPO_DIR="/home/opc/RoboWire-Blog"
+REPO_DIR="/home/opc/Arcbotix-Blog"
 LOG_FILE="$REPO_DIR/auto-blog.log"
 INTERVAL_SECONDS=28800  # 8 hours, same cadence as production Nachhilfe-Mentor blog
 
 # ─── The Prompt given to Claude Code ─────────────────────────────────────────
 
-BLOG_PROMPT='You are the autonomous blog manager for RoboWire, an English-language robotics blog. Your working directory is /home/opc/RoboWire-Blog.
+BLOG_PROMPT='You are the autonomous blog manager for Arcbotix, an English-language robotics blog. Your working directory is /home/opc/Arcbotix-Blog.
 
-## PREVIEW BUILD - IMPORTANT
-This site is NOT live yet. It is served from a temporary preview URL for internal review only.
-- Do NOT attempt to submit anything to search engines, Pinterest, or any external indexing/social service.
-- Do NOT run blog/_update_seo.py with --ping.
-- Do NOT push to any git remote (there is none configured yet). A local commit is enough.
+## PRODUCTION NOTE
+This site is live at https://arcbotix.com (GitHub Pages, repo github.com/laurenzpdm/arcbotix.com).
+- Do NOT run blog/_update_seo.py with --ping unless the human operator has explicitly asked for a search-engine submission run.
+- Do NOT post to Pinterest or any other external service.
+- Do NOT push to the git remote yourself. Commit locally only; a human reviews and pushes. This may change later if a human operator explicitly enables auto-push for this script.
+- Do NOT modify the PostHog consent banner, analytics.js, or the Content-Security-Policy meta tag in blog/_template.html.
 
 ## Core principle
 Optimize for genuinely useful, technically correct robotics content. Save context: you write the article and metadata, but you do NOT hand-edit the big structural files. The template, blog index, and registry are maintained by scripts.
@@ -79,7 +80,7 @@ Quality requirements for content_html:
 - Clear, direct English, technically correct.
 - Use h2, h3, p, ul, ol, blockquote sensibly.
 - Focus keyword in the title, meta description, first H2, and 2-3 times naturally in the body.
-- 1-2 internal links to other RoboWire articles if a natural connection exists.
+- 1-2 internal links to other Arcbotix articles if a natural connection exists.
 - No CTA block, no navigation, no footer, no analytics code - the template adds those.
 - No em dashes or en dashes.
 - No fabricated statistics or fake citations.
@@ -100,7 +101,7 @@ Quality requirements for content_html:
 - git add all changed and new files except auto-blog.log
 - git commit with a descriptive English message.
 - No Co-Authored-By tag, no AI signature.
-- Do NOT push. There is no remote configured for this preview build.
+- Do NOT push. The human operator reviews and pushes commits to github.com/laurenzpdm/arcbotix.com.
 
 ## What you must NOT do
 - Do not hand-edit blog/index.html.
@@ -156,7 +157,7 @@ run_blog_cycle() {
     fi
 
     # SEO safety fallback: regenerate sitemap.xml + feed.xml. Never pings
-    # external services in this preview build (no --ping flag).
+    # external services (no --ping flag) unless explicitly requested.
     echo "[$timestamp] Running SEO safety fallback (sitemap + feed only, no ping)..." | tee -a "$LOG_FILE"
     cd "$REPO_DIR"
     python3 blog/_update_seo.py 2>&1 | tee -a "$LOG_FILE"
@@ -171,31 +172,31 @@ set +e
 
 if [ "${1:-}" = "batch" ]; then
     COUNT="${2:-10}"
-    echo "RoboWire batch run started at $(date) - $COUNT cycles, no waiting between them." | tee -a "$LOG_FILE"
+    echo "Arcbotix batch run started at $(date) - $COUNT cycles, no waiting between them." | tee -a "$LOG_FILE"
     for i in $(seq 1 "$COUNT"); do
         echo "=== Batch cycle $i / $COUNT ===" | tee -a "$LOG_FILE"
         run_blog_cycle
     done
-    echo "RoboWire batch run finished at $(date)." | tee -a "$LOG_FILE"
+    echo "Arcbotix batch run finished at $(date)." | tee -a "$LOG_FILE"
     exit 0
 fi
 
 if [ "${1:-}" != "loop" ]; then
-    echo "Starting RoboWire auto-blog tmux session..."
-    tmux kill-session -t robowire-blog 2>/dev/null || true
-    tmux new-session -d -s robowire-blog "$0 loop"
-    echo "tmux session 'robowire-blog' started."
-    echo "  - Watch:  tmux attach -t robowire-blog"
-    echo "  - Stop:   tmux kill-session -t robowire-blog"
+    echo "Starting Arcbotix auto-blog tmux session..."
+    tmux kill-session -t arcbotix-blog 2>/dev/null || true
+    tmux new-session -d -s arcbotix-blog "$0 loop"
+    echo "tmux session 'arcbotix-blog' started."
+    echo "  - Watch:  tmux attach -t arcbotix-blog"
+    echo "  - Stop:   tmux kill-session -t arcbotix-blog"
     echo "  - Logs:   tail -f $LOG_FILE"
     exit 0
 fi
 
 # Loop mode (intended to run under systemd, same pattern as autoblog.service)
-echo "RoboWire auto-blog loop started at $(date)" | tee -a "$LOG_FILE"
+echo "Arcbotix auto-blog loop started at $(date)" | tee -a "$LOG_FILE"
 echo "Interval: ${INTERVAL_SECONDS}s ($((INTERVAL_SECONDS/3600))h)" | tee -a "$LOG_FILE"
 
-WAKE_SIGNAL="/tmp/robowire-blog-wake"
+WAKE_SIGNAL="/tmp/arcbotix-blog-wake"
 
 _interruptible_sleep() {
     local remaining=$1
