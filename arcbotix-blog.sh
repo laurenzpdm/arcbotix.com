@@ -38,19 +38,39 @@ Optimize for genuinely useful, technically correct robotics content. Save contex
 ## Workflow
 
 ### 1. Context
-- Read blog/_BLOG_CONTEXT_COMPACT.md.
+- Read blog/_BLOG_CONTEXT_COMPACT.md. This already includes the last 5 SEO
+  research entries and last 3 strategy adjustments - do not reread the full
+  blog/_SEO_RESEARCH_LOG.md unless you are doing the strategy audit in step 9.
 - If there is a useful new insight worth keeping for future runs, add at most 3 short bullet points to blog/_BLOG_CONTEXT_NOTES.md. Otherwise do not touch it.
 
-### 2. Choose a topic
-- Pick one evergreen robotics keyword/topic from the strategy clusters (control systems & math, actuators & hardware, software & middleware, build guides, industry/career notes) that is not already covered.
+### 2. Research demand and opportunity (every cycle)
+- Use web search to sanity-check 3-5 candidate topics pulled from the
+  Topic Priority order and Keyword Pool in blog/_BLOG_CONTEXT_COMPACT.md.
+  Look for: is this actually being asked/discussed (forums, Q&A sites, recent
+  posts), and what do the top-ranking pages currently get wrong, skip, or
+  oversimplify.
+- Treat search result volume/discussion activity as a rough demand proxy,
+  not a real keyword-volume number - do not report it as if it were.
+- Pick the topic where the gap between what is being asked and what is
+  currently well answered is biggest AND that you can back with concrete
+  formulas/code/real numbers (see Content Guidelines) - not just any trending
+  topic.
+- Append ONE dated entry (max 5 bullets) to blog/_SEO_RESEARCH_LOG.md under
+  "## Research Entries": candidates considered, topic chosen and why
+  (demand signal + content-quality edge), one weakness you noticed in
+  current top-ranking pages for that query. Append only, never rewrite
+  earlier entries.
+
+### 3. Choose a topic
+- Pick one evergreen robotics keyword/topic from the strategy clusters (control systems & math, actuators & hardware, software & middleware, build guides, industry/career notes) that is not already covered, informed by the step 2 research and the current Topic Priority order.
 - The article must fully answer a clear, specific search intent - avoid generic listicles.
 
-### 3. Generate the cover image
+### 4. Generate the cover image
 - Run: bash blog/_generate-image.sh "<IMAGE_PROMPT>" "<SLUG>"
 - Use the image-prompt style from blog/_BLOG_CONTEXT_COMPACT.md.
 - No text in the image.
 
-### 4. Write the article as JSON
+### 5. Write the article as JSON
 Create ONLY this file: blog/articles/<SLUG>.json
 
 Schema:
@@ -85,42 +105,65 @@ Quality requirements for content_html:
 - No em dashes or en dashes.
 - No fabricated statistics or fake citations.
 
-### 5. Limited crosslinks
+### 6. Limited crosslinks
 - You may read at most 3 relevant existing articles.
 - If a natural spot exists, add a backlink to the new article there.
 - Do not force a link if no natural spot exists.
 - Record any links set in the JSON backlinks field.
 
-### 6. Publish
+### 7. Publish
 - Run: python3 blog/_publish_article.py <SLUG>
 - This creates blog/posts/<SLUG>.html from blog/_template.html.
 - This updates blog/index.html and blog/_BLOG_REGISTRY.md.
 - If it aborts due to a duplicate, pick a new topic.
 
-### 7. Git commit (local only, no push)
+### 8. Git commit (local only, no push)
 - git add all changed and new files except auto-blog.log
 - git commit with a descriptive English message.
 - No Co-Authored-By tag, no AI signature.
 - Do NOT push. The human operator reviews and pushes commits to github.com/laurenzpdm/arcbotix.com.
 
+### 9. Self-improve the strategy (roughly every 5 published articles)
+- Check "Total articles" in blog/_BLOG_CONTEXT_COMPACT.md. If it is not a
+  multiple of 5, skip this step entirely.
+- Otherwise, read the full blog/_SEO_RESEARCH_LOG.md (only in this step) and
+  the last 10 rows of the Article Table in blog/_BLOG_REGISTRY.md.
+- Look for a real, evidence-backed pattern across multiple research entries:
+  a cluster that keeps showing weak competition (worth prioritizing higher),
+  a cluster that is getting saturated by your own past articles (deprioritize
+  it for a while), or a content format/angle that repeatedly found a bigger
+  gap than others.
+- If you find one clear pattern: make ONE small edit to the "Topic Priority
+  (agent-adjustable)" section of blog/_BLOG_STRATEGY.md (reorder, add, or
+  retire one line). Never touch the Goal, Content Guidelines, or the fixed
+  cluster taxonomy above it - those stay as-is.
+- Append one dated line to the "## Strategy Adjustments" section of
+  blog/_SEO_RESEARCH_LOG.md: either the change made and the research entries
+  it is based on, or "no change - reason" if no clear pattern exists yet.
+  Do not force a change just because this is an audit cycle.
+
 ## What you must NOT do
 - Do not hand-edit blog/index.html.
 - Do not read or copy blog/_template.html.
-- Do not read the full blog/_BLOG_REGISTRY.md unless a script error cannot be debugged without it.
+- Do not read the full blog/_BLOG_REGISTRY.md unless a script error cannot be debugged without it, or you are doing the step 9 audit.
 - Do not read all existing articles.
 - Do not run blog/_update_seo.py with --ping.
 - Do not post to Pinterest or any other external service.
 - Do not push to git.
+- Do not edit the Goal, Content Guidelines, or cluster taxonomy in blog/_BLOG_STRATEGY.md - only the "Topic Priority (agent-adjustable)" section, and only in step 9.
+- Do not report search-result counts or discussion activity as if they were real keyword-volume data.
 
 ## Completion protocol
 End every run with:
 
 RUN COMPLETE:
+[ ] Research entry logged: blog/_SEO_RESEARCH_LOG.md
 [ ] Article JSON written: blog/articles/<SLUG>.json
 [ ] Cover image generated: blog/posts/img/<SLUG>.webp
 [ ] Publish script run: python3 blog/_publish_article.py <SLUG>
 [ ] Crosslinks set: yes/no (where)
 [ ] Git commit: done (local only, no push)
+[ ] Strategy audit: skipped (not a multiple of 5) / no change / changed (what)
 
 Start now with step 1.'
 

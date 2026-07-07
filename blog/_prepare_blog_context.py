@@ -17,6 +17,13 @@ REGISTRY = BLOG_DIR / "_BLOG_REGISTRY.md"
 STRATEGY = BLOG_DIR / "_BLOG_STRATEGY.md"
 OUT = BLOG_DIR / "_BLOG_CONTEXT_COMPACT.md"
 NOTES = BLOG_DIR / "_BLOG_CONTEXT_NOTES.md"
+RESEARCH_LOG = BLOG_DIR / "_SEO_RESEARCH_LOG.md"
+
+
+def last_bullets(text: str, heading: str, limit: int) -> list[str]:
+    body = section(text, heading)
+    bullets = [line for line in body.splitlines() if line.strip().startswith("-")]
+    return bullets[-limit:]
 
 
 def section(text: str, heading: str) -> str:
@@ -59,6 +66,7 @@ def all_slugs(registry: str) -> list[str]:
 def main() -> None:
     registry = REGISTRY.read_text(encoding="utf-8")
     strategy = STRATEGY.read_text(encoding="utf-8")
+    research_log = RESEARCH_LOG.read_text(encoding="utf-8") if RESEARCH_LOG.exists() else ""
     slugs = all_slugs(registry)
 
     parts = [
@@ -93,6 +101,12 @@ def main() -> None:
         "",
         "## Image Prompt Style",
         section(strategy, "Image Prompt Style").strip(),
+        "",
+        "## Recent SEO Research (last 5 entries)",
+        *(last_bullets(research_log, "Research Entries", 5) or ["(none yet)"]),
+        "",
+        "## Recent Strategy Adjustments (last 3 entries)",
+        *(last_bullets(research_log, "Strategy Adjustments", 3) or ["(none yet)"]),
         "",
     ]
     OUT.write_text("\n".join(part for part in parts if part is not None), encoding="utf-8")

@@ -42,6 +42,17 @@ Rotate across these clusters so the blog doesn't read as one narrow niche:
 Prioritize clusters 1-3 for evergreen search value. Do not repeat a topic
 already covered - check the slugs and titles list before choosing.
 
+## Topic Priority (agent-adjustable)
+This section is a live ranking, not a fixed rule. The blog agent may edit it
+roughly every 5 published articles, based on blog/_SEO_RESEARCH_LOG.md
+findings. Do NOT edit the cluster taxonomy above, the Goal, or the Content
+Guidelines - only this ranked list and its one-line rationale per entry.
+Keep it to 5-8 lines. Every change must have a dated rationale citing a
+research log entry; no rationale, no edit.
+
+- Default order: clusters 1, 2, 3 (evergreen, high signal), then 4, then 5.
+  (baseline - 2026-07-07, no research yet)
+
 ## Image Prompt Style
 Cover images should look like clean technical illustrations, not stock-photo
 robots. Style: minimalist 3D render or isometric technical diagram, dark

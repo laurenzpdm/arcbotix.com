@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 9
+- Total articles: 10
 - Last published: 2026-07-03
-- Known slugs: 9
+- Known slugs: 10
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 10 | 2026-07-03 | imu-sensor-fusion-basics | IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data | IMU sensor fusion basics, IMU sensor fusion, accelerometer gyroscope fusion, complementary filter IMU | Control Systems  |
 | 9 | 2026-07-03 | choosing-a-battery-for-a-quadruped-robot | Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide | choosing a battery for a quadruped robot, quadruped robot battery, LiPo battery robot, robot power budgeting | Build Guides  |
 | 8 | 2026-07-03 | trajectory-planning-for-robotic-arms | Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion | trajectory planning for robotic arms, robot trajectory planning, trapezoidal velocity profile, joint space trajectory | Control Systems  |
 | 7 | 2026-07-03 | harmonic-drive-vs-planetary-gearbox | Harmonic Drive vs Planetary Gearbox: Choosing the Right Reduction for a Robot Joint | harmonic drive vs planetary gearbox, harmonic drive robotics, planetary gearbox robot arm, strain wave gear | Hardware  |
@@ -86,7 +87,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -96,3 +97,9 @@ background with blue/cyan/purple accent lighting (matches the site's dark
 tech theme), no visible text or logos in the image, focus on one clear
 subject (e.g. a robotic arm joint, a PCB, a control-loop diagram rendered
 as a scene). Keep prompts specific to the article's actual subject matter.
+
+## Recent SEO Research (last 5 entries)
+(none yet)
+
+## Recent Strategy Adjustments (last 3 entries)
+(none yet)
