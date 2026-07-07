@@ -5,61 +5,85 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Jul 2026 10:26:31 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jul 2026 12:02:51 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion</title>
-      <link>https://arcbotix.com/blog/posts/trajectory-planning-for-robotic-arms.html</link>
-      <guid>https://arcbotix.com/blog/posts/trajectory-planning-for-robotic-arms.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
-      <description>Trajectory planning for robotic arms explained: joint-space vs Cartesian trajectories, trapezoidal and S-curve profiles, and how to avoid jerky motion.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>PID Controller Tuning for Robotic Arms: A Practical Guide</title>
-      <link>https://arcbotix.com/blog/posts/pid-controller-tuning-for-robotic-arms.html</link>
-      <guid>https://arcbotix.com/blog/posts/pid-controller-tuning-for-robotic-arms.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
-      <description>Learn how PID controller tuning works for robotic arm joints, with formulas, tuning methods, and practical fixes for overshoot, oscillation, and steady-state error.</description>
-      <category>Control Systems</category>
+      <title>Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator</title>
+      <link>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</link>
+      <guid>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</guid>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
+      <description>Compare servo, stepper, and BLDC motors for robotics: torque, precision, cost, and control complexity, with clear guidance on which to pick for your build.</description>
+      <category>Hardware</category>
     </item>
     <item>
       <title>SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time</title>
       <link>https://arcbotix.com/blog/posts/slam-basics-for-mobile-robots.html</link>
       <guid>https://arcbotix.com/blog/posts/slam-basics-for-mobile-robots.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>SLAM basics for mobile robots explained: why mapping and localization are solved together, the main algorithm families, and common pitfalls in real systems.</description>
       <category>Software</category>
+    </item>
+    <item>
+      <title>PID Controller Tuning for Robotic Arms: A Practical Guide</title>
+      <link>https://arcbotix.com/blog/posts/pid-controller-tuning-for-robotic-arms.html</link>
+      <guid>https://arcbotix.com/blog/posts/pid-controller-tuning-for-robotic-arms.html</guid>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
+      <description>Learn how PID controller tuning works for robotic arm joints, with formulas, tuning methods, and practical fixes for overshoot, oscillation, and steady-state error.</description>
+      <category>Control Systems</category>
     </item>
     <item>
       <title>Harmonic Drive vs Planetary Gearbox: Choosing the Right Reduction for a Robot Joint</title>
       <link>https://arcbotix.com/blog/posts/harmonic-drive-vs-planetary-gearbox.html</link>
       <guid>https://arcbotix.com/blog/posts/harmonic-drive-vs-planetary-gearbox.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>Harmonic drive vs planetary gearbox for robot joints: how each works, backlash, torque density, stiffness and cost tradeoffs, with guidance on picking one.</description>
       <category>Hardware</category>
     </item>
     <item>
-      <title>Kalman Filter for Robot State Estimation: A Practical Introduction</title>
-      <link>https://arcbotix.com/blog/posts/kalman-filter-robot-state-estimation.html</link>
-      <guid>https://arcbotix.com/blog/posts/kalman-filter-robot-state-estimation.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
-      <description>How the Kalman filter fuses noisy sensor data and motion models for robot state estimation, with the core equations and a worked example.</description>
+      <title>IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data</title>
+      <link>https://arcbotix.com/blog/posts/imu-sensor-fusion-basics.html</link>
+      <guid>https://arcbotix.com/blog/posts/imu-sensor-fusion-basics.html</guid>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
+      <description>IMU sensor fusion basics explained: why raw accelerometer and gyroscope data drift, and how complementary and Kalman filters combine them for stable orientation.</description>
       <category>Control Systems</category>
     </item>
     <item>
       <title>ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself</title>
       <link>https://arcbotix.com/blog/posts/ros2-nodes-and-topics-explained.html</link>
       <guid>https://arcbotix.com/blog/posts/ros2-nodes-and-topics-explained.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>ROS2 nodes and topics explained with real code: how publishers, subscribers, and the DDS middleware let robot software components communicate.</description>
       <category>Software</category>
+    </item>
+    <item>
+      <title>Trajectory Planning for Robotic Arms: From Waypoints to Smooth Motion</title>
+      <link>https://arcbotix.com/blog/posts/trajectory-planning-for-robotic-arms.html</link>
+      <guid>https://arcbotix.com/blog/posts/trajectory-planning-for-robotic-arms.html</guid>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
+      <description>Trajectory planning for robotic arms explained: joint-space vs Cartesian trajectories, trapezoidal and S-curve profiles, and how to avoid jerky motion.</description>
+      <category>Control Systems</category>
+    </item>
+    <item>
+      <title>Kalman Filter for Robot State Estimation: A Practical Introduction</title>
+      <link>https://arcbotix.com/blog/posts/kalman-filter-robot-state-estimation.html</link>
+      <guid>https://arcbotix.com/blog/posts/kalman-filter-robot-state-estimation.html</guid>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
+      <description>How the Kalman filter fuses noisy sensor data and motion models for robot state estimation, with the core equations and a worked example.</description>
+      <category>Control Systems</category>
+    </item>
+    <item>
+      <title>Quadrature Encoder Wiring for a 6-DOF Robot Arm: A Practical Guide</title>
+      <link>https://arcbotix.com/blog/posts/quadrature-encoder-wiring-6dof-robot-arm.html</link>
+      <guid>https://arcbotix.com/blog/posts/quadrature-encoder-wiring-6dof-robot-arm.html</guid>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
+      <description>Wire and decode quadrature encoders for a 6-DOF robot arm: channel A/B wiring, CPR-to-angle math after gearing, debouncing, and index-pulse homing.</description>
+      <category>Build Guides</category>
     </item>
     <item>
       <title>Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide</title>
       <link>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</link>
       <guid>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>Learn how to size and choose a battery for a quadruped robot, covering chemistry, voltage, capacity, discharge rate, and mounting tradeoffs.</description>
       <category>Build Guides</category>
     </item>
@@ -67,32 +91,8 @@
       <title>Inverse Kinematics Explained: How Robotic Arms Solve for Joint Angles</title>
       <link>https://arcbotix.com/blog/posts/inverse-kinematics-explained.html</link>
       <guid>https://arcbotix.com/blog/posts/inverse-kinematics-explained.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
+      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>Inverse kinematics explained with math and code: how a robotic arm computes joint angles from a target end-effector position, plus common solving methods.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator</title>
-      <link>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</link>
-      <guid>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
-      <description>Compare servo, stepper, and BLDC motors for robotics: torque, precision, cost, and control complexity, with clear guidance on which to pick for your build.</description>
-      <category>Hardware</category>
-    </item>
-    <item>
-      <title>Quadrature Encoder Wiring for a 6-DOF Robot Arm: A Practical Guide</title>
-      <link>https://arcbotix.com/blog/posts/quadrature-encoder-wiring-6dof-robot-arm.html</link>
-      <guid>https://arcbotix.com/blog/posts/quadrature-encoder-wiring-6dof-robot-arm.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
-      <description>Wire and decode quadrature encoders for a 6-DOF robot arm: channel A/B wiring, CPR-to-angle math after gearing, debouncing, and index-pulse homing.</description>
-      <category>Build Guides</category>
-    </item>
-    <item>
-      <title>IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data</title>
-      <link>https://arcbotix.com/blog/posts/imu-sensor-fusion-basics.html</link>
-      <guid>https://arcbotix.com/blog/posts/imu-sensor-fusion-basics.html</guid>
-      <pubDate>Tue, 07 Jul 2026 10:26:10 +0000</pubDate>
-      <description>IMU sensor fusion basics explained: why raw accelerometer and gyroscope data drift, and how complementary and Kalman filters combine them for stable orientation.</description>
       <category>Control Systems</category>
     </item>
   </channel>
