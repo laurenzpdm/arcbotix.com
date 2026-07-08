@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>LQR Control for Robot Arms: A Practical Introduction – Arcbotix</title>
+  <meta name="description" content="A worked introduction to LQR control for robot arms: state-space setup, Q/R tuning, and a side-by-side comparison against a tuned PID loop.">
+  <meta name="keywords" content="LQR control for robot arms, LQR robotics, LQR vs PID robot arm, linear quadratic regulator robot joint">
+  <meta property="og:title" content="LQR Control for Robot Arms: A Practical Introduction">
+  <meta property="og:description" content="A worked introduction to LQR control for robot arms: state-space setup, Q/R tuning, and a side-by-side comparison against a tuned PID loop.">
+  <meta property="og:image" content="/blog/posts/img/lqr-control-robot-arm-practical-introduction.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-08">July 8, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">LQR Control for Robot Arms: A Practical Introduction</h1>
+    <p class="blog-post-subtitle">Moving from a tuned PID loop to a full-state feedback controller, with the matrices worked out</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/lqr-control-robot-arm-practical-introduction.webp" alt="Minimalist isometric illustration of a robot arm joint with a feedback control-loop diagram overlaid in blue and purple light" loading="lazy">
+    </div>
+
+    <p>If you have already tuned a <a href="/blog/posts/pid-controller-tuning-for-robotic-arms.html">PID controller for a robot arm joint</a>, you know the limits well: three gains, a lot of trial and error, and a controller that only really knows about the error on that one joint. LQR control for robot arms takes a different approach. Instead of reacting to error, it uses a full model of the joint's dynamics and a cost function to compute the mathematically optimal feedback gains for every state at once. This article works through the state-space setup, the Q/R tuning process, and a direct comparison against a tuned PID loop on the same joint.</p><h2>Why move past PID for robot arm control</h2><p>A PID controller only sees one number: the position error. It has no idea what the velocity is doing except through its own derivative term, and it has no model of the joint's inertia, damping, or gear ratio. That works fine for a single, well-isolated joint with a stiff gearbox. It works less well when:</p><ul><li>Joint dynamics are lightly damped, so overshoot and ringing are hard to remove without slowing the response.</li><li>The controller needs to reject an external disturbance (a payload change, a cable snag) predictably rather than just eventually.</li><li>You want a repeatable, less trial-and-error way to hit a target bandwidth and damping ratio.</li></ul><p>LQR (Linear Quadratic Regulator) control replaces manual gain guessing with an optimization problem: given a linear model of the system and a cost function that penalizes state error and control effort, solve for the feedback gain matrix that minimizes that cost over all time. The result is full-state feedback, not just error feedback.</p><h2>Building the state-space model of a robot joint</h2><p>Start with a single revolute joint driven by a DC motor through a gearbox, modeled as a second-order system: angle <code>theta</code>, angular velocity <code>omega</code>, with viscous damping <code>b</code> and effective inertia <code>J</code> (motor plus reflected load inertia through the gear ratio). The equation of motion is:</p><blockquote>J * theta_ddot + b * theta_dot = tau</blockquote><p>where <code>tau</code> is the motor torque at the joint. Define the state vector <code>x = [theta, omega]^T</code> and the input <code>u = tau</code>. In state-space form:</p><blockquote>x_dot = A*x + B*u</blockquote><p>with:</p><pre><code>A = [[0, 1],
+     [0, -b/J]]
+
+B = [[0],
+     [1/J]]</code></pre><p>As a concrete example, take a joint with <code>J = 0.02 kg*m^2</code> (motor plus reflected load inertia) and <code>b = 0.1 N*m*s/rad</code>. Then:</p><pre><code>A = [[0, 1],
+     [0, -5.0]]
+
+B = [[0],
+     [50.0]]</code></pre><p>This is the same physical joint you would tune a PID loop for, just written in a form LQR can use directly. Note that A and B come from real, measurable quantities: J from the datasheet (or a swing-down test), b from a similar swing-down decay measurement, and the gear ratio squared multiplying the reflected load inertia.</p><h2>Setting up the cost function: Q and R</h2><p>LQR minimizes a cost function of the form:</p><blockquote>J_cost = integral of (x^T * Q * x + u^T * R * u) dt</blockquote><p><code>Q</code> is a matrix that penalizes state error, and <code>R</code> penalizes control effort. For a single joint with state <code>[theta, omega]</code>, a diagonal Q is the natural starting point:</p><pre><code>Q = [[q1, 0],
+     [0, q2]]
+
+R = [[r1]]</code></pre><p>The ratio between Q and R is what matters, not their absolute scale. A practical starting point:</p><ul><li>Set <code>q1</code> (position weight) high if position accuracy matters most, for example <code>q1 = 100</code>.</li><li>Set <code>q2</code> (velocity weight) lower, for example <code>q2 = 1</code>, unless velocity overshoot itself is a problem (e.g. a joint near a mechanical limit).</li><li>Set <code>r1</code> to reflect actuator cost. A small <code>r1</code> (like <code>0.01</code>) allows aggressive torque commands and gives a fast, stiff response. A larger <code>r1</code> (like <code>1.0</code>) produces a gentler response that uses less peak torque, useful if you are close to motor current limits.</li></ul><p>In practice you sweep these values rather than deriving them analytically. A reasonable workflow: fix R, start with Q as the identity matrix, solve, simulate the step response, then scale q1 up if the response is too slow, or scale r1 up if commanded torque is unrealistically high for your motor.</p><h2>Solving for the gain matrix</h2><p>LQR reduces to solving the continuous-time algebraic Riccati equation for a matrix P:</p><blockquote>A^T*P + P*A - P*B*R^-1*B^T*P + Q = 0</blockquote><p>and then computing the optimal gain:</p><blockquote>K = R^-1 * B^T * P</blockquote><p>The control law is then simply <code>u = -K*x</code>, full-state feedback rather than error-only feedback. You do not solve the Riccati equation by hand; every major numerical library has a solver. In Python with SciPy:</p><pre><code>import numpy as np
+from scipy.linalg import solve_continuous_are
+
+A = np.array([[0, 1], [0, -5.0]])
+B = np.array([[0], [50.0]])
+Q = np.diag([100, 1])
+R = np.array([[0.01]])
+
+P = solve_continuous_are(A, B, Q, R)
+K = np.linalg.inv(R) @ B.T @ P
+print(K)  # e.g. K = [[100.0, 4.47]]</code></pre><p>The resulting K gives you two gains: one on position error, one on velocity. Unlike PID, there is no separate integral term by default. If you need zero steady-state error under a constant disturbance (like gravity loading on a non-horizontal joint), augment the state with the integral of position error and re-solve, which is the same trick used in gain-scheduled and LQI (linear quadratic integral) designs.</p><h2>LQR vs PID on the same joint: what changes</h2><p>Running both controllers on the same simulated joint (same J, same b, same actuator torque limit) highlights the practical differences rather than a purely theoretical one:</p><ul><li><b>Tuning process:</b> PID tuning is iterative and manual (Ziegler-Nichols or hand-tuning three coupled gains). LQR tuning is choosing two or three cost weights, then letting the Riccati solver compute the gains directly. Retuning after a design change (say, a different gear ratio) means recomputing A and B and re-solving, not re-guessing gains from scratch.</li><li><b>Response shape:</b> A well-tuned PID and a well-tuned LQR controller can produce very similar step responses on a simple single joint like this one. The practical gap opens up on coupled or higher-order systems.</li><li><b>Disturbance handling:</b> Because LQR uses full-state feedback, it reacts to velocity disturbances (not just position error) immediately, which tends to damp out disturbances like a bumped joint faster than PID's derivative term, which is acting on a noisier estimate of the same information.</li><li><b>Multi-joint coupling:</b> This is where LQR earns its complexity. For a multi-DOF arm where joint torques couple through the manipulator's inertia matrix, you can build a combined state-space model across all joints and get one LQR gain matrix that accounts for that coupling. PID loops per joint have no way to represent that coupling at all; each loop is blind to what the other joints are doing.</li><li><b>Computational cost:</b> PID is three multiplies and an add, trivial on any microcontroller. LQR is one matrix-vector multiply per control cycle once K is computed offline, which is also cheap at runtime, but the offline Riccati solve requires more than a microcontroller can reasonably do live, so K is normally computed on a workstation and hardcoded or updated at a much slower rate.</li></ul><h2>When to actually use LQR on a robot arm</h2><p>For a single, well-isolated joint with a stiff gearbox and no significant coupling to other joints, a tuned PID controller (see our <a href="/blog/posts/pid-controller-tuning-for-robotic-arms.html">PID tuning guide</a>) is often good enough and much simpler to implement and debug. LQR earns its added complexity when:</p><ul><li>You have a validated dynamic model (from CAD-derived inertias or system identification), since LQR performance is only as good as A and B.</li><li>Multiple joints interact mechanically and you want one controller that accounts for that coupling.</li><li>You need predictable, tunable disturbance rejection rather than trial-and-error gain adjustment.</li></ul><p>If you do not have a trustworthy model of J and b, LQR will compute gains that are optimal for the wrong system, which is worse than a hand-tuned PID loop that was tuned against the real hardware directly. Model quality, not the control law, is usually the limiting factor in practice.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 12
-- Last published: 2026-07-07
-- Known slugs: 12
+- Total articles: 13
+- Last published: 2026-07-08
+- Known slugs: 13
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 13 | 2026-07-08 | lqr-control-robot-arm-practical-introduction | LQR Control for Robot Arms: A Practical Introduction | LQR control for robot arms, LQR robotics, LQR vs PID robot arm, linear quadratic regulator robot joint | Control Systems  |
 | 12 | 2026-07-07 | power-budgeting-for-mobile-robots | Power Budgeting for Mobile Robots: From Component List to Wire Gauge | power budgeting for mobile robots, robot power budget, peak vs average current robot, wire gauge robot wiring | Build Guides  |
 | 11 | 2026-07-07 | quadrature-encoder-wiring-6dof-robot-arm | Quadrature Encoder Wiring for a 6-DOF Robot Arm: A Practical Guide | quadrature encoder wiring 6-DOF robot arm, quadrature encoder robotics, encoder wiring robot arm, CPR to angle conversion | Build Guides  |
 | 10 | 2026-07-03 | imu-sensor-fusion-basics | IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data | IMU sensor fusion basics, IMU sensor fusion, accelerometer gyroscope fusion, complementary filter IMU | Control Systems  |
@@ -89,7 +90,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -101,11 +102,11 @@ subject (e.g. a robotic arm joint, a PCB, a control-loop diagram rendered
 as a scene). Keep prompts specific to the article's actual subject matter.
 
 ## Recent SEO Research (last 5 entries)
-- Candidates checked: power budgeting for mobile robots, feedback control basics for beginners, real-time considerations in robot control loops, simulating robots in Gazebo vs PyBullet.
-- Real-time control loops and Gazebo vs PyBullet: already flagged in the previous entry as weak-gap/saturated, confirmed still true, skipped again.
-- Feedback control basics for beginners: mostly generic corporate-blog explainers (numberanalytics, vaia, LinkedIn advice posts) restating open-loop-vs-closed-loop at a very high level with no math; risk of conceptual overlap with our own published PID article outweighs the gap.
-- Chose "power budgeting for mobile robots": top pages (techietory.com, iBuyRobotics, Articulated Robotics) explain the general "list components, add margin" idea but stop short of a worked peak-vs-average current table, wire gauge/fusing sizing from that table, and brownout risk from motor stall current on a shared rail.
-- Weakness in current top pages: none of them separate peak (stall/inrush) current from average current in a worked numeric example, and none connect the resulting current budget to wire gauge ampacity or fuse/breaker sizing.
+- Candidates checked: incremental vs absolute encoders, motor driver current sensing (shunt sizing), choosing a microcontroller for real-time robot control, LQR control for robot arms vs PID.
+- Incremental vs absolute encoders: well covered by multiple vendor comparison pages (Heidenhain, Celera Motion, ELTRA); mostly product-marketing framing, but the core comparison itself is not underserved.
+- Motor driver current sensing / shunt sizing: coverage is fragmented across patents and generic app notes (Allegro), no robotics-specific worked example, but overlaps somewhat with the already-published power budgeting article.
+- Choosing a microcontroller for real-time robot control: only thin forum threads (electro-tech-online, etechnophiles), decent gap but mostly a listicle-shaped topic (STM32 vs Teensy vs ESP32) that risks becoming generic buying advice rather than technical depth.
+- Chose "LQR control for robot arms vs PID": top results are paywalled IEEE/ResearchGate papers or a self-balancing-robot blog post; none give an accessible worked state-space example (A/B matrices for a simple joint, Q/R cost tuning walkthrough, closed-loop pole comparison against a tuned PID) for someone who already knows PID from our existing article.
 
 ## Recent Strategy Adjustments (last 3 entries)
 (none yet)

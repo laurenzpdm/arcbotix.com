@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 12
-- Last published: 2026-07-07
+- Total articles: 13
+- Last published: 2026-07-08
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 13 | 2026-07-08 | lqr-control-robot-arm-practical-introduction | LQR Control for Robot Arms: A Practical Introduction | LQR control for robot arms, LQR robotics, LQR vs PID robot arm, linear quadratic regulator robot joint | Control Systems | Practical introduction to LQR (Linear Quadratic Regulator) control for a single robot arm joint. Derives the state-space model (A, B matrices) from joint inertia and damping, explains how to set the Q and R cost weight matrices, shows solving the continuous-time algebraic Riccati equation in Python/SciPy to get the gain matrix K, and gives a direct practical comparison against a tuned PID loop (tuning process, disturbance handling, multi-joint coupling, computational cost). Ends with guidance on when LQR is worth the added complexity over PID and warns that model quality (accurate J and b) matters more than the control law choice. |
 | 12 | 2026-07-07 | power-budgeting-for-mobile-robots | Power Budgeting for Mobile Robots: From Component List to Wire Gauge | power budgeting for mobile robots, robot power budget, peak vs average current robot, wire gauge robot wiring | Build Guides | Practical power budgeting guide for mobile robots covering how to build a component current table with separate average and peak current per subsystem, how to sum average vs worst-case peak current correctly, battery capacity and C-rating/discharge-rate sizing from those sums, translating peak current into wire gauge selection via ampacity tables, and main/branch fuse sizing, with a full worked numeric example and a note on how actuator choice (stepper vs BLDC) shapes the current profile. |
 | 11 | 2026-07-07 | quadrature-encoder-wiring-6dof-robot-arm | Quadrature Encoder Wiring for a 6-DOF Robot Arm: A Practical Guide | quadrature encoder wiring 6-DOF robot arm, quadrature encoder robotics, encoder wiring robot arm, CPR to angle conversion | Build Guides | Practical wiring and decoding guide for quadrature encoders on a 6-DOF robot arm: channel A/B/index wiring, noise mitigation on long cable runs, interrupt-based vs hardware quadrature decoding (LS7366R, MCU peripherals), the CPR-and-gear-ratio math for converting raw counts to joint angle, and index-pulse homing for a repeatable zero reference. |
 | 10 | 2026-07-03 | imu-sensor-fusion-basics | IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data | IMU sensor fusion basics, IMU sensor fusion, accelerometer gyroscope fusion, complementary filter IMU | Control Systems | Explains IMU sensor fusion basics: why accelerometer readings are noisy and motion-corrupted while gyroscope integration drifts over time, then covers the complementary filter formula (with alpha tuning tradeoffs) and Kalman/Madgwick filter approaches for combining them into a stable orientation estimate. Also covers magnetometer use for heading correction and practical tips (sample rate, gyro bias calibration, quaternions vs Euler angles, vibration isolation). Links to the Kalman filter state estimation article as the general estimation framework. |
@@ -78,3 +79,6 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 12)
 - power-budgeting-for-mobile-robots -> servo-vs-stepper-vs-bldc-motor-robotics (linked actuator type (stepper vs BLDC) to how it shapes the average and peak current profile being budgeted)
 - choosing-a-battery-for-a-quadruped-robot -> power-budgeting-for-mobile-robots (backlink added in the concluding paragraph where wiring gauge and connector selection for the rest of the power system is mentioned)
+
+## Internal links (article 13)
+- lqr-control-robot-arm-practical-introduction -> pid-controller-tuning-for-robotic-arms (referenced as the baseline PID controller being compared against and extended)
