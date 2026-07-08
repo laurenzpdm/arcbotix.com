@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 08 Jul 2026 09:52:54 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 08 Jul 2026 21:55:43 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>LQR Control for Robot Arms: A Practical Introduction</title>
+      <link>https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html</link>
+      <guid>https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html</guid>
+      <pubDate>Wed, 08 Jul 2026 21:55:13 +0000</pubDate>
+      <description>A worked introduction to LQR control for robot arms: state-space setup, Q/R tuning, and a side-by-side comparison against a tuned PID loop.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide</title>
       <link>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</link>
