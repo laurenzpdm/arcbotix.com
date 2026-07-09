@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 13
-- Last published: 2026-07-08
+- Total articles: 14
+- Last published: 2026-07-09
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 14 | 2026-07-09 | gearbox-backlash-compensation-robot-arm | Gearbox Backlash Compensation for Robot Arm Joints: Measuring and Correcting Mechanical Play | gearbox backlash compensation robot arm, backlash compensation robotics, robot joint backlash, encoder backlash measurement | Control Systems | Explains how to measure gearbox backlash on a robot arm joint from encoder data (dial-indicator method with a worked tick-to-degree conversion, plus a software-only step-response estimation method for assembled robots), then covers two software compensation techniques: dead-band inversion (Python class that adds a fixed offset to the motor setpoint on direction reversal) and a position-dependent lookup table (interpolated backlash correction for joints with uneven load across their range). Closes with what compensation cannot fix (thermal/load drift, wear-induced growth, added settling delay) and when to switch to mechanical elimination (anti-backlash preload, lower-backlash gearbox, output-side encoder) instead of software compensation. |
 | 13 | 2026-07-08 | lqr-control-robot-arm-practical-introduction | LQR Control for Robot Arms: A Practical Introduction | LQR control for robot arms, LQR robotics, LQR vs PID robot arm, linear quadratic regulator robot joint | Control Systems | Practical introduction to LQR (Linear Quadratic Regulator) control for a single robot arm joint. Derives the state-space model (A, B matrices) from joint inertia and damping, explains how to set the Q and R cost weight matrices, shows solving the continuous-time algebraic Riccati equation in Python/SciPy to get the gain matrix K, and gives a direct practical comparison against a tuned PID loop (tuning process, disturbance handling, multi-joint coupling, computational cost). Ends with guidance on when LQR is worth the added complexity over PID and warns that model quality (accurate J and b) matters more than the control law choice. |
 | 12 | 2026-07-07 | power-budgeting-for-mobile-robots | Power Budgeting for Mobile Robots: From Component List to Wire Gauge | power budgeting for mobile robots, robot power budget, peak vs average current robot, wire gauge robot wiring | Build Guides | Practical power budgeting guide for mobile robots covering how to build a component current table with separate average and peak current per subsystem, how to sum average vs worst-case peak current correctly, battery capacity and C-rating/discharge-rate sizing from those sums, translating peak current into wire gauge selection via ampacity tables, and main/branch fuse sizing, with a full worked numeric example and a note on how actuator choice (stepper vs BLDC) shapes the current profile. |
 | 11 | 2026-07-07 | quadrature-encoder-wiring-6dof-robot-arm | Quadrature Encoder Wiring for a 6-DOF Robot Arm: A Practical Guide | quadrature encoder wiring 6-DOF robot arm, quadrature encoder robotics, encoder wiring robot arm, CPR to angle conversion | Build Guides | Practical wiring and decoding guide for quadrature encoders on a 6-DOF robot arm: channel A/B/index wiring, noise mitigation on long cable runs, interrupt-based vs hardware quadrature decoding (LS7366R, MCU peripherals), the CPR-and-gear-ratio math for converting raw counts to joint angle, and index-pulse homing for a repeatable zero reference. |
@@ -82,3 +83,8 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 13)
 - lqr-control-robot-arm-practical-introduction -> pid-controller-tuning-for-robotic-arms (referenced as the baseline PID controller being compared against and extended)
+
+## Internal links (article 14)
+- gearbox-backlash-compensation-robot-arm -> quadrature-encoder-wiring-6dof-robot-arm (backlash measurement relies on the same motor-side encoder and CPR/gear-ratio math covered in the encoder wiring guide)
+- gearbox-backlash-compensation-robot-arm -> harmonic-drive-vs-planetary-gearbox (backlash figures used in the worked example are pulled directly from the gearbox comparison article)
+- gearbox-backlash-compensation-robot-arm -> lqr-control-robot-arm-practical-introduction (notes that the backlash compensator sits upstream of either a PID or LQR position controller)

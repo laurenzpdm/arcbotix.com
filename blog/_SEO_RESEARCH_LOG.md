@@ -38,3 +38,11 @@ the current top-ranking pages for that query.)
 entries above and decide whether blog/_BLOG_STRATEGY.md's "Topic Priority"
 section still reflects reality. Log either the change made and why, or
 "no change needed" and why, as a single dated line.)
+
+### 2026-07-09
+- Candidates checked: brushless motor FOC vs trapezoidal commutation, gearbox backlash compensation for robot arms, URDF description common mistakes, real-time considerations in robot control loops (re-checked).
+- FOC vs trapezoidal: reasonably well covered by TI app notes and vendor explainers (vector-robotics, ISL Products) with clear tradeoffs already public.
+- URDF common mistakes: well served by ROS2 official docs, MoveIt docs, and Articulated Robotics tutorials; low gap for a first-pass explainer.
+- Real-time control loops: still weak-gap per the 2026-07-07 entries, skipped again.
+- Chose "gearbox backlash compensation for robot arm joints": top pages are either generic mechanical-engineering explainers (lily-bearing, geartechnology) describing what backlash is, or dense patents on proprietary compensation methods; only one Arduino forum thread discusses practical software compensation, and none walk through measuring backlash from encoder position error at direction reversals or a concrete dead-band-inversion/lookup-table compensation approach for a robot joint.
+- Weakness in current top pages: they explain backlash as a mechanical concept but skip the software/control side entirely, leaving a builder with an encoder-equipped joint no concrete way to measure or compensate for it in code.
