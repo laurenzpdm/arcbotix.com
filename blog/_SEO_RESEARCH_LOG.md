@@ -44,5 +44,11 @@ section still reflects reality. Log either the change made and why, or
 - FOC vs trapezoidal: reasonably well covered by TI app notes and vendor explainers (vector-robotics, ISL Products) with clear tradeoffs already public.
 - URDF common mistakes: well served by ROS2 official docs, MoveIt docs, and Articulated Robotics tutorials; low gap for a first-pass explainer.
 - Real-time control loops: still weak-gap per the 2026-07-07 entries, skipped again.
+
+### 2026-07-09 (2)
+- Candidates checked: impedance vs admittance control for robot arms, robot arm singularity avoidance with the Jacobian, CAN bus vs RS485 for robot communication.
+- Impedance vs admittance control: decent conceptual coverage already exists (source-robotics, patsnap articles explain the force/motion distinction clearly), gap is smaller than expected for a first-pass explainer.
+- CAN bus vs RS485: well covered by multiple vendor/industrial comparison pages (dnkpower, dorleco, robotmotor), mostly generic electrical-protocol framing not specific to arms.
+- Chose "robot arm singularity avoidance with the Jacobian": top-ranking pages are either dense academic papers/patents (arXiv, MDPI, USPTO) or short vendor blog posts (RoboDK, Realman) that name the concept and the damped-least-squares idea but do not walk through a worked numeric example - computing the Jacobian determinant for a simple planar arm, showing it approach zero near a stretched-out pose, and comparing plain pseudo-inverse vs damped least squares behavior with actual joint velocity numbers.
 - Chose "gearbox backlash compensation for robot arm joints": top pages are either generic mechanical-engineering explainers (lily-bearing, geartechnology) describing what backlash is, or dense patents on proprietary compensation methods; only one Arduino forum thread discusses practical software compensation, and none walk through measuring backlash from encoder position error at direction reversals or a concrete dead-band-inversion/lookup-table compensation approach for a robot joint.
 - Weakness in current top pages: they explain backlash as a mechanical concept but skip the software/control side entirely, leaving a builder with an encoder-equipped joint no concrete way to measure or compensate for it in code.

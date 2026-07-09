@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Robot Arm Singularity Avoidance with the Jacobian: A Worked Example – Arcbotix</title>
+  <meta name="description" content="Learn robot arm singularity avoidance with a worked Jacobian example: detect singular poses, compare plain pseudo-inverse vs damped least squares.">
+  <meta name="keywords" content="robot arm singularity avoidance, Jacobian singularity robotics, damped least squares inverse kinematics, manipulator singularity">
+  <meta property="og:title" content="Robot Arm Singularity Avoidance with the Jacobian: A Worked Example">
+  <meta property="og:description" content="Learn robot arm singularity avoidance with a worked Jacobian example: detect singular poses, compare plain pseudo-inverse vs damped least squares.">
+  <meta property="og:image" content="/blog/posts/img/robot-arm-singularity-avoidance-jacobian.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/robot-arm-singularity-avoidance-jacobian.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/robot-arm-singularity-avoidance-jacobian.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-09">July 9, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Robot Arm Singularity Avoidance with the Jacobian: A Worked Example</h1>
+    <p class="blog-post-subtitle">Detecting singular poses with the Jacobian determinant and keeping the arm moving smoothly near them</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/robot-arm-singularity-avoidance-jacobian.webp" alt="Isometric illustration of a robotic arm in an outstretched pose with a glowing velocity-vector overlay at the wrist, representing a kinematic singularity" loading="lazy">
+    </div>
+
+    <p>A robot arm singularity is a joint configuration where the arm momentarily loses the ability to move its end effector in some direction, no matter how the joints are commanded. Robot arm singularity avoidance matters because a controller that does not detect these poses in advance can command joint velocities that spike toward infinity, causing violent, unpredictable motion. This article walks through detecting a singularity with the Jacobian determinant on a concrete two-link arm, then compares two practical ways to keep the controller stable when the arm gets close to one.</p>
+
+<h2>What a Singularity Actually Is</h2>
+<p>For a serial manipulator, the Jacobian matrix J relates joint velocities to end-effector velocity:</p>
+<blockquote>v = J(q) * q_dot</blockquote>
+<p>where q is the vector of joint angles, q_dot is joint velocity, and v is the end-effector's linear (and angular, for 6-DOF arms) velocity. To move the end effector at some desired velocity, the controller inverts this relationship:</p>
+<blockquote>q_dot = J^-1(q) * v</blockquote>
+<p>As covered in <a href="/blog/posts/inverse-kinematics-explained.html">inverse kinematics explained</a>, this pseudo-inverse relationship is also how iterative IK solvers work. This works fine as long as J is invertible. At a singularity, J loses rank: its determinant goes to zero, J^-1 blows up, and the same small end-effector velocity command demands infinite joint velocity. Physically, this happens when two or more joint axes line up so that moving either one produces the same effect on the end effector, or when the arm is fully stretched out and has no remaining reach in the outward direction.</p>
+
+<h2>Robot Arm Singularity Avoidance: A 2-Link Worked Example</h2>
+<p>Take a planar 2-link arm with link lengths L1 and L2, joint angles theta1 and theta2 (theta2 measured relative to link 1). The end-effector position is:</p>
+<blockquote>x = L1*cos(theta1) + L2*cos(theta1+theta2)<br>
+y = L1*sin(theta1) + L2*sin(theta1+theta2)</blockquote>
+<p>Differentiating gives the 2x2 Jacobian:</p>
+<blockquote>J = [ -L1*sin(theta1)-L2*sin(theta1+theta2),  -L2*sin(theta1+theta2) ;<br>
+     &nbsp;L1*cos(theta1)+L2*cos(theta1+theta2),  &nbsp;L2*cos(theta1+theta2) ]</blockquote>
+<p>Its determinant simplifies to a clean expression:</p>
+<blockquote>det(J) = L1 * L2 * sin(theta2)</blockquote>
+<p>This is the entire story for a 2-link arm: det(J) is zero whenever theta2 is 0 or 180 degrees. theta2 = 0 means the arm is fully extended (both links pointing the same direction) - the classic outstretched singularity. theta2 = 180 degrees means the arm is folded back on itself, which is a less common but equally real singular pose.</p>
+
+<h3>Plugging in Numbers</h3>
+<p>With L1 = 0.3 m and L2 = 0.25 m, here is det(J) at a few elbow angles:</p>
+<ul>
+<li>theta2 = 90 deg: det(J) = 0.3 * 0.25 * sin(90) = 0.075</li>
+<li>theta2 = 30 deg: det(J) = 0.3 * 0.25 * sin(30) = 0.0375</li>
+<li>theta2 = 10 deg: det(J) = 0.3 * 0.25 * sin(10) = 0.013</li>
+<li>theta2 = 1 deg: det(J) = 0.3 * 0.25 * sin(1) = 0.0013</li>
+<li>theta2 = 0 deg: det(J) = 0 (singular)</li>
+</ul>
+<p>Now suppose the controller commands an end-effector velocity of 0.1 m/s outward, and it solves q_dot = J^-1 * v directly. Because J^-1 scales roughly with 1/det(J), the required joint velocity climbs sharply as theta2 shrinks: it is manageable at 90 degrees, already uncomfortable at 10 degrees, and effectively unbounded by 1 degree. A real servo or gearbox cannot deliver that, so the arm either stalls, trips a current limit, or (worse) briefly tries to comply and jerks.</p>
+
+<h2>Detecting the Problem: Manipulability, Not Just det(J) = 0</h2>
+<p>Checking det(J) == 0 exactly is fragile in floating point and only tells you about exact singularities, not near-singular poses where the same blow-up already starts. A more useful signal is Yoshikawa's manipulability measure:</p>
+<blockquote>w = sqrt(det(J * J^T))</blockquote>
+<p>For a square, non-redundant Jacobian this reduces to abs(det(J)). The practical use is a threshold check the controller runs every cycle: if w drops below some fraction of its typical working-region value (a common starting point is 5-10% of the manipulability at a well-conditioned reference pose), treat the arm as near-singular and switch behavior before the joint velocities actually spike.</p>
+
+<h2>Two Ways to Handle It in the Controller</h2>
+
+<h3>1. Plain Pseudo-Inverse (What Breaks)</h3>
+<p>For redundant or non-square Jacobians, the Moore-Penrose pseudo-inverse J+ = J^T * (J * J^T)^-1 is the standard way to solve q_dot = J+ * v. The problem is that J * J^T is exactly what goes singular in the same poses, so the pseudo-inverse inherits the same blow-up. It is not a fix by itself, just a more general way to write the same fragile inversion.</p>
+
+<h3>2. Damped Least Squares (What Actually Helps)</h3>
+<p>Damped least squares (DLS), sometimes called the Levenberg-Marquardt method in this context, adds a small damping term lambda to trade a bounded amount of tracking error for bounded joint velocity:</p>
+<blockquote>q_dot = J^T * (J * J^T + lambda^2 * I)^-1 * v</blockquote>
+<p>With lambda = 0, this is identical to the plain pseudo-inverse. As lambda increases, the joint velocity solution stays finite even as det(J) approaches zero, at the cost of the end effector tracking the commanded velocity less exactly near the singularity. A practical scheme makes lambda adaptive: near zero when manipulability w is healthy (so tracking stays exact in the normal working volume), and ramping up smoothly as w drops below the threshold from the manipulability check above.</p>
+<p>Continuing the 2-link example at theta2 = 1 degree, a fixed damping of lambda = 0.02 keeps the effective denominator away from zero, capping joint velocity to a sane range instead of the near-infinite value the plain inverse would demand, at the cost of a small, boundable deviation from the requested 0.1 m/s end-effector path right at that instant.</p>
+
+<h2>Practical Guidelines</h2>
+<ul>
+<li>Compute manipulability w every control cycle, not just det(J); it is cheap (one 2x2 or 3x3 determinant for most arm sizes) and catches near-singular poses before they become exact ones.</li>
+<li>Set the damping threshold from your own arm's healthy-pose manipulability, not a generic constant - a small desktop arm and a heavy industrial arm have very different natural magnitudes for w.</li>
+<li>Prefer trajectory planning that keeps the arm's elbow away from full extension and full fold-back when the task allows it, rather than relying on damping alone to save every pose; damping trades accuracy for safety, it does not remove the underlying geometric problem. This is also a good reason to check reachable poses during the planning stage described in <a href="/blog/posts/trajectory-planning-for-robotic-arms.html">trajectory planning for robotic arms</a>, rather than only reacting to singularities at execution time.</li>
+<li>Log the damping factor lambda actually applied during operation. If it is frequently non-zero in normal use, that is a sign the workspace or task path is routing too close to a singular region and the trajectory, not just the controller, needs adjusting.</li>
+</ul>
+
+<h2>Why This Matters Beyond the Math</h2>
+<p>Singularities are not an edge case reserved for redundant or exotic arm designs. Any serial arm with two or more links has at least a full-extension singularity, and most reachable workspaces include poses close enough to it that naive inverse kinematics solvers will occasionally hand back an unreasonable joint velocity command. Robot arm singularity avoidance is really two separate habits: detecting proximity to a singularity with a cheap manipulability check, and using damped least squares (or an equivalent bounded-velocity method) so the controller degrades gracefully instead of demanding motion the hardware cannot deliver.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
