@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 08 Jul 2026 21:55:43 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jul 2026 09:58:42 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Gearbox Backlash Compensation for Robot Arm Joints: Measuring and Correcting Mechanical Play</title>
+      <link>https://arcbotix.com/blog/posts/gearbox-backlash-compensation-robot-arm.html</link>
+      <guid>https://arcbotix.com/blog/posts/gearbox-backlash-compensation-robot-arm.html</guid>
+      <pubDate>Thu, 09 Jul 2026 09:58:25 +0000</pubDate>
+      <description>How to measure gearbox backlash from encoder data and compensate for it in software: dead-band inversion, lookup tables, and when compensation is not enough.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>LQR Control for Robot Arms: A Practical Introduction</title>
       <link>https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html</link>
