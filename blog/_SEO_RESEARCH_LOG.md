@@ -25,6 +25,14 @@ the current top-ranking pages for that query.)
 - Chose "power budgeting for mobile robots": top pages (techietory.com, iBuyRobotics, Articulated Robotics) explain the general "list components, add margin" idea but stop short of a worked peak-vs-average current table, wire gauge/fusing sizing from that table, and brownout risk from motor stall current on a shared rail.
 - Weakness in current top pages: none of them separate peak (stall/inrush) current from average current in a worked numeric example, and none connect the resulting current budget to wire gauge ampacity or fuse/breaker sizing.
 
+### 2026-07-10
+- Candidates checked: differential drive robot kinematics/odometry, URDF robot description tutorials, robot joint torque control via current sensing, real-time considerations in robot control loops (re-checked).
+- Differential drive odometry: saturated - WPILib, automaticaddison.com, Zbotic and Bench Robotics all already give full worked equations and Python code.
+- URDF tutorials: saturated and documentation-shaped - Articulated Robotics and MoveIt docs already cover structure, xacro, and common mistakes thoroughly.
+- Real-time control loops: re-confirmed still a thin gap as noted on 2026-07-07, skipped again.
+- Chose "torque control for robot arm joints via current sensing": top results are dense patents (USPTO current-limiting/torque-limiting filings) and academic sliding-mode/flexible-joint papers; nothing accessible walks through the Kt-based torque-from-current relationship, a cascaded current/velocity/position loop structure, or a concrete PI current-loop tuning example with real numbers for a small robot arm joint.
+- Weakness in current top pages: they either patent-describe current limiting abstractly or bury the current-loop math inside advanced sliding-mode papers, leaving a builder with a current sensor no practical path from measured current to a tuned, safe torque command.
+
 ### 2026-07-08
 - Candidates checked: incremental vs absolute encoders, motor driver current sensing (shunt sizing), choosing a microcontroller for real-time robot control, LQR control for robot arms vs PID.
 - Incremental vs absolute encoders: well covered by multiple vendor comparison pages (Heidenhain, Celera Motion, ELTRA); mostly product-marketing framing, but the core comparison itself is not underserved.
@@ -38,6 +46,14 @@ the current top-ranking pages for that query.)
 entries above and decide whether blog/_BLOG_STRATEGY.md's "Topic Priority"
 section still reflects reality. Log either the change made and why, or
 "no change needed" and why, as a single dated line.)
+
+### 2026-07-10
+- Deprioritized "real-time considerations in robot control loops", "URDF
+  tutorials", and "Gazebo vs PyBullet" within cluster 3 in
+  blog/_BLOG_STRATEGY.md Topic Priority, based on the 2026-07-07,
+  2026-07-07(2), 2026-07-09, and 2026-07-10 research entries all
+  independently re-checking these three topics and finding weak gap or
+  saturated existing coverage every single time.
 
 ### 2026-07-09
 - Candidates checked: brushless motor FOC vs trapezoidal commutation, gearbox backlash compensation for robot arms, URDF description common mistakes, real-time considerations in robot control loops (re-checked).

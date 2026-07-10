@@ -52,6 +52,12 @@ research log entry; no rationale, no edit.
 
 - Default order: clusters 1, 2, 3 (evergreen, high signal), then 4, then 5.
   (baseline - 2026-07-07, no research yet)
+- Within cluster 3, deprioritize "real-time considerations in robot control
+  loops", "URDF tutorials", and "Gazebo vs PyBullet" as specific sub-topics -
+  research entries 2026-07-07, 2026-07-07(2), 2026-07-09, and 2026-07-10 each
+  re-checked these and found the gap too thin or the topic already saturated
+  by strong existing coverage every time. Favor other cluster 3 angles
+  (Isaac Sim, real ROS2 middleware internals) instead.
 
 ## Image Prompt Style
 Cover images should look like clean technical illustrations, not stock-photo

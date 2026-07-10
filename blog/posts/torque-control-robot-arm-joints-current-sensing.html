@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque – Arcbotix</title>
+  <meta name="description" content="Learn robot joint torque control from current sensing: the Kt torque constant, a cascaded current/velocity/position loop, and a worked PI current-loop tuning example.">
+  <meta name="keywords" content="torque control for robot arm joints, robot joint torque control, current sensing torque estimation, cascaded control loop robotics">
+  <meta property="og:title" content="Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque">
+  <meta property="og:description" content="Learn robot joint torque control from current sensing: the Kt torque constant, a cascaded current/velocity/position loop, and a worked PI current-loop tuning example.">
+  <meta property="og:image" content="/blog/posts/img/torque-control-robot-arm-joints-current-sensing.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/torque-control-robot-arm-joints-current-sensing.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/torque-control-robot-arm-joints-current-sensing.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-10">July 10, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque</h1>
+    <p class="blog-post-subtitle">Turning a current sensor reading into a safe, tuned torque command for a robot joint</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/torque-control-robot-arm-joints-current-sensing.webp" alt="Isometric technical diagram of a robot arm joint with a current-sense shunt resistor feeding a control loop" loading="lazy">
+    </div>
+
+    <p>If you have already wired up a shunt resistor or an inline current sensor on a robot joint's motor line, you know how to get a current reading. What is far less documented is what to do with that number. <strong>Torque control for robot arm joints</strong> means turning a measured current into a commanded torque, closing a fast inner loop around it, and using that loop as the foundation for velocity and position control above it. This article walks through the actual math and a worked tuning example, not just the concept.</p>
+
+<h2>Why torque control for robot arm joints matters</h2>
+<p>A position controller alone does not know how hard a joint is pushing. If a gripper contacts an object, or a joint jams against a mechanical stop, a pure position loop keeps increasing its output trying to close a position error that physically cannot close. The result is excessive force, a stalled motor dumping full current as heat, or a broken part. A torque-aware inner loop caps how much force each joint is allowed to apply, independent of what the outer position loop is asking for.</p>
+<p>This matters for three concrete situations on a robot arm: contact tasks (inserting a part, pressing a button), collision safety (stopping before damaging the joint or gearbox), and smooth low-speed motion where friction and cogging would otherwise make position control jerky.</p>
+
+<h2>From current to torque: the Kt constant</h2>
+<p>For a brushed DC motor or a BLDC motor driven with field-oriented control, output torque is approximately proportional to the current in the torque-producing axis:</p>
+<blockquote>tau_motor = Kt * I</blockquote>
+<p>where <code>Kt</code> is the motor's torque constant in newton-meters per amp, and <code>I</code> is the measured current (for BLDC, this is the quadrature-axis current, Iq, not the raw phase current). Motor datasheets list Kt directly, often as "torque constant" or derived from the back-EMF constant Ke (in SI units, Kt and Ke are numerically equal).</p>
+<p>Worked example: a small joint uses a BLDC motor with Kt = 0.06 Nm/A, driving a 50:1 harmonic drive at 90% efficiency. If the current sensor reads 3.2 A of Iq:</p>
+<blockquote>tau_motor = 0.06 * 3.2 = 0.192 Nm<br>tau_joint = tau_motor * 50 * 0.90 = 8.64 Nm</blockquote>
+<p>That joint-side torque number is what you actually want to control and limit, since it is what the arm exerts on the world. Always apply the gearbox ratio and efficiency after the Kt calculation, not before, or your torque limits will be off by the reduction ratio.</p>
+
+<h2>The cascaded control structure</h2>
+<p>Industrial and research robot arm joints almost universally use a cascade of three nested loops, each running at a different rate:</p>
+<ul>
+<li><strong>Current loop (innermost, fastest, typically 10-20 kHz)</strong>: takes a commanded current (or torque) as its setpoint and drives the motor's actual current to match, using the current sensor as feedback.</li>
+<li><strong>Velocity loop (middle, typically 1-2 kHz)</strong>: takes a commanded velocity, computes a current command to achieve it, using encoder-derived velocity as feedback.</li>
+<li><strong>Position loop (outermost, slowest, typically 100-500 Hz)</strong>: takes a commanded position (from a trajectory planner), computes a velocity command, using encoder position as feedback.</li>
+</ul>
+<p>Each outer loop's output becomes the next inner loop's setpoint. The key property this gives you: since torque is proportional to current, a torque limit is simply a clamp on the current command coming out of the velocity loop, before it reaches the current loop. This is where <a href="/blog/posts/lqr-control-robot-arm-practical-introduction.html">state-space approaches like LQR</a> can also be used for the velocity or position loop instead of PID, but the current loop itself is almost always a simple PI controller because the motor electrical dynamics are close to a first-order system.</p>
+
+<h2>Tuning the current loop: a worked example</h2>
+<p>The current loop controls motor current by adjusting applied voltage, working against the motor's electrical time constant. Model the motor electrically as a series resistance R and inductance L:</p>
+<blockquote>L * dI/dt + R * I = V - Ke * omega</blockquote>
+<p>For current-loop tuning, the back-EMF term (Ke * omega) is treated as a slow-moving disturbance rather than part of the plant, since the current loop runs much faster than the mechanical dynamics. This leaves a first-order electrical plant with time constant:</p>
+<blockquote>tau_e = L / R</blockquote>
+<p>Worked numbers: motor winding resistance R = 0.4 ohm, inductance L = 0.2 mH. Electrical time constant:</p>
+<blockquote>tau_e = 0.0002 / 0.4 = 0.5 ms</blockquote>
+<p>A standard approach is pole-zero cancellation: choose the PI controller's zero to cancel the plant pole, then pick the loop bandwidth. For a PI controller with gains Kp and Ki, the zero is at Kp/Ki. Setting Kp/Ki = L/R cancels the electrical pole, leaving a first-order closed loop with time constant L/Kp. If you want a closed-loop current-loop bandwidth of 2 kHz (angular frequency omega_c = 2*pi*2000 = 12566 rad/s):</p>
+<blockquote>Kp = L * omega_c = 0.0002 * 12566 = 2.51 V/A<br>Ki = Kp * R / L = 2.51 * 0.4 / 0.0002 = 5021 V/(A*s)</blockquote>
+<p>In discrete form at a 20 kHz control rate (dt = 50 microseconds), the incremental PI update is:</p>
+<pre><code>error = I_command - I_measured
+integral += error * dt
+V_command = Kp * error + Ki * integral
+V_command = clamp(V_command, -V_bus, V_bus)</code></pre>
+<p>Sanity check the bandwidth choice against your PWM switching frequency: a current loop bandwidth should generally stay at or below one-tenth of the PWM frequency to avoid instability from the sampling and switching delay. At a 20 kHz PWM rate, a 2 kHz current loop bandwidth is a safe margin.</p>
+
+<h2>Implementing a torque limit</h2>
+<p>With Kt known and the current loop tuned, a torque limit becomes a straightforward clamp applied to whatever current command the outer velocity loop produces:</p>
+<pre><code>I_command_raw = velocity_loop_output(velocity_error)
+I_max = torque_limit_joint / (Kt * gear_ratio * gear_efficiency)
+I_command = clamp(I_command_raw, -I_max, I_max)</code></pre>
+<p>For the earlier example (Kt = 0.06 Nm/A, gear_ratio = 50, efficiency = 0.90), a joint-level torque limit of 6 Nm translates to a current limit of:</p>
+<blockquote>I_max = 6 / (0.06 * 50 * 0.90) = 2.22 A</blockquote>
+<p>Any velocity-loop output demanding more current than this gets clamped, so the joint physically cannot exceed 6 Nm of output torque regardless of position or velocity error. This is the mechanism behind collision-stop behavior and compliant, force-limited motion on modern robot arms.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Using raw phase current instead of Iq for BLDC motors.</strong> Only the quadrature-axis current after Park/Clarke transforms is proportional to torque; raw phase current oscillates with rotor position and does not give a stable torque estimate.</li>
+<li><strong>Ignoring gearbox efficiency in the torque limit calculation.</strong> Efficiency of 85-95% for a harmonic drive or planetary gearbox is not negligible when setting a safety-critical torque limit; a 10% error there is a 10% error in the actual force the joint can apply before it should stop.</li>
+<li><strong>Setting the current loop bandwidth too close to the PWM frequency.</strong> This is a common source of high-frequency current oscillation ("current loop ringing") that looks like a tuning problem but is actually a sample-rate problem.</li>
+<li><strong>Skipping the inner current loop entirely and commanding voltage directly from a position PID.</strong> This works at low performance requirements but gives you no way to enforce a torque limit, since voltage does not map cleanly to torque once back-EMF and load vary.</li>
+</ul>
+
+<h2>Conclusion</h2>
+<p>Torque control for robot arm joints is not a separate control paradigm from position or velocity control, it is what sits underneath both once you close a current loop around the motor and use the Kt relationship to translate between amps and newton-meters. The practical payoff is a clean, physically meaningful torque limit you can enforce in software, which is the basis for safe contact tasks and collision response on a real arm.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
