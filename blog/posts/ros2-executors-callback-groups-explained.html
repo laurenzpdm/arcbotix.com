@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot – Arcbotix</title>
+  <meta name="description" content="ROS2 executors and callback groups explained with a worked example: how a slow sensor callback can silently stall a control loop, and how to fix it.">
+  <meta name="keywords" content="ROS2 executors and callback groups, ROS2 callback groups, ROS2 multi-threaded executor, ROS2 executor explained">
+  <meta property="og:title" content="ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot">
+  <meta property="og:description" content="ROS2 executors and callback groups explained with a worked example: how a slow sensor callback can silently stall a control loop, and how to fix it.">
+  <meta property="og:image" content="/blog/posts/img/ros2-executors-callback-groups-explained.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/ros2-executors-callback-groups-explained.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/ros2-executors-callback-groups-explained.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Software</span>
+      <time datetime="2026-07-10">July 10, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot</h1>
+    <p class="blog-post-subtitle">How ROS2 decides which callback runs when, and the concurrency bug that catches almost every beginner</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/ros2-executors-callback-groups-explained.webp" alt="Isometric technical illustration of a central processing node with multiple parallel data pipelines, one highlighted while others queue" loading="lazy">
+    </div>
+
+    <p>A node with a working publisher and a working subscriber can still freeze the rest of a robot's software. The usual cause is not a crash or a bad message, it is scheduling: a slow callback occupies the only thread available to it, and every other callback waiting on that same thread simply never runs. This article explains ROS2 executors and callback groups by walking through exactly that failure, then showing the concrete fix in code.</p>
+
+<h2>ROS2 Executors and Callback Groups: The Core Model</h2>
+<p>Every ROS2 node registers callbacks: functions that fire when a subscription receives a message, a timer expires, or a service is called. None of these callbacks run on their own. An executor is the object that actually pulls ready callbacks off a queue and runs them. By default, calling <code>rclpy.spin(node)</code> creates a single-threaded executor, which processes exactly one callback at a time, to completion, before starting the next one.</p>
+<p>A callback group is a label attached to each callback that tells the executor how it is allowed to be scheduled relative to other callbacks. ROS2 defines two kinds:</p>
+<ul>
+  <li><strong>MutuallyExclusive</strong> (the default): callbacks in this group never run concurrently with each other. The executor serializes them, one at a time, even on a multi-threaded executor.</li>
+  <li><strong>Reentrant</strong>: callbacks in this group can run concurrently with each other and with callbacks in other groups, limited only by the number of threads the executor has available.</li>
+</ul>
+<p>If you never create a callback group explicitly, every callback in a node lands in that node's single default MutuallyExclusive group. This detail is what causes the stall.</p>
+
+<h2>The Bug: A Slow Sensor Callback Blocks Everything</h2>
+<p>Consider a node with two subscriptions on a differential-drive robot: one to a lidar topic publishing at 10 Hz, and one to an IMU topic publishing at 100 Hz that feeds a control loop. The lidar callback does some point-cloud filtering that occasionally takes 150 milliseconds. Both callbacks are on the same node and neither one created a custom callback group, so both are in the same default MutuallyExclusive group.</p>
+<pre><code>import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import LaserScan, Imu
+
+class DriveNode(Node):
+    def __init__(self):
+        super().__init__('drive_node')
+        self.create_subscription(LaserScan, 'scan', self.on_scan, 10)
+        self.create_subscription(Imu, 'imu', self.on_imu, 10)
+
+    def on_scan(self, msg):
+        # occasionally slow point-cloud filtering, ~150 ms
+        self.filter_scan(msg)
+
+    def on_imu(self, msg):
+        # feeds the control loop, needs to run near 100 Hz
+        self.update_orientation(msg)
+</code></pre>
+<p>With a single-threaded executor, the timeline looks like this whenever <code>on_scan</code> takes 150 ms: every <code>on_imu</code> message that arrives during that window queues up and waits, because the executor cannot start a new callback from the same MutuallyExclusive group until the current one finishes. Instead of updating at 100 Hz, the control loop effectively updates in bursts, with a 150 ms gap every time the lidar filter runs. On a real robot this shows up as jerky orientation estimates and, if a PID loop is downstream of <code>on_imu</code>, oscillation or overshoot that looks like a tuning problem but is actually a scheduling problem.</p>
+<p>Switching to a multi-threaded executor without touching callback groups does not fix this. The default callback group is still MutuallyExclusive, so the executor still refuses to run <code>on_scan</code> and <code>on_imu</code> at the same time, even though it now has multiple threads free to do so.</p>
+
+<h2>The Fix: Separate Callback Groups, Multi-Threaded Executor</h2>
+<p>The fix has two parts. First, put the slow callback and the time-critical callback in different callback groups so the executor no longer considers them mutually exclusive. Second, use an executor with more than one thread, since callback groups only describe what is allowed to run concurrently, not that it will.</p>
+<pre><code>from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
+
+class DriveNode(Node):
+    def __init__(self):
+        super().__init__('drive_node')
+        scan_group = MutuallyExclusiveCallbackGroup()
+        imu_group = MutuallyExclusiveCallbackGroup()
+        self.create_subscription(LaserScan, 'scan', self.on_scan, 10,
+                                  callback_group=scan_group)
+        self.create_subscription(Imu, 'imu', self.on_imu, 10,
+                                  callback_group=imu_group)
+
+    def on_scan(self, msg):
+        self.filter_scan(msg)
+
+    def on_imu(self, msg):
+        self.update_orientation(msg)
+
+def main():
+    rclpy.init()
+    node = DriveNode()
+    executor = MultiThreadedExecutor(num_threads=2)
+    executor.add_node(node)
+    executor.spin()
+</code></pre>
+<p>Note that each subscription still uses a MutuallyExclusive group, just a separate one for each. This is the usual pattern: MutuallyExclusive groups protect a callback from re-entering itself or racing with other callbacks that share state, while giving unrelated callbacks their own group lets them run in parallel. Reentrant groups are for the narrower case where a single callback can safely run multiple instances of itself concurrently, such as an independent, stateless service handler; reaching for Reentrant by default risks data races if the callback touches shared node state without a lock.</p>
+
+<h2>Sizing the Executor's Thread Pool</h2>
+<p>A MultiThreadedExecutor with too few threads recreates the same stall with extra steps, since two callback groups sharing one thread still serialize. A reasonable starting point is one thread per callback group that has real concurrency requirements, plus one spare thread for timers and services. For the two-group example above, two threads is the minimum that actually decouples the lidar and IMU callbacks; three gives the timer or an added service callback room to run without contending. Adding threads beyond what your callback groups can use does not help and just adds idle threads.</p>
+<p>It is also worth checking whether a callback truly needs to live inside the executor at all. CPU-heavy work like image processing is sometimes better moved to a separate thread or process that the callback simply hands data off to, keeping the callback itself, and therefore the executor, fast regardless of how the work is scheduled.</p>
+
+<h2>Diagnosing an Existing Stall</h2>
+<p>Before restructuring callback groups, confirm the stall actually exists. Two checks are worth running:</p>
+<ul>
+  <li>Log a timestamp at the start and end of each suspect callback, and check whether the gap between consecutive <code>on_imu</code> calls spikes whenever <code>on_scan</code> runs. A spike lining up with the slow callback's duration confirms serialization, not a message-rate problem.</li>
+  <li>Use <code>ros2 topic hz /imu</code> while artificially slowing the lidar filter (a sleep call is enough for testing) and watch the reported rate drop in lockstep. If the drop tracks the artificial delay, the callback group is the cause.</li>
+</ul>
+<p>If a node already publishes and subscribes correctly, as covered in <a href="/blog/posts/ros2-nodes-and-topics-explained.html">ROS2 nodes and topics explained</a>, callback group misconfiguration is the next most common source of a robot that behaves correctly in isolation but stutters once more subscriptions are added to the same node.</p>
+
+<h2>Conclusion</h2>
+<p>ROS2 executors decide when callbacks run, and callback groups decide which callbacks are allowed to overlap. The default, everything in one MutuallyExclusive group processed by a single-threaded executor, is safe but strictly serial, and it is easy to hit a real stall the moment one callback in a node is occasionally slow. Splitting time-critical and slow callbacks into separate MutuallyExclusive groups, and running them under a MultiThreadedExecutor sized to match, restores the concurrency the robot's control loop actually needs without introducing races inside any single callback.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

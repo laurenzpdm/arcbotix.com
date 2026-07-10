@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 15
-- Last published: 2026-07-09
-- Known slugs: 15
+- Total articles: 17
+- Last published: 2026-07-10
+- Known slugs: 17
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,8 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 17 | 2026-07-10 | ros2-executors-callback-groups-explained | ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot | ROS2 executors and callback groups, ROS2 callback groups, ROS2 multi-threaded executor, ROS2 executor explained | Software  |
+| 16 | 2026-07-10 | torque-control-robot-arm-joints-current-sensing | Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque | torque control for robot arm joints, robot joint torque control, current sensing torque estimation, cascaded control loop robotics | Control Systems  |
 | 15 | 2026-07-09 | robot-arm-singularity-avoidance-jacobian | Robot Arm Singularity Avoidance with the Jacobian: A Worked Example | robot arm singularity avoidance, Jacobian singularity robotics, damped least squares inverse kinematics, manipulator singularity | Control Systems  |
 | 14 | 2026-07-09 | gearbox-backlash-compensation-robot-arm | Gearbox Backlash Compensation for Robot Arm Joints: Measuring and Correcting Mechanical Play | gearbox backlash compensation robot arm, backlash compensation robotics, robot joint backlash, encoder backlash measurement | Control Systems  |
 | 13 | 2026-07-08 | lqr-control-robot-arm-practical-introduction | LQR Control for Robot Arms: A Practical Introduction | LQR control for robot arms, LQR robotics, LQR vs PID robot arm, linear quadratic regulator robot joint | Control Systems  |
@@ -92,7 +94,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -104,11 +106,11 @@ subject (e.g. a robotic arm joint, a PCB, a control-loop diagram rendered
 as a scene). Keep prompts specific to the article's actual subject matter.
 
 ## Recent SEO Research (last 5 entries)
-- Candidates checked: incremental vs absolute encoders, motor driver current sensing (shunt sizing), choosing a microcontroller for real-time robot control, LQR control for robot arms vs PID.
-- Incremental vs absolute encoders: well covered by multiple vendor comparison pages (Heidenhain, Celera Motion, ELTRA); mostly product-marketing framing, but the core comparison itself is not underserved.
-- Motor driver current sensing / shunt sizing: coverage is fragmented across patents and generic app notes (Allegro), no robotics-specific worked example, but overlaps somewhat with the already-published power budgeting article.
-- Choosing a microcontroller for real-time robot control: only thin forum threads (electro-tech-online, etechnophiles), decent gap but mostly a listicle-shaped topic (STM32 vs Teensy vs ESP32) that risks becoming generic buying advice rather than technical depth.
-- Chose "LQR control for robot arms vs PID": top results are paywalled IEEE/ResearchGate papers or a self-balancing-robot blog post; none give an accessible worked state-space example (A/B matrices for a simple joint, Q/R cost tuning walkthrough, closed-loop pole comparison against a tuned PID) for someone who already knows PID from our existing article.
+- Real-time control loops: still weak-gap per the deprioritization on 2026-07-10, skipped again.
+- Impedance control: GitHub tutorials (franklinselva, mathworks) and source-robotics already give a decent conceptual + code walkthrough; gap smaller than expected.
+- Compliant/force control for end effectors: coverage is either medical-research papers (nasopharyngeal swab study) or vendor compliance-tool product pages, not a robotics-hobbyist angle, but scope felt closer to a hardware buying guide than a control-systems explainer.
+- Chose "ROS2 executors and callback groups explained": top pages are the official ROS2 docs (dense reference style, no concrete failure scenario), a ROS Answers thread, and one Medium series; none walk through a worked example of a slow sensor callback blocking a control loop in the same mutually-exclusive callback group, with a timing diagram and the reentrant-group fix in code.
+- Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
 
 ## Recent Strategy Adjustments (last 3 entries)
 - Chose "robot arm singularity avoidance with the Jacobian": top-ranking pages are either dense academic papers/patents (arXiv, MDPI, USPTO) or short vendor blog posts (RoboDK, Realman) that name the concept and the damped-least-squares idea but do not walk through a worked numeric example - computing the Jacobian determinant for a simple planar arm, showing it approach zero near a stretched-out pose, and comparing plain pseudo-inverse vs damped least squares behavior with actual joint velocity numbers.
