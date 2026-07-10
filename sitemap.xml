@@ -91,6 +91,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/ros2-executors-callback-groups-explained.html</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/ros2-nodes-and-topics-explained.html</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
