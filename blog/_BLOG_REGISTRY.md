@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 17
-- Last published: 2026-07-10
+- Total articles: 18
+- Last published: 2026-07-11
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 18 | 2026-07-11 | differential-drive-robot-kinematics-odometry | Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example | differential drive robot kinematics, wheel odometry, differential drive odometry, robot odometry drift | Control Systems | Derives differential drive robot kinematics from two independently driven wheels: the forward kinematics equations connecting wheel speed and wheelbase to linear/angular velocity, converting quadrature encoder ticks to wheel speed, the discrete Euler and exact arc-based odometry pose updates with Python code, and a worked numeric example (0.20m wheelbase, 360 counts/rev, 0.065m wheels) quantifying how encoder quantization noise (random, self-canceling) versus wheel radius asymmetry (systematic, linearly growing with distance) accumulate into real position and heading error. Covers wheelbase and wheel-radius-ratio calibration to remove systematic drift, and common mistakes (gear backlash on direction reversal, low update rate, trusting odometry as ground truth). |
 | 17 | 2026-07-10 | ros2-executors-callback-groups-explained | ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot | ROS2 executors and callback groups, ROS2 callback groups, ROS2 multi-threaded executor, ROS2 executor explained | Software | Explains ROS2 executors and callback groups through a worked failure scenario: a slow lidar-filtering callback and a 100 Hz IMU callback sharing the default MutuallyExclusive callback group on a single-threaded executor, causing the IMU-driven control loop to stall in bursts. Shows the fix (separate MutuallyExclusive callback groups per subscription plus a MultiThreadedExecutor sized to the number of groups), explains Reentrant groups and when they are risky, gives guidance on sizing the thread pool, and covers two diagnostic techniques (callback timestamp logging, ros2 topic hz under artificial delay) for confirming the stall before restructuring. |
 | 16 | 2026-07-10 | torque-control-robot-arm-joints-current-sensing | Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque | torque control for robot arm joints, robot joint torque control, current sensing torque estimation, cascaded control loop robotics | Control Systems | Explains torque control for robot arm joints: the Kt torque-constant relationship between motor current and torque, the standard cascaded current/velocity/position control loop structure used on real robot joints, a worked PI current-loop tuning example (pole-zero cancellation, R/L electrical time constant, discrete-time PI code), and how to implement a joint torque limit as a current clamp with a numeric worked example including gearbox ratio and efficiency. |
 | 15 | 2026-07-09 | robot-arm-singularity-avoidance-jacobian | Robot Arm Singularity Avoidance with the Jacobian: A Worked Example | robot arm singularity avoidance, Jacobian singularity robotics, damped least squares inverse kinematics, manipulator singularity | Control Systems | Explains robot arm singularity avoidance with a worked numeric example: derives the Jacobian determinant for a 2-link planar arm (det(J) = L1*L2*sin(theta2)), shows numerically how required joint velocity blows up as the elbow angle approaches 0 degrees (full extension), introduces Yoshikawa's manipulability measure as a practical near-singularity detection signal, and compares plain pseudo-inverse (which inherits the same singularity) against damped least squares (which trades bounded tracking error for bounded joint velocity). Ends with practical controller guidelines: computing manipulability every cycle, setting an arm-specific damping threshold, favoring trajectories that avoid full extension/fold-back, and logging the damping factor to catch trajectories that route too close to singular regions. Links to inverse-kinematics-explained (which introduces the Jacobian pseudo-inverse and CCD/FABRIK IK methods) and trajectory-planning-for-robotic-arms (workspace-aware path planning). |
@@ -101,3 +102,8 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 17)
 - ros2-executors-callback-groups-explained -> ros2-nodes-and-topics-explained (links to the nodes/topics explainer as the prerequisite concept before executors and callback groups)
+
+## Internal links (article 18)
+- differential-drive-robot-kinematics-odometry -> quadrature-encoder-wiring-6dof-robot-arm (linked encoder tick-to-distance conversion to the underlying quadrature decoding and CPR wiring guide)
+- differential-drive-robot-kinematics-odometry -> imu-sensor-fusion-basics (linked odometry's remaining random error to IMU fusion as the correcting sensor layer)
+- differential-drive-robot-kinematics-odometry -> kalman-filter-robot-state-estimation (linked odometry as the input a Kalman filter state estimator corrects against)

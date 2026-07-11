@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example – Arcbotix</title>
+  <meta name="description" content="Differential drive robot kinematics explained with the full odometry derivation, real encoder numbers, and a worked example showing how drift accumulates.">
+  <meta name="keywords" content="differential drive robot kinematics, wheel odometry, differential drive odometry, robot odometry drift">
+  <meta property="og:title" content="Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example">
+  <meta property="og:description" content="Differential drive robot kinematics explained with the full odometry derivation, real encoder numbers, and a worked example showing how drift accumulates.">
+  <meta property="og:image" content="/blog/posts/img/differential-drive-robot-kinematics-odometry.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/differential-drive-robot-kinematics-odometry.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/differential-drive-robot-kinematics-odometry.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-11">July 11, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example</h1>
+    <p class="blog-post-subtitle">Deriving position from wheel encoders, and showing exactly how the estimate drifts</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/differential-drive-robot-kinematics-odometry.webp" alt="Isometric technical illustration of a differential drive mobile robot with wheel rotation vectors and a curved path trace" loading="lazy">
+    </div>
+
+    <h2>Differential Drive Robot Kinematics: Why Two Wheels Are Enough to Steer</h2><p>A differential drive robot has two independently driven wheels on a common axle, usually with one or more passive casters for balance. There's no steering mechanism. Instead, the robot turns by spinning its wheels at different speeds: equal speeds drive straight, unequal speeds curve the path, and opposite speeds spin the robot in place. Differential drive robot kinematics is the math that turns those two wheel speeds into a robot's linear and angular velocity, and the odometry built on top of it is how the robot estimates its own position from nothing but encoder ticks.</p><p>This matters for anything from a small research rover to a warehouse AMR: odometry is usually the first position estimate a mobile robot has, often the only one running at full control-loop rate, and it's what other estimators (an EKF, a particle filter, a full SLAM stack) correct against rather than replace outright.</p><h2>Forward Kinematics: From Wheel Speeds to Robot Velocity</h2><p>Define two wheels, left and right, separated by a wheelbase (track width) <code>L</code>, each with linear surface speed <code>v_L</code> and <code>v_R</code> (meters per second, computed from wheel radius times angular velocity). The robot's linear velocity <code>v</code> and angular velocity <code>omega</code> at its center point are:</p><pre><code>v     = (v_R + v_L) / 2
+omega = (v_R - v_L) / L</code></pre><p>This is the whole model. When <code>v_R = v_L</code>, omega is zero and the robot drives straight. When <code>v_R = -v_L</code>, v is zero and the robot rotates in place around the midpoint of its axle. Everything else is a mix of forward motion and turning, tracing an arc whose instantaneous radius is <code>R = v / omega</code> (undefined, meaning infinite, when omega is zero).</p><h2>From Wheel Encoders to Wheel Speed</h2><p>In practice you don't measure <code>v_L</code> and <code>v_R</code> directly, you measure encoder tick counts and derive them. For a quadrature encoder (see <a href="/blog/posts/quadrature-encoder-wiring-6dof-robot-arm.html">quadrature encoder wiring</a> for the wiring and decoding details), the per-wheel distance traveled between two control loop ticks is:</p><pre><code>delta_ticks   = ticks_now - ticks_previous
+delta_angle   = 2 * pi * (delta_ticks / counts_per_rev)
+delta_distance = delta_angle * wheel_radius</code></pre><p>Divide <code>delta_distance</code> by the loop's elapsed time <code>dt</code> to get <code>v_L</code> or <code>v_R</code> for that step. A typical small robot might use a 12 CPR magnetic encoder behind a 30:1 gearbox, giving 360 counts per output wheel revolution, on a 65mm diameter wheel. At a 50Hz control loop, one encoder tick corresponds to roughly 0.57mm of wheel travel, which sets the practical resolution floor of your odometry.</p><h2>The Discrete Odometry Update</h2><p>Given <code>v</code> and <code>omega</code> for a short timestep <code>dt</code>, the robot's pose <code>(x, y, theta)</code> updates as:</p><pre><code>theta_new = theta + omega * dt
+x_new     = x + v * cos(theta) * dt
+y_new     = y + v * sin(theta) * dt</code></pre><p>This is the standard first-order (Euler) integration used in most real firmware, and it's accurate enough at typical control loop rates (50Hz or faster) where the arc traveled in one step is small. Some implementations use the exact arc-based update instead, which matters more at low update rates or high angular velocity:</p><pre><code>if omega != 0:
+    x_new     = x + (v/omega) * (sin(theta_new) - sin(theta))
+    y_new     = y - (v/omega) * (cos(theta_new) - cos(theta))
+    theta_new = theta + omega * dt
+else:
+    x_new = x + v * cos(theta) * dt
+    y_new = y + v * sin(theta) * dt</code></pre><p>In Python, a minimal odometry update running inside a control loop looks like this:</p><pre><code>def update_odometry(x, y, theta, v_l, v_r, L, dt):
+    v = (v_r + v_l) / 2.0
+    omega = (v_r - v_l) / L
+    theta_new = theta + omega * dt
+    x_new = x + v * math.cos(theta) * dt
+    y_new = y + v * math.sin(theta) * dt
+    return x_new, y_new, theta_new</code></pre><h2>A Worked Example: How Drift Actually Accumulates</h2><p>Take a robot with a 0.20m wheelbase, 0.065m wheels, and encoders giving 360 counts per output revolution as above. Command it to drive a 2m straight line at 0.3 m/s, control loop at 50Hz (dt = 0.02s), so 100 steps.</p><p>With perfect encoder counts and zero slip, both wheels report identical tick deltas each step, omega stays at zero, and the odometry lands exactly at (2.0, 0.0). Now introduce two realistic error sources:</p><ul><li><strong>Encoder quantization</strong>: at 0.57mm resolution per tick, each wheel's measured distance per step can be off by up to half a tick, roughly 0.3mm, in either direction, essentially random noise on each wheel's reported speed.</li><li><strong>Wheel slip asymmetry</strong>: a small, consistent difference in effective wheel radius (say the right wheel is 0.3% larger due to tire wear or tire pressure) produces a small but constant nonzero omega even when both wheels are commanded equally.</li></ul><p>The encoder quantization noise mostly averages out over many steps since it's symmetric, adding a small random walk to the position estimate, typically a few millimeters of scatter over a 2m run. The wheel radius asymmetry is the more damaging error because it's systematic: a constant 0.3% radius mismatch over a 0.20m wheelbase produces a steady omega of roughly 0.0009 rad/s at 0.3 m/s wheel speed. Integrated over the 6.7 seconds it takes to drive 2m, that's a heading error of about 0.36 degrees, which sounds small but translates to roughly 12mm of lateral position error at the end of the run, and grows linearly with distance traveled. Drive 20m instead of 2m and the same systematic bias produces over 10cm of lateral error.</p><p>This is the core lesson of differential drive odometry: random noise sources (encoder quantization, minor timing jitter) mostly average out and grow slowly with the square root of distance, while systematic bias sources (wheel radius mismatch, wheelbase measured incorrectly, gear backlash) grow linearly with distance and dominate over any meaningfully long run.</p><h2>Calibrating Away the Systematic Error</h2><p>Two calibration numbers fix most of the systematic drift before it ever reaches a full sensor fusion stage:</p><ol><li><strong>Effective wheelbase</strong>: drive the robot through several full in-place rotations commanded from software, measure the actual rotation with an external reference (a protractor, a floor mark, or an IMU heading reading), and adjust the <code>L</code> used in the kinematics equations until commanded and measured rotation match. The wheelbase that makes the math work is often a few percent different from the physically measured axle distance, because of tire compliance and contact patch effects.</li><li><strong>Wheel radius ratio</strong>: drive a long straight line and measure the actual heading drift. If the robot consistently curves one direction, one wheel's effective radius is slightly larger; apply a small correction factor to that wheel's computed distance per tick until straight-line commands actually drive straight.</li></ol><p>These two corrections typically remove the majority of systematic error. What remains, quantization noise and slip during acceleration or on uneven surfaces, is exactly what an <a href="/blog/posts/imu-sensor-fusion-basics.html">IMU sensor fusion</a> layer or a full <a href="/blog/posts/kalman-filter-robot-state-estimation.html">Kalman filter state estimator</a> is built to correct, by combining odometry with a gyroscope's independent heading estimate and, where available, absolute position fixes.</p><h2>Common Mistakes</h2><ul><li><strong>Using the wrong wheelbase.</strong> The geometric axle distance is a starting point, not the value to trust; calibrate it from actual rotation behavior.</li><li><strong>Ignoring gear backlash on direction reversals.</strong> A gearbox with play reports encoder motion that doesn't correspond to real wheel motion right after a direction change, corrupting a single step's odometry update.</li><li><strong>Running the odometry update at too low a rate.</strong> Euler integration accumulates extra error when omega is large and dt is not small relative to the turn radius; either increase the update rate or switch to the exact arc-based update.</li><li><strong>Treating odometry as ground truth for long-duration autonomy.</strong> Odometry alone is fine over short distances, but any mission longer than a few meters needs a correcting sensor layered on top.</li></ul><h2>Conclusion</h2><p>Differential drive robot kinematics reduces to two equations connecting wheel speed to linear and angular velocity, and wheel odometry is just integrating that velocity over time using encoder-derived speeds. The forward math is simple enough to implement in a few lines of code, but the real engineering work is understanding which errors are random and self-canceling versus systematic and linearly growing, and calibrating the wheelbase and wheel radius ratio to remove the systematic part before it dominates your position estimate.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
