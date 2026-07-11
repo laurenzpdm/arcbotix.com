@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 11 Jul 2026 10:11:24 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 11 Jul 2026 22:14:14 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps</title>
+      <link>https://arcbotix.com/blog/posts/stepper-motor-microstepping-explained.html</link>
+      <guid>https://arcbotix.com/blog/posts/stepper-motor-microstepping-explained.html</guid>
+      <pubDate>Sat, 11 Jul 2026 22:13:55 +0000</pubDate>
+      <description>Stepper motor microstepping explained with real formulas: holding torque per microstep, driver chip choices (A4988, DRV8825, TMC2209), and missed-step risk.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example</title>
       <link>https://arcbotix.com/blog/posts/differential-drive-robot-kinematics-odometry.html</link>
