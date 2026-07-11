@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps – Arcbotix</title>
+  <meta name="description" content="Stepper motor microstepping explained with real formulas: holding torque per microstep, driver chip choices (A4988, DRV8825, TMC2209), and missed-step risk.">
+  <meta name="keywords" content="stepper motor microstepping explained, microstepping torque, stepper driver microstepping, missed steps stepper motor">
+  <meta property="og:title" content="Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps">
+  <meta property="og:description" content="Stepper motor microstepping explained with real formulas: holding torque per microstep, driver chip choices (A4988, DRV8825, TMC2209), and missed-step risk.">
+  <meta property="og:image" content="/blog/posts/img/stepper-motor-microstepping-explained.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/stepper-motor-microstepping-explained.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/stepper-motor-microstepping-explained.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-11">July 11, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps</h1>
+    <p class="blog-post-subtitle">Why finer microstepping smooths motion but does not give you more resolution for free</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/stepper-motor-microstepping-explained.webp" alt="Isometric technical illustration of a stepper motor rotor with glowing microstep angle increments around the shaft" loading="lazy">
+    </div>
+
+    <p>Stepper motor microstepping explained simply: it is a driver technique that positions the rotor between full steps by proportioning current between two motor phases, instead of switching one phase fully on and the other fully off. This guide covers the actual holding-torque-per-microstep formula, how to pick a driver chip for a robot joint, and the missed-step failure mode that catches people who treat microstepping as free resolution.</p>
+
+<h2>What Microstepping Actually Changes</h2>
+<p>A standard hybrid stepper motor has a fixed mechanical step angle, almost always 1.8 degrees (200 full steps per revolution) or 0.9 degrees (400 full steps per revolution). Full-step and half-step drive modes only ever park the rotor at those fixed mechanical positions or the halfway points between them. Microstepping changes this by driving the two phase coils with sine and cosine current waveforms instead of square waves.</p>
+<p>At each microstep, the driver sets phase A current to <code>I * cos(theta)</code> and phase B current to <code>I * sin(theta)</code>, where theta is the electrical angle for that microstep and I is the configured full-scale current. The resulting magnetic field vector rotates smoothly between the pole positions, and the rotor's detent torque pulls it to follow that vector. A common driver like the A4988 supports up to 16 microsteps per full step (3200 steps/revolution on a 1.8 degree motor), while the DRV8825 supports up to 32, and modern chips like the TMC2209 support up to 256 microsteps per full step in software (51,200 steps/revolution).</p>
+
+<h2>The Holding Torque Per Microstep Formula</h2>
+<p>The torque available to hold the rotor at any given microstep position is:</p>
+<blockquote>T(theta) = T_holding * sin(theta)</blockquote>
+<p>where T_holding is the motor's rated full-step holding torque and theta is the electrical angle from the nearest full step, in radians. This is the formula that top-ranking industrial motion-control pages state correctly but rarely apply with numbers.</p>
+<p>Take a NEMA 17 motor rated at 0.4 N*m (40 N*cm) holding torque, driven at 16 microsteps per full step. The first microstep sits at theta = (1/16) * (pi/2) = 0.0982 rad from the full step. Available torque there is:</p>
+<blockquote>T(1) = 0.4 * sin(0.0982) = 0.4 * 0.098 = 0.039 N*m</blockquote>
+<p>That is less than 10 percent of the rated holding torque, at the very first microstep. This is why microstepping smooths motion and improves positioning resolution, but does not raise the torque the motor can actually push against while stationary between full steps. If your robot joint needs to hold a load against gravity between full-step positions, size the motor for that reduced torque, not the datasheet holding-torque number.</p>
+
+<h3>Resolution vs Real Accuracy</h3>
+<p>Microstepping resolution is not the same as mechanical accuracy. Rotor detent positions are set by the physical pole geometry, and microstep positions between them depend on the linearity of the driver's current control and the motor's own magnetic nonlinearity. In practice, a 1.8 degree stepper with 16x microstepping will have real positional error of a few percent of a full step at each individual microstep, even though the commanded resolution is 0.1125 degrees. For a robot arm joint after a gear reduction, this error shrinks proportionally, which is one reason microstepping matters more for direct-drive or lightly geared joints than for heavily reduced ones already covered by <a href="/blog/posts/harmonic-drive-vs-planetary-gearbox.html">harmonic drive and planetary gearbox choices</a>.</p>
+
+<h2>Choosing a Microstepping Resolution for a Robot Build</h2>
+<ul>
+<li><strong>1/8 to 1/16 microstepping</strong>: good default for hobby robot arms and small mobile bases. Noticeably smoother and quieter than full-step, without pushing the driver's current-control bandwidth or CPU step-pulse rate too hard.</li>
+<li><strong>1/32 to 1/256 microstepping</strong>: useful for very smooth, low-vibration motion (camera gimbals, precision linear stages) or for driver chips like the TMC2209 that do sine-wave interpolation internally (marketed as StealthChop or similar) regardless of the step resolution your controller commands.</li>
+<li><strong>Full or half step</strong>: still the right choice when you need maximum torque per step and can tolerate more vibration, for example a low-speed, high-load lead screw axis.</li>
+</ul>
+<p>Step pulse rate is the practical limit on how much microstepping you can use. Commanding the same shaft speed at 256 microsteps instead of full steps means issuing 256 times as many step pulses per second. A microcontroller bit-banging step pulses in a tight loop, or a Raspberry Pi generating pulses in software, will run out of headroom well before a dedicated motion controller does. Check your controller's maximum sustainable step rate before assuming a high microstepping setting is free.</p>
+
+<h2>How Missed Steps Actually Happen</h2>
+<p>A stepper motor is an open-loop position device unless you add an encoder. It commits to a commanded position by assuming the rotor tracked every microstep. Two failure modes break that assumption:</p>
+<ol>
+<li><strong>Torque saturation</strong>: if the load torque at any point in the motion exceeds the available torque at that microstep angle (recall T(theta) drops to near zero right after each full step), the rotor slips backward relative to the commanded field position. The driver has no idea this happened, because it never reads rotor position.</li>
+<li><strong>Resonance</strong>: stepper motors have a natural mechanical resonance frequency, often in the 100-300 Hz full-step-rate range for small NEMA motors. Driving near that frequency, especially at low microstepping settings, can cause the rotor to lose synchronization even under light load. Higher microstepping settings smooth the torque ripple that excites this resonance, which is a second, distinct reason to use microstepping beyond visual smoothness.</li>
+</ol>
+<p>A missed step is silent and cumulative: the controller's internal position count and the rotor's actual position permanently diverge by one or more full steps, and every subsequent move is offset by that error. This is the practical argument for adding a quadrature encoder to a stepper-driven joint on anything beyond a low-stakes hobby project, using the same <a href="/blog/posts/quadrature-encoder-wiring-6dof-robot-arm.html">quadrature encoder wiring and CPR-to-angle conversion</a> approach used for other feedback-driven joints, and periodically re-homing against a limit switch or index pulse to catch any accumulated drift.</p>
+
+<h2>Practical Driver Chip Notes</h2>
+<ul>
+<li><strong>A4988</strong>: fixed microstep resolutions up to 1/16, simple to wire, common on cheap hobby boards, but has no stall detection and gets hot at higher currents without a heatsink and fan.</li>
+<li><strong>DRV8825</strong>: up to 1/32 microstepping, higher current rating than the A4988, still purely open-loop with no back-EMF sensing.</li>
+<li><strong>TMC2209 and similar Trinamic chips</strong>: up to 1/256 microstepping with internal interpolation, plus StallGuard-style back-EMF sensing that can detect (not prevent) a stall condition, which is genuinely useful for adding a software-level missed-step check without a physical encoder.</li>
+</ul>
+
+<h2>Conclusion</h2>
+<p>Microstepping smooths motion, reduces resonance-driven step loss, and increases commanded positional resolution, but it does not increase available torque between full steps, and it does not turn an open-loop stepper into a closed-loop system. Size your motor for the reduced torque at the worst-case microstep angle, pick a microstepping resolution your controller can actually sustain at your target speed, and if the joint carries real load or needs guaranteed position, add encoder feedback rather than trusting step count alone.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

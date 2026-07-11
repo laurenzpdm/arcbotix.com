@@ -6,6 +6,13 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-11
+- Candidates checked: Gazebo vs PyBullet simulation choice, feedback control basics for beginners, URDF explained for a robot arm, A* vs RRT path planning, stepper motor microstepping and torque.
+- Gazebo vs PyBullet: still saturated - godrift.ai, blackcoffeerobotics.com and roboticscenter.ai already published detailed 2026 ROS2-integration comparisons.
+- URDF and A* vs RRT: both have solid existing worked-example coverage (articulatedrobotics.xyz/automaticaddison.com for URDF; multiple comparison papers and Medium RRT* code walkthroughs for path planning) - gap too thin for a fresh piece right now.
+- Chose "stepper motor microstepping explained for robotics": top pages (Analog Devices, Faulhaber, mechtex, linearmotiontips) explain the concept and the torque-per-microstep tradeoff correctly but from a generic industrial-motion-control angle, with no worked numbers for a small robot joint, no driver-chip specifics (A4988 vs DRV8825 vs TMC2209), and no missed-step/lost-position failure scenario tied back to closed-loop correction.
+- Weakness in current top pages: none derive the holding-torque-per-microstep formula with actual numbers for a hobby-robot NEMA motor, and none connect microstepping resolution choice to real step-loss risk under load.
+
 (No entries yet. Each cycle, before choosing a topic, add one dated entry here:
 candidate topics considered, the one chosen and why - demand signal plus the
 content-quality edge over what currently ranks - and one weakness noticed in

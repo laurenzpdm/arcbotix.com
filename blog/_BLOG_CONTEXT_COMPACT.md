@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 17
-- Last published: 2026-07-10
-- Known slugs: 17
+- Total articles: 18
+- Last published: 2026-07-11
+- Known slugs: 18
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 18 | 2026-07-11 | differential-drive-robot-kinematics-odometry | Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example | differential drive robot kinematics, wheel odometry, differential drive odometry, robot odometry drift | Control Systems  |
 | 17 | 2026-07-10 | ros2-executors-callback-groups-explained | ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot | ROS2 executors and callback groups, ROS2 callback groups, ROS2 multi-threaded executor, ROS2 executor explained | Software  |
 | 16 | 2026-07-10 | torque-control-robot-arm-joints-current-sensing | Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque | torque control for robot arm joints, robot joint torque control, current sensing torque estimation, cascaded control loop robotics | Control Systems  |
 | 15 | 2026-07-09 | robot-arm-singularity-avoidance-jacobian | Robot Arm Singularity Avoidance with the Jacobian: A Worked Example | robot arm singularity avoidance, Jacobian singularity robotics, damped least squares inverse kinematics, manipulator singularity | Control Systems  |
@@ -94,7 +95,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -113,6 +114,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- Chose "robot arm singularity avoidance with the Jacobian": top-ranking pages are either dense academic papers/patents (arXiv, MDPI, USPTO) or short vendor blog posts (RoboDK, Realman) that name the concept and the damped-least-squares idea but do not walk through a worked numeric example - computing the Jacobian determinant for a simple planar arm, showing it approach zero near a stretched-out pose, and comparing plain pseudo-inverse vs damped least squares behavior with actual joint velocity numbers.
-- Chose "gearbox backlash compensation for robot arm joints": top pages are either generic mechanical-engineering explainers (lily-bearing, geartechnology) describing what backlash is, or dense patents on proprietary compensation methods; only one Arduino forum thread discusses practical software compensation, and none walk through measuring backlash from encoder position error at direction reversals or a concrete dead-band-inversion/lookup-table compensation approach for a robot joint.
-- Weakness in current top pages: they explain backlash as a mechanical concept but skip the software/control side entirely, leaving a builder with an encoder-equipped joint no concrete way to measure or compensate for it in code.
+- Extended Kalman filter localization: PythonRobotics and an independent tutorial (aleksandarhaber.com) already give full worked Python implementations with real matrices - gap too small for a fresh explainer.
+- Chose "differential drive robot kinematics and wheel odometry": top pages are either FRC/WPILib-specific (Java API, competition-robot framing, not general robotics) or a solid but generic automaticaddison.com walkthrough; none quantify odometry drift with a concrete numeric example (encoder CPR, wheelbase, slip) or connect it back to a real encoder-equipped robot build.
+- Weakness in current top pages: they derive the kinematics equations correctly but stop before showing how encoder tick noise and wheel slip actually accumulate into a numeric heading/position error over a real path.
