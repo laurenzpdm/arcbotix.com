@@ -62,6 +62,16 @@ entries above and decide whether blog/_BLOG_STRATEGY.md's "Topic Priority"
 section still reflects reality. Log either the change made and why, or
 "no change needed" and why, as a single dated line.)
 
+### 2026-07-12
+- Deprioritized "feedback control basics for beginners" within cluster 1 in
+  blog/_BLOG_STRATEGY.md Topic Priority. It was checked and rejected three
+  separate times (2026-07-07(2), 2026-07-11, 2026-07-12), always for the
+  same reason: thin generic source coverage plus conceptual overlap with the
+  existing PID tuning article. Also noted that "real ROS2 middleware
+  internals" within cluster 3 has now found a strong concrete gap twice in a
+  row (executors/callback groups on 2026-07-10(2), QoS settings on
+  2026-07-12), reinforcing the existing preference for that angle.
+
 ### 2026-07-10
 - Deprioritized "real-time considerations in robot control loops", "URDF
   tutorials", and "Gazebo vs PyBullet" within cluster 3 in
@@ -90,3 +100,11 @@ section still reflects reality. Log either the change made and why, or
 - Extended Kalman filter localization: PythonRobotics and an independent tutorial (aleksandarhaber.com) already give full worked Python implementations with real matrices - gap too small for a fresh explainer.
 - Chose "differential drive robot kinematics and wheel odometry": top pages are either FRC/WPILib-specific (Java API, competition-robot framing, not general robotics) or a solid but generic automaticaddison.com walkthrough; none quantify odometry drift with a concrete numeric example (encoder CPR, wheelbase, slip) or connect it back to a real encoder-equipped robot build.
 - Weakness in current top pages: they derive the kinematics equations correctly but stop before showing how encoder tick noise and wheel slip actually accumulate into a numeric heading/position error over a real path.
+
+### 2026-07-12
+- Candidates checked: ROS2 DDS QoS settings explained, Denavit-Hartenberg parameters for robot arms, BLDC hall sensor commutation, feedback control basics for beginners.
+- Denavit-Hartenberg parameters: well covered already by two automaticaddison.com articles, Robot Academy, and Universal Robots' own developer docs with clear worked tables - gap too thin.
+- BLDC hall sensor commutation: coverage is mostly vendor/product-marketing blogs (mechtex, jkongmotor) describing the 120-degree sensor layout in prose, no code-level commutation state table.
+- Feedback control basics for beginners: top results are thin AI-generated advice pages (LinkedIn, Vaia, Britannica) with no real block diagrams or numbers, but the topic overlaps heavily with the existing PID tuning article.
+- Chose "ROS2 QoS settings explained": the official design doc and docs.ros.org page define reliability/durability/history correctly but read as dense policy reference; several Medium walkthroughs repeat the same policy list without a concrete failure. None show the classic mismatch bug (publisher on sensor-data best-effort QoS, subscriber left on default reliable) where the subscriber silently receives zero messages, with the actual ros2 topic info --verbose diagnostic output and the fix.
+- Weakness in current top pages: they enumerate QoS policies correctly but never walk through why a QoS mismatch causes silent, no-error data loss or how to diagnose it on a real ROS2 system.

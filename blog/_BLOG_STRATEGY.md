@@ -58,6 +58,13 @@ research log entry; no rationale, no edit.
   re-checked these and found the gap too thin or the topic already saturated
   by strong existing coverage every time. Favor other cluster 3 angles
   (Isaac Sim, real ROS2 middleware internals) instead.
+- Within cluster 1, deprioritize "feedback control basics for beginners" -
+  research entries 2026-07-07(2), 2026-07-11, and 2026-07-12 each re-checked
+  it and found only thin generic advice-blog coverage, but also consistent
+  conceptual overlap risk with the already-published PID tuning article.
+  Real ROS2 middleware internals (cluster 3) has instead found a strong,
+  concrete failure-scenario gap twice in a row (executors/callback groups,
+  then QoS settings) - keep favoring that angle within cluster 3.
 
 ## Image Prompt Style
 Cover images should look like clean technical illustrations, not stock-photo

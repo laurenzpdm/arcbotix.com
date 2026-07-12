@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 18
-- Last published: 2026-07-11
-- Known slugs: 18
+- Total articles: 20
+- Last published: 2026-07-12
+- Known slugs: 20
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,8 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 20 | 2026-07-12 | ros2-qos-settings-explained | ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages | ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy | Software  |
+| 19 | 2026-07-11 | stepper-motor-microstepping-explained | Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps | stepper motor microstepping explained, microstepping torque, stepper driver microstepping, missed steps stepper motor | Hardware  |
 | 18 | 2026-07-11 | differential-drive-robot-kinematics-odometry | Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example | differential drive robot kinematics, wheel odometry, differential drive odometry, robot odometry drift | Control Systems  |
 | 17 | 2026-07-10 | ros2-executors-callback-groups-explained | ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot | ROS2 executors and callback groups, ROS2 callback groups, ROS2 multi-threaded executor, ROS2 executor explained | Software  |
 | 16 | 2026-07-10 | torque-control-robot-arm-joints-current-sensing | Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque | torque control for robot arm joints, robot joint torque control, current sensing torque estimation, cascaded control loop robotics | Control Systems  |
@@ -95,7 +97,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -114,6 +116,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- Extended Kalman filter localization: PythonRobotics and an independent tutorial (aleksandarhaber.com) already give full worked Python implementations with real matrices - gap too small for a fresh explainer.
-- Chose "differential drive robot kinematics and wheel odometry": top pages are either FRC/WPILib-specific (Java API, competition-robot framing, not general robotics) or a solid but generic automaticaddison.com walkthrough; none quantify odometry drift with a concrete numeric example (encoder CPR, wheelbase, slip) or connect it back to a real encoder-equipped robot build.
-- Weakness in current top pages: they derive the kinematics equations correctly but stop before showing how encoder tick noise and wheel slip actually accumulate into a numeric heading/position error over a real path.
+- Feedback control basics for beginners: top results are thin AI-generated advice pages (LinkedIn, Vaia, Britannica) with no real block diagrams or numbers, but the topic overlaps heavily with the existing PID tuning article.
+- Chose "ROS2 QoS settings explained": the official design doc and docs.ros.org page define reliability/durability/history correctly but read as dense policy reference; several Medium walkthroughs repeat the same policy list without a concrete failure. None show the classic mismatch bug (publisher on sensor-data best-effort QoS, subscriber left on default reliable) where the subscriber silently receives zero messages, with the actual ros2 topic info --verbose diagnostic output and the fix.
+- Weakness in current top pages: they enumerate QoS policies correctly but never walk through why a QoS mismatch causes silent, no-error data loss or how to diagnose it on a real ROS2 system.

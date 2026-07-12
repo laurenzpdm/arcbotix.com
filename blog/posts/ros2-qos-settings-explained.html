@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages – Arcbotix</title>
+  <meta name="description" content="ROS2 QoS settings explained with a real reliability mismatch bug: a subscriber that silently receives zero messages, how to diagnose it, and the fix.">
+  <meta name="keywords" content="ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy">
+  <meta property="og:title" content="ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages">
+  <meta property="og:description" content="ROS2 QoS settings explained with a real reliability mismatch bug: a subscriber that silently receives zero messages, how to diagnose it, and the fix.">
+  <meta property="og:image" content="/blog/posts/img/ros2-qos-settings-explained.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/ros2-qos-settings-explained.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/ros2-qos-settings-explained.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Software</span>
+      <time datetime="2026-07-12">July 12, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages</h1>
+    <p class="blog-post-subtitle">A worked example of the QoS mismatch bug that leaves a subscriber silently starved of data, and how to diagnose it.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/ros2-qos-settings-explained.webp" alt="Isometric illustration of two robot nodes exchanging data packets, one stream connected and one stream shown as dropped fragments" loading="lazy">
+    </div>
+
+    <p>ROS2 QoS settings explained the wrong way sound like an abstract list of enums. Explained the right way, they explain a specific, maddening bug: a subscriber node that starts cleanly, shows up in <code>ros2 node info</code>, is definitely subscribed to the right topic, and yet never receives a single message. No error, no warning, no crash. Just silence.</p>
+
+<p>This happens because ROS2 runs on DDS, and DDS treats reliability, durability, and history as a contract that both sides of a connection must agree on. When they disagree, DDS does not connect the two endpoints at all. It fails silently by design.</p>
+
+<h2>The three QoS policies that matter most</h2>
+
+<p>ROS2 exposes a longer list of QoS policies, but three cause almost all of the practical pain.</p>
+
+<h3>Reliability</h3>
+<ul>
+<li><strong>Reliable</strong>: the publisher guarantees delivery. It keeps a history buffer and retransmits samples the subscriber has not acknowledged, using periodic heartbeat and ACKNACK messages under the hood.</li>
+<li><strong>Best effort</strong>: the publisher sends once and does not retry. If a packet is dropped on the wire, it is gone.</li>
+</ul>
+
+<h3>Durability</h3>
+<ul>
+<li><strong>Volatile</strong>: a late-joining subscriber gets nothing that was published before it connected.</li>
+<li><strong>Transient local</strong>: the publisher holds the last N samples and delivers them to any subscriber that connects afterward, even if it joins late.</li>
+</ul>
+
+<h3>History</h3>
+<ul>
+<li><strong>Keep last (depth N)</strong>: only the most recent N samples are buffered.</li>
+<li><strong>Keep all</strong>: every sample is buffered up to the resource limits of the DDS implementation.</li>
+</ul>
+
+<p>Each policy individually is easy to understand. The part that trips people up is that ROS2 enforces <strong>QoS compatibility</strong> between a publisher and a subscriber before it will let them talk at all.</p>
+
+<h2>The compatibility rule that causes the bug</h2>
+
+<p>The rule for reliability is one-directional: a publisher offering <strong>reliable</strong> can serve a subscriber that requests <strong>reliable</strong> or <strong>best effort</strong>. But a publisher offering <strong>best effort</strong> cannot serve a subscriber that requests <strong>reliable</strong>. The subscriber is asking for a delivery guarantee the publisher never promised, so DDS refuses to match them.</p>
+
+<p>This is exactly the situation ROS2's built-in sensor data profile creates if you are not paying attention. A LiDAR driver node commonly publishes on <code>rclcpp::SensorDataQoS()</code> or the Python equivalent, which sets reliability to best effort and a small keep-last depth, on the reasonable assumption that a dropped scan is better than a late one. If you then write a subscriber using the ROS2 default QoS, which is <strong>reliable</strong>, the two profiles are incompatible. The subscription is created, the node runs, no exception is thrown, and no data ever arrives.</p>
+
+<h2>Diagnosing it</h2>
+
+<p>The fastest way to confirm a QoS mismatch is <code>ros2 topic info</code> with the verbose flag, which prints the QoS profile of every publisher and subscriber on a topic:</p>
+
+<pre><code>ros2 topic info /scan --verbose
+
+Type: sensor_msgs/msg/LaserScan
+
+Publisher count: 1
+
+Node name: lidar_driver
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: PUBLISHER
+GID: 01.0f.7a...
+QoS profile:
+  Reliability: BEST_EFFORT
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+  History (Depth): KEEP_LAST (5)
+
+Subscription count: 1
+
+Node name: scan_filter
+Node namespace: /
+Topic type: sensor_msgs/msg/LaserScan
+Endpoint type: SUBSCRIPTION
+GID: 01.0f.7b...
+QoS profile:
+  Reliability: RELIABLE
+  Durability: VOLATILE
+  Lifespan: Infinite
+  Deadline: Infinite
+  Liveliness: AUTOMATIC
+  Liveliness lease duration: Infinite
+  History (Depth): KEEP_LAST (10)</code></pre>
+
+<p>The publisher is <code>BEST_EFFORT</code>, the subscription is <code>RELIABLE</code>. That single line pair is the entire bug. <code>ros2 topic hz /scan</code> run from the subscriber's process context would report nothing, while the same command run against the publisher directly would show data flowing fine, confirming the break is at the QoS boundary and not the driver.</p>
+
+<h2>Fixing the mismatch</h2>
+
+<p>There are two valid fixes, and which one is correct depends on what the data actually needs.</p>
+
+<p>If occasional dropped messages are acceptable, which is true for most sensor streams, match the subscriber to best effort:</p>
+
+<pre><code>import rclpy
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+
+qos = QoSProfile(
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=5,
+)
+
+self.create_subscription(LaserScan, '/scan', self.scan_callback, qos)</code></pre>
+
+<p>If every sample genuinely matters, for example a command topic where a missed message means a joint never gets its target, change the publisher to reliable instead:</p>
+
+<pre><code>from rclpy.qos import QoSProfile, ReliabilityPolicy
+
+qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
+self.create_publisher(JointCommand, '/joint_cmd', qos)</code></pre>
+
+<p>Do not default to reliable everywhere out of caution. Reliable delivery adds retransmission overhead and, under sustained packet loss or a slow subscriber, can cause the publisher's history buffer to back up and add latency instead of removing it. For high-rate sensor data, best effort with a shallow keep-last depth is usually the right choice precisely because a stale retransmitted scan is less useful than the next fresh one.</p>
+
+<h2>Durability: the other silent failure</h2>
+
+<p>A second, less common version of this bug involves durability instead of reliability. A map server that publishes the occupancy grid once at startup on a <strong>transient local</strong> publisher will correctly deliver that map to any subscriber using transient local, including ones that start later. But a subscriber left on the default <strong>volatile</strong> durability will never see that one-time message if it starts after the publish happened, because volatile subscribers only receive samples published while they were already connected.</p>
+
+<p>The fix is the same shape as the reliability case: match the subscriber's durability to what the publisher actually offers, using <code>QoSProfile(durability=DurabilityPolicy.TRANSIENT_LOCAL, depth=1)</code> for consumers of one-shot or slowly-changing state like a static map or a URDF-derived transform.</p>
+
+<h2>A quick pre-flight check</h2>
+
+<p>Before assuming a driver, network, or callback scheduling bug (see <a href="/blog/posts/ros2-executors-callback-groups-explained.html">ROS2 executors and callback groups explained</a> for that class of failure), run <code>ros2 topic info &lt;topic&gt; --verbose</code> on any topic where a subscriber reports zero messages. If the publisher and subscriber show different reliability or durability values, that is the entire bug, and it is a one-line QoS profile fix rather than a debugging session.</p>
+
+<ol>
+<li>Confirm the publisher exists and is actually publishing with <code>ros2 topic hz</code> run against it directly.</li>
+<li>Run <code>ros2 topic info --verbose</code> and compare reliability and durability on both sides.</li>
+<li>Match the subscriber's QoS to the publisher's intent, not the ROS2 default.</li>
+<li>Re-check with <code>ros2 topic hz</code> from the subscriber's side to confirm data now flows.</li>
+</ol>
+
+<p>QoS mismatches are one of the few ROS2 bugs that are fully deterministic and fully diagnosable from the command line in under a minute, once you know which two fields to compare.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 19
-- Last published: 2026-07-11
+- Total articles: 20
+- Last published: 2026-07-12
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 20 | 2026-07-12 | ros2-qos-settings-explained | ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages | ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy | Software | Explains the three ROS2 QoS policies that matter most in practice (reliability, durability, history) and walks through the classic silent-failure bug: a best-effort sensor publisher paired with a default-reliable subscriber, where DDS refuses to match the two endpoints and the subscriber receives zero messages with no error. Shows the exact ros2 topic info --verbose output that reveals the mismatch, gives the code fix for both the reliability case (matching best-effort for high-rate sensor data) and the durability case (transient local for one-shot map/state publishers), and ends with a four-step diagnostic checklist. |
 | 19 | 2026-07-11 | stepper-motor-microstepping-explained | Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps | stepper motor microstepping explained, microstepping torque, stepper driver microstepping, missed steps stepper motor | Hardware | Explains stepper motor microstepping for robotics builders: the T(theta) = T_holding * sin(theta) holding-torque-per-microstep formula with a worked NEMA 17 example, resolution vs real mechanical accuracy, how to choose a microstepping setting based on step-pulse-rate limits, the two root causes of missed steps (torque saturation and resonance), and a comparison of A4988, DRV8825, and TMC2209 driver chips. Links to the harmonic drive/planetary gearbox article and the quadrature encoder wiring article. |
 | 18 | 2026-07-11 | differential-drive-robot-kinematics-odometry | Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example | differential drive robot kinematics, wheel odometry, differential drive odometry, robot odometry drift | Control Systems | Derives differential drive robot kinematics from two independently driven wheels: the forward kinematics equations connecting wheel speed and wheelbase to linear/angular velocity, converting quadrature encoder ticks to wheel speed, the discrete Euler and exact arc-based odometry pose updates with Python code, and a worked numeric example (0.20m wheelbase, 360 counts/rev, 0.065m wheels) quantifying how encoder quantization noise (random, self-canceling) versus wheel radius asymmetry (systematic, linearly growing with distance) accumulate into real position and heading error. Covers wheelbase and wheel-radius-ratio calibration to remove systematic drift, and common mistakes (gear backlash on direction reversal, low update rate, trusting odometry as ground truth). |
 | 17 | 2026-07-10 | ros2-executors-callback-groups-explained | ROS2 Executors and Callback Groups Explained: Why One Slow Callback Can Stall Your Robot | ROS2 executors and callback groups, ROS2 callback groups, ROS2 multi-threaded executor, ROS2 executor explained | Software | Explains ROS2 executors and callback groups through a worked failure scenario: a slow lidar-filtering callback and a 100 Hz IMU callback sharing the default MutuallyExclusive callback group on a single-threaded executor, causing the IMU-driven control loop to stall in bursts. Shows the fix (separate MutuallyExclusive callback groups per subscription plus a MultiThreadedExecutor sized to the number of groups), explains Reentrant groups and when they are risky, gives guidance on sizing the thread pool, and covers two diagnostic techniques (callback timestamp logging, ros2 topic hz under artificial delay) for confirming the stall before restructuring. |
@@ -112,3 +113,6 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 19)
 - stepper-motor-microstepping-explained -> harmonic-drive-vs-planetary-gearbox (notes that microstepping accuracy matters more for direct-drive/lightly geared joints than heavily reduced ones)
 - stepper-motor-microstepping-explained -> quadrature-encoder-wiring-6dof-robot-arm (recommends encoder feedback to catch missed steps, reusing the CPR-to-angle conversion approach)
+
+## Internal links (article 20)
+- ros2-qos-settings-explained -> ros2-executors-callback-groups-explained (pointed readers debugging 'no data arriving' toward the executor/callback-group failure mode as the other common cause, contrasted against the QoS mismatch cause covered here)
