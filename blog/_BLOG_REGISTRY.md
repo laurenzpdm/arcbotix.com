@@ -4,7 +4,7 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 20
+- Total articles: 21
 - Last published: 2026-07-12
 
 ## Keyword Pool (not yet used)
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 21 | 2026-07-12 | bldc-hall-sensor-commutation-six-step | BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch | BLDC hall sensor commutation, six-step commutation BLDC motor, hall sensor commutation table, BLDC motor control hall sensors | Hardware | Explains BLDC hall sensor commutation from first principles: why six-step commutation exists, the electrical-vs-mechanical degree relationship tied to pole-pair count, the 90-degree torque angle target and resulting torque ripple, a derived six-state hall-to-phase-energization table with a hardware-agnostic C lookup-table implementation driven from a hall-change interrupt, and diagnosing the classic wrong-direction/stall symptom caused by swapped hall or phase wiring. |
 | 20 | 2026-07-12 | ros2-qos-settings-explained | ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages | ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy | Software | Explains the three ROS2 QoS policies that matter most in practice (reliability, durability, history) and walks through the classic silent-failure bug: a best-effort sensor publisher paired with a default-reliable subscriber, where DDS refuses to match the two endpoints and the subscriber receives zero messages with no error. Shows the exact ros2 topic info --verbose output that reveals the mismatch, gives the code fix for both the reliability case (matching best-effort for high-rate sensor data) and the durability case (transient local for one-shot map/state publishers), and ends with a four-step diagnostic checklist. |
 | 19 | 2026-07-11 | stepper-motor-microstepping-explained | Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps | stepper motor microstepping explained, microstepping torque, stepper driver microstepping, missed steps stepper motor | Hardware | Explains stepper motor microstepping for robotics builders: the T(theta) = T_holding * sin(theta) holding-torque-per-microstep formula with a worked NEMA 17 example, resolution vs real mechanical accuracy, how to choose a microstepping setting based on step-pulse-rate limits, the two root causes of missed steps (torque saturation and resonance), and a comparison of A4988, DRV8825, and TMC2209 driver chips. Links to the harmonic drive/planetary gearbox article and the quadrature encoder wiring article. |
 | 18 | 2026-07-11 | differential-drive-robot-kinematics-odometry | Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example | differential drive robot kinematics, wheel odometry, differential drive odometry, robot odometry drift | Control Systems | Derives differential drive robot kinematics from two independently driven wheels: the forward kinematics equations connecting wheel speed and wheelbase to linear/angular velocity, converting quadrature encoder ticks to wheel speed, the discrete Euler and exact arc-based odometry pose updates with Python code, and a worked numeric example (0.20m wheelbase, 360 counts/rev, 0.065m wheels) quantifying how encoder quantization noise (random, self-canceling) versus wheel radius asymmetry (systematic, linearly growing with distance) accumulate into real position and heading error. Covers wheelbase and wheel-radius-ratio calibration to remove systematic drift, and common mistakes (gear backlash on direction reversal, low update rate, trusting odometry as ground truth). |
@@ -116,3 +117,7 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 20)
 - ros2-qos-settings-explained -> ros2-executors-callback-groups-explained (pointed readers debugging 'no data arriving' toward the executor/callback-group failure mode as the other common cause, contrasted against the QoS mismatch cause covered here)
+
+## Internal links (article 21)
+- bldc-hall-sensor-commutation-six-step -> servo-vs-stepper-vs-bldc-motor-robotics (linked from the torque angle section when discussing when six-step BLDC vs other actuator types is worth the added complexity)
+- bldc-hall-sensor-commutation-six-step -> torque-control-robot-arm-joints-current-sensing (linked when discussing why commutation needs a dedicated interrupt context similar to a tight current control loop)
