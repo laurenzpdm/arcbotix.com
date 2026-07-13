@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 21
-- Last published: 2026-07-12
-- Known slugs: 21
+- Total articles: 22
+- Last published: 2026-07-13
+- Known slugs: 22
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 22 | 2026-07-13 | field-oriented-control-foc-bldc-motors-explained | Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example | field-oriented control BLDC motor, FOC explained robotics, Clarke Park transform example, Id Iq current control BLDC | Control Systems  |
 | 21 | 2026-07-12 | bldc-hall-sensor-commutation-six-step | BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch | BLDC hall sensor commutation, six-step commutation BLDC motor, hall sensor commutation table, BLDC motor control hall sensors | Hardware  |
 | 20 | 2026-07-12 | ros2-qos-settings-explained | ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages | ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy | Software  |
 | 19 | 2026-07-11 | stepper-motor-microstepping-explained | Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps | stepper motor microstepping explained, microstepping torque, stepper driver microstepping, missed steps stepper motor | Hardware  |
@@ -98,7 +99,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -117,6 +118,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- ROS2 actions vs services vs topics: well covered already by docs.ros.org (three separate distro versions), automaticaddison.com, and The Construct with clear when-to-use guidance - gap too thin.
-- Chose "BLDC hall sensor commutation with hall sensors, building the six-step table from scratch": top pages are MCU-vendor documentation (MATLAB/Simulink STM32 guide, NXP S32M276, TI E2E forum, Microchip devhelp) tied to a specific chip's peripheral registers, or marketing-style overviews (mechtex, jkongmotor, zbotic) that describe the 120-degree hall layout in prose without a hardware-agnostic state table a hobbyist can port to any microcontroller.
-- Weakness in current top pages: none derive the six hall-state-to-phase-energization table from first principles (electrical angle, torque angle target of 90 degrees) in a way that is not locked to one vendor's specific timer/ADC peripheral, and none cover the classic wrong-direction/stall symptom when two hall wires are swapped.
+- RRT vs A* path planning: mostly academic comparison papers (ResearchGate, PMC) with abstract performance claims, no worked numeric example on a small grid - a real angle exists but weaker than the FOC gap this cycle.
+- Chose "field-oriented control (FOC) for BLDC motors explained": top pages are either vendor/product-marketing (mechtex "beginners guide", roboteq "ultra simple") that skip the actual Clarke/Park transform math, or dense academic-style pages (eurthtech) that give the transforms without a worked numeric example connecting hall/encoder angle to a concrete d-q current command. None bridge from the six-step trapezoidal commutation covered in the previous article to why FOC's sinusoidal current control gives smoother torque, with actual transform matrices and numbers.
+- Weakness in current top pages: they name Clarke and Park transforms correctly but never walk through a single worked numeric example (three-phase currents to Iq/Id, then setting Id=0 for max torque per amp) that a hobbyist could reproduce in code.
