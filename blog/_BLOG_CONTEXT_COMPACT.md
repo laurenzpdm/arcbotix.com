@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 22
+- Total articles: 23
 - Last published: 2026-07-13
-- Known slugs: 22
+- Known slugs: 23
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 23 | 2026-07-13 | ekf-slam-explained-worked-example | Extended Kalman Filter SLAM (EKF-SLAM) Explained: A Worked Numeric Example | EKF-SLAM explained, extended Kalman filter SLAM, EKF-SLAM worked example, SLAM Jacobian landmark update | Control Systems  |
 | 22 | 2026-07-13 | field-oriented-control-foc-bldc-motors-explained | Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example | field-oriented control BLDC motor, FOC explained robotics, Clarke Park transform example, Id Iq current control BLDC | Control Systems  |
 | 21 | 2026-07-12 | bldc-hall-sensor-commutation-six-step | BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch | BLDC hall sensor commutation, six-step commutation BLDC motor, hall sensor commutation table, BLDC motor control hall sensors | Hardware  |
 | 20 | 2026-07-12 | ros2-qos-settings-explained | ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages | ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy | Software  |
@@ -99,7 +100,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -118,6 +119,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- RRT vs A* path planning: mostly academic comparison papers (ResearchGate, PMC) with abstract performance claims, no worked numeric example on a small grid - a real angle exists but weaker than the FOC gap this cycle.
-- Chose "field-oriented control (FOC) for BLDC motors explained": top pages are either vendor/product-marketing (mechtex "beginners guide", roboteq "ultra simple") that skip the actual Clarke/Park transform math, or dense academic-style pages (eurthtech) that give the transforms without a worked numeric example connecting hall/encoder angle to a concrete d-q current command. None bridge from the six-step trapezoidal commutation covered in the previous article to why FOC's sinusoidal current control gives smoother torque, with actual transform matrices and numbers.
-- Weakness in current top pages: they name Clarke and Park transforms correctly but never walk through a single worked numeric example (three-phase currents to Iq/Id, then setting Id=0 for max torque per amp) that a hobbyist could reproduce in code.
+- Shunt vs hall-effect current sensing: already well served by solid vendor application notes (Bourns, Isabellenhuette, Elehub) with practical tradeoff tables.
+- Chose "Extended Kalman Filter SLAM (EKF-SLAM) explained": top pages (andrewjkramer.net's EKF tutorial series, a UMass lecture PDF, jihongju.github.io's "hands-on" post) stay in symbolic matrix notation (x, P, F, H, K) or jump straight to code without showing the arithmetic for one full prediction+update cycle.
+- Weakness in current top pages: none walk through a full numeric prediction+update cycle for a small concrete example (a differential-drive robot observing 2 landmarks) with actual state vector values, an actual covariance matrix, actual Jacobian entries, and an actual Kalman gain computed by hand.
