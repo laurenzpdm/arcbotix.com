@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 13 Jul 2026 10:25:38 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 13 Jul 2026 22:30:21 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Extended Kalman Filter SLAM (EKF-SLAM) Explained: A Worked Numeric Example</title>
+      <link>https://arcbotix.com/blog/posts/ekf-slam-explained-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/ekf-slam-explained-worked-example.html</guid>
+      <pubDate>Mon, 13 Jul 2026 22:29:46 +0000</pubDate>
+      <description>EKF-SLAM explained with a full worked numeric example: state vector, covariance, Jacobians, and Kalman gain computed by hand for a robot observing two landmarks.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example</title>
       <link>https://arcbotix.com/blog/posts/field-oriented-control-foc-bldc-motors-explained.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/trajectory-planning-for-robotic-arms.html</guid>
       <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>Trajectory planning for robotic arms explained: joint-space vs Cartesian trajectories, trapezoidal and S-curve profiles, and how to avoid jerky motion.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Kalman Filter for Robot State Estimation: A Practical Introduction</title>
-      <link>https://arcbotix.com/blog/posts/kalman-filter-robot-state-estimation.html</link>
-      <guid>https://arcbotix.com/blog/posts/kalman-filter-robot-state-estimation.html</guid>
-      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
-      <description>How the Kalman filter fuses noisy sensor data and motion models for robot state estimation, with the core equations and a worked example.</description>
       <category>Control Systems</category>
     </item>
   </channel>
