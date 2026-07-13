@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 20
+- Total articles: 21
 - Last published: 2026-07-12
-- Known slugs: 20
+- Known slugs: 21
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 21 | 2026-07-12 | bldc-hall-sensor-commutation-six-step | BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch | BLDC hall sensor commutation, six-step commutation BLDC motor, hall sensor commutation table, BLDC motor control hall sensors | Hardware  |
 | 20 | 2026-07-12 | ros2-qos-settings-explained | ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages | ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy | Software  |
 | 19 | 2026-07-11 | stepper-motor-microstepping-explained | Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps | stepper motor microstepping explained, microstepping torque, stepper driver microstepping, missed steps stepper motor | Hardware  |
 | 18 | 2026-07-11 | differential-drive-robot-kinematics-odometry | Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example | differential drive robot kinematics, wheel odometry, differential drive odometry, robot odometry drift | Control Systems  |
@@ -97,7 +98,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -116,6 +117,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- Feedback control basics for beginners: top results are thin AI-generated advice pages (LinkedIn, Vaia, Britannica) with no real block diagrams or numbers, but the topic overlaps heavily with the existing PID tuning article.
-- Chose "ROS2 QoS settings explained": the official design doc and docs.ros.org page define reliability/durability/history correctly but read as dense policy reference; several Medium walkthroughs repeat the same policy list without a concrete failure. None show the classic mismatch bug (publisher on sensor-data best-effort QoS, subscriber left on default reliable) where the subscriber silently receives zero messages, with the actual ros2 topic info --verbose diagnostic output and the fix.
-- Weakness in current top pages: they enumerate QoS policies correctly but never walk through why a QoS mismatch causes silent, no-error data loss or how to diagnose it on a real ROS2 system.
+- ROS2 actions vs services vs topics: well covered already by docs.ros.org (three separate distro versions), automaticaddison.com, and The Construct with clear when-to-use guidance - gap too thin.
+- Chose "BLDC hall sensor commutation with hall sensors, building the six-step table from scratch": top pages are MCU-vendor documentation (MATLAB/Simulink STM32 guide, NXP S32M276, TI E2E forum, Microchip devhelp) tied to a specific chip's peripheral registers, or marketing-style overviews (mechtex, jkongmotor, zbotic) that describe the 120-degree hall layout in prose without a hardware-agnostic state table a hobbyist can port to any microcontroller.
+- Weakness in current top pages: none derive the six hall-state-to-phase-energization table from first principles (electrical angle, torque angle target of 90 degrees) in a way that is not locked to one vendor's specific timer/ADC peripheral, and none cover the classic wrong-direction/stall symptom when two hall wires are swapped.

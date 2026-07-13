@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example – Arcbotix</title>
+  <meta name="description" content="Field-oriented control for BLDC motors explained with real numbers: Clarke and Park transforms, Id/Iq current control, and why FOC beats six-step commutation.">
+  <meta name="keywords" content="field-oriented control BLDC motor, FOC explained robotics, Clarke Park transform example, Id Iq current control BLDC">
+  <meta property="og:title" content="Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example">
+  <meta property="og:description" content="Field-oriented control for BLDC motors explained with real numbers: Clarke and Park transforms, Id/Iq current control, and why FOC beats six-step commutation.">
+  <meta property="og:image" content="/blog/posts/img/field-oriented-control-foc-bldc-motors-explained.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/field-oriented-control-foc-bldc-motors-explained.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/field-oriented-control-foc-bldc-motors-explained.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-13">July 13, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example</h1>
+    <p class="blog-post-subtitle">Six-step commutation gets a motor spinning. FOC is what makes it spin smoothly, quietly, and efficiently. Here is the math with real numbers behind it.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/field-oriented-control-foc-bldc-motors-explained.webp" alt="Isometric technical illustration of a BLDC motor cross-section with a rotating d-q reference frame vector overlay" loading="lazy">
+    </div>
+
+    <p>Six-step commutation, driven by three hall sensors, gets a BLDC motor turning in the right direction with reasonable torque. But it has a hard ceiling: each of the six states energizes two phases at a fixed voltage level, so the current waveform is a stepped square wave, not a sine wave. That stepping shows up as torque ripple, audible noise, and current spikes every 60 electrical degrees. Field-oriented control (FOC) removes that ceiling by controlling the motor as if it were a simple DC motor, with two independent current knobs instead of three coupled phase voltages. This article walks through exactly how, with a full worked numeric example.</p>
+
+<h2>Why Field-Oriented Control Exists</h2>
+<p>A three-phase BLDC (or PMSM) motor has three phase currents, Ia, Ib, and Ic, that are sinusoidal in a well-designed drive and always sum to zero. Controlling torque means controlling the magnitude and phase angle of the resulting stator magnetic field relative to the rotor's permanent-magnet field. Doing that directly in the three-phase frame is awkward: the three currents are coupled, time-varying, and 120 degrees apart, so a PI controller trying to track a sinusoidal setpoint always has steady-state error and phase lag.</p>
+<p>Field-oriented control solves this by changing the reference frame. Instead of three moving sinusoids, it projects the currents into a two-axis frame that rotates in sync with the rotor. In that rotating frame, at constant torque and speed, the current values are <em>constant</em>, not sinusoidal. A plain PI controller can then track a constant setpoint with zero steady-state error. That single reframing is the entire trick behind FOC.</p>
+
+<h2>Step 1: Clarke Transform, Three Phases to Two</h2>
+<p>The Clarke transform converts the three phase currents (Ia, Ib, Ic), which live in a redundant three-axis frame 120 degrees apart, into two orthogonal stationary-frame currents, Ialpha and Ibeta:</p>
+<pre><code>Ialpha = Ia
+Ibeta  = (Ia + 2*Ib) / sqrt(3)
+</code></pre>
+<p>Because Ia + Ib + Ic = 0 for a balanced three-phase motor, only two phase currents need to be measured in practice; the third is redundant. Ialpha and Ibeta together represent the same current vector as Ia, Ib, Ic, just in a fixed two-dimensional coordinate system attached to the stator instead of three overlapping axes.</p>
+
+<h3>Worked Example: Clarke Transform</h3>
+<p>Suppose at one instant the measured phase currents are:</p>
+<pre><code>Ia = 5.0 A
+Ib = -6.5 A
+Ic = 1.5 A   (redundant check: Ia + Ib + Ic = 0.0, correct)
+</code></pre>
+<p>Applying the Clarke transform:</p>
+<pre><code>Ialpha = 5.0
+Ibeta  = (5.0 + 2*(-6.5)) / 1.732 = (5.0 - 13.0) / 1.732 = -4.62 A
+</code></pre>
+<p>That is a single fixed vector of magnitude sqrt(5.0^2 + 4.62^2) = 6.81 A, pointing at some angle in the stator frame. It is still rotating over time as the motor spins, which is exactly the problem the next step fixes.</p>
+
+<h2>Step 2: Park Transform, Stationary to Rotating Frame</h2>
+<p>The Park transform rotates the two-axis frame so it spins with the rotor, using the rotor's electrical angle theta_e (the same electrical angle covered in six-step commutation, derived from mechanical angle times pole-pair count):</p>
+<pre><code>Id = Ialpha*cos(theta_e) + Ibeta*sin(theta_e)
+Iq = -Ialpha*sin(theta_e) + Ibeta*cos(theta_e)
+</code></pre>
+<p>Id is the direct-axis current, aligned with the rotor's magnetic field. Iq is the quadrature-axis current, at 90 electrical degrees to it. Torque in a surface-mount PMSM/BLDC motor is proportional to Iq alone:</p>
+<pre><code>Torque = (3/2) * P * lambda_m * Iq
+</code></pre>
+<p>where P is the number of pole pairs and lambda_m is the rotor flux linkage. Id contributes zero torque; its only job is field weakening at high speed. For maximum torque per amp at normal operating speed, FOC deliberately commands Id = 0 and puts all available current into Iq. This is the same 90-degree torque angle target derived from first principles in the <a href="/blog/posts/bldc-hall-sensor-commutation-six-step.html">six-step commutation article</a>, but here it is held exactly at 90 degrees continuously instead of stepping through six discrete states.</p>
+
+<h3>Worked Example: Park Transform</h3>
+<p>Continuing the example, suppose the rotor's electrical angle at this instant is theta_e = 30 degrees:</p>
+<pre><code>cos(30) = 0.866, sin(30) = 0.5
+
+Id = Ialpha*cos(theta_e) + Ibeta*sin(theta_e)
+   = 5.0*0.866 + (-4.62)*0.5
+   = 4.33 - 2.31
+   = 2.02 A
+
+Iq = -Ialpha*sin(theta_e) + Ibeta*cos(theta_e)
+   = -5.0*0.5 + (-4.62)*0.866
+   = -2.5 - 4.00
+   = -6.50 A
+</code></pre>
+<p>Id is not zero here, meaning some current is currently misaligned with the target field angle and producing no torque, just heat. This is exactly what a real FOC current loop corrects on every control cycle.</p>
+
+<h2>Step 3: The Current Control Loop</h2>
+<p>With Id and Iq available, FOC runs two independent PI controllers:</p>
+<ul>
+<li>An Id controller with setpoint 0 A (or a field-weakening value at high speed)</li>
+<li>An Iq controller with setpoint equal to the commanded torque, scaled by the torque constant</li>
+</ul>
+<p>Each PI controller outputs a voltage command, Vd and Vq, in the same rotating frame. These get rotated back to the stationary frame with the inverse Park transform, then converted to three-phase voltage commands with the inverse Clarke transform (often combined into Space Vector Modulation, which also improves DC bus utilization by about 15% over simple sinusoidal PWM). The three-phase voltages finally drive the inverter's PWM duty cycles.</p>
+<pre><code>Ialpha_cmd = Vd*cos(theta_e) - Vq*sin(theta_e)
+Ibeta_cmd  = Vd*sin(theta_e) + Vq*cos(theta_e)
+</code></pre>
+<p>Because this entire loop runs continuously (typically 10 to 20 kHz for the current loop), the current vector is kept locked at 90 degrees to the rotor field at all times, not just at six fixed points per electrical revolution. That is the direct mechanical reason FOC produces smooth, low-ripple torque where six-step commutation produces a rippling one.</p>
+
+<h2>What FOC Needs That Six-Step Commutation Does Not</h2>
+<p>Six-step commutation only needs to know which of six 60-degree sectors the rotor is in, which three cheap hall sensors provide directly. FOC needs the <em>continuous</em> electrical angle, not just a sector, because the Park transform uses sin(theta_e) and cos(theta_e) at every control cycle. Three common ways to get that:</p>
+<ul>
+<li><strong>Quadrature encoder or absolute encoder</strong>: gives high-resolution mechanical angle directly; multiply by pole-pair count for electrical angle.</li>
+<li><strong>Sensorless back-EMF or flux observer</strong>: estimates angle from the motor's own electrical behavior, but is unreliable at zero and very low speed since there is no back-EMF to observe.</li>
+<li><strong>Hall sensors with interpolation</strong>: the same three hall sensors used for six-step commutation give six known angle points per electrical revolution; a common trick is to interpolate between hall edges using a speed estimate, trading some accuracy for using hardware you likely already have.</li>
+</ul>
+<p>This is why many practical drives start the motor in six-step mode at zero speed, then switch to FOC once back-EMF becomes usable, or use a hall-interpolation scheme to run FOC across the full speed range with only hall sensors.</p>
+
+<h2>Six-Step vs FOC: What Actually Changes</h2>
+<table>
+<tr><th>Property</th><th>Six-Step Commutation</th><th>Field-Oriented Control</th></tr>
+<tr><td>Current waveform</td><td>Stepped, square-ish</td><td>Sinusoidal</td></tr>
+<tr><td>Torque ripple</td><td>High, especially at low speed</td><td>Low, near-constant torque</td></tr>
+<tr><td>Angle resolution needed</td><td>6 sectors (60 degrees)</td><td>Continuous, sub-degree</td></tr>
+<tr><td>Audible noise</td><td>Noticeable "cogging" hum</td><td>Much quieter</td></tr>
+<tr><td>Computation</td><td>Lookup table, trivial</td><td>Trig functions + 2 PI loops, real-time</td></tr>
+<tr><td>Typical use</td><td>Fans, low-cost actuators</td><td>Robot joints, gimbals, drones, EVs</td></tr>
+</table>
+
+<h2>Common Implementation Mistake: Wrong Angle Reference</h2>
+<p>The single most common bug when bringing up FOC on new hardware is an angle offset or scaling error between the sensor's zero position and the motor's actual electrical zero (the point where phase A's back-EMF crosses zero going positive). If that offset is wrong, Id will not sit near zero even under correct current control, current draw will be higher than expected for a given torque, and at large offsets the motor will simply fail to spin or spin with a harsh, jerky motion. This is diagnosed the same way as the direction fault in six-step commutation: log Id, Iq, and theta_e directly, and adjust the angle offset until Id settles near zero at steady-state torque command.</p>
+
+<h2>Summary</h2>
+<p>Field-oriented control is not a different motor topology, it is a different reference frame. The Clarke transform collapses three redundant phase currents into two. The Park transform rotates those two into a frame that spins with the rotor, turning sinusoidal AC quantities into DC quantities a simple PI loop can track with zero steady-state error. Torque comes from Iq alone; Id is held near zero for maximum efficiency. The price is that FOC needs continuous, accurate rotor angle, not just the six-sector information hall sensors give six-step commutation for free.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

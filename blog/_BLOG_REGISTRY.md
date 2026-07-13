@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 21
-- Last published: 2026-07-12
+- Total articles: 22
+- Last published: 2026-07-13
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 22 | 2026-07-13 | field-oriented-control-foc-bldc-motors-explained | Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example | field-oriented control BLDC motor, FOC explained robotics, Clarke Park transform example, Id Iq current control BLDC | Control Systems | Explains field-oriented control (FOC) for BLDC/PMSM motors from first principles as a follow-up to the six-step hall commutation article: why FOC exists (torque ripple in six-step), the Clarke transform (3-phase to 2-axis stationary frame) with a full worked numeric example, the Park transform (stationary to rotor-synchronous rotating frame) with a worked example continuing the same numbers, why torque depends only on Iq and Id is held at zero, the current control loop structure (two PI loops plus inverse transforms/SVM), what angle-sensing options FOC needs (encoder, sensorless back-EMF, hall interpolation) versus six-step's sector-only requirement, a six-step vs FOC comparison table, and the common wrong-angle-offset bug diagnosed via Id not settling near zero. |
 | 21 | 2026-07-12 | bldc-hall-sensor-commutation-six-step | BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch | BLDC hall sensor commutation, six-step commutation BLDC motor, hall sensor commutation table, BLDC motor control hall sensors | Hardware | Explains BLDC hall sensor commutation from first principles: why six-step commutation exists, the electrical-vs-mechanical degree relationship tied to pole-pair count, the 90-degree torque angle target and resulting torque ripple, a derived six-state hall-to-phase-energization table with a hardware-agnostic C lookup-table implementation driven from a hall-change interrupt, and diagnosing the classic wrong-direction/stall symptom caused by swapped hall or phase wiring. |
 | 20 | 2026-07-12 | ros2-qos-settings-explained | ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages | ROS2 QoS settings explained, ROS2 QoS reliability mismatch, ROS2 quality of service, ROS2 durability policy | Software | Explains the three ROS2 QoS policies that matter most in practice (reliability, durability, history) and walks through the classic silent-failure bug: a best-effort sensor publisher paired with a default-reliable subscriber, where DDS refuses to match the two endpoints and the subscriber receives zero messages with no error. Shows the exact ros2 topic info --verbose output that reveals the mismatch, gives the code fix for both the reliability case (matching best-effort for high-rate sensor data) and the durability case (transient local for one-shot map/state publishers), and ends with a four-step diagnostic checklist. |
 | 19 | 2026-07-11 | stepper-motor-microstepping-explained | Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps | stepper motor microstepping explained, microstepping torque, stepper driver microstepping, missed steps stepper motor | Hardware | Explains stepper motor microstepping for robotics builders: the T(theta) = T_holding * sin(theta) holding-torque-per-microstep formula with a worked NEMA 17 example, resolution vs real mechanical accuracy, how to choose a microstepping setting based on step-pulse-rate limits, the two root causes of missed steps (torque saturation and resonance), and a comparison of A4988, DRV8825, and TMC2209 driver chips. Links to the harmonic drive/planetary gearbox article and the quadrature encoder wiring article. |
@@ -121,3 +122,6 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 21)
 - bldc-hall-sensor-commutation-six-step -> servo-vs-stepper-vs-bldc-motor-robotics (linked from the torque angle section when discussing when six-step BLDC vs other actuator types is worth the added complexity)
 - bldc-hall-sensor-commutation-six-step -> torque-control-robot-arm-joints-current-sensing (linked when discussing why commutation needs a dedicated interrupt context similar to a tight current control loop)
+
+## Internal links (article 22)
+- field-oriented-control-foc-bldc-motors-explained -> bldc-hall-sensor-commutation-six-step (references the 90-degree torque angle and electrical angle concepts derived in the six-step commutation article as the foundation FOC builds on)
