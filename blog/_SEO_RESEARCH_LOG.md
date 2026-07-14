@@ -55,6 +55,14 @@ the current top-ranking pages for that query.)
 - Chose "ROS2 executors and callback groups explained": top pages are the official ROS2 docs (dense reference style, no concrete failure scenario), a ROS Answers thread, and one Medium series; none walk through a worked example of a slow sensor callback blocking a control loop in the same mutually-exclusive callback group, with a timing diagram and the reentrant-group fix in code.
 - Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
 
+### 2026-07-14
+- Candidates checked: robot arm gravity compensation (feedforward), Gazebo vs PyBullet simulation choice, URDF explained, PID vs state-space feedback control basics.
+- Gazebo vs PyBullet: reconfirmed saturated again (2026-07-07, 2026-07-11, 2026-07-12, 2026-07-13), skipped.
+- URDF explained: well covered already by articulatedrobotics.xyz, the official ROS2 docs, and several step-by-step blog tutorials with clear link/joint breakdowns - gap too thin.
+- PID vs state-space feedback control basics: overlaps heavily with the existing PID tuning and LQR articles, and top pages (motioncontroltips, WPILib docs, a Medium piece) already explain the conceptual difference reasonably well.
+- Chose "robot arm gravity compensation": top pages are either research papers (iterative learning schemes, ARMin feedforward study) too abstract for a hobbyist, or short vendor/product overviews (source-robotics, phospho.ai) that state the concept and the general inverse-dynamics idea but never show a worked numeric torque computation for a concrete link.
+- Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
+
 ## Strategy Adjustments
 
 (No entries yet. Roughly every 5 published articles, review the research

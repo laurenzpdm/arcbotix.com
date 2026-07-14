@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Robot Arm Gravity Compensation: A Worked Torque Calculation Example – Arcbotix</title>
+  <meta name="description" content="Robot arm gravity compensation explained with a real formula: computing joint torque from mass, link length, and angle, then adding it as a PD feedforward term.">
+  <meta name="keywords" content="robot arm gravity compensation, gravity compensation robotics, gravity feedforward torque, PD control gravity term">
+  <meta property="og:title" content="Robot Arm Gravity Compensation: A Worked Torque Calculation Example">
+  <meta property="og:description" content="Robot arm gravity compensation explained with a real formula: computing joint torque from mass, link length, and angle, then adding it as a PD feedforward term.">
+  <meta property="og:image" content="/blog/posts/img/robot-arm-gravity-compensation-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/robot-arm-gravity-compensation-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/robot-arm-gravity-compensation-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-14">July 14, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">Robot Arm Gravity Compensation: A Worked Torque Calculation Example</h1>
+    <p class="blog-post-subtitle">Why your robot arm sags or drifts without a gravity term, and how to compute one from a real link model</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/robot-arm-gravity-compensation-worked-example.webp" alt="Isometric illustration of a two-link robotic arm joint with a glowing torque vector representing gravity compensation" loading="lazy">
+    </div>
+
+    <p>If a robot arm joint sags when you cut power to the motor, or the arm holds a shaky position that drifts downward under load, the position loop is fighting gravity every cycle instead of getting help from a feedforward term. <strong>Robot arm gravity compensation</strong> is that missing term: a torque command computed directly from the arm's mass, link geometry, and current joint angle, added on top of whatever the PD or PID position loop is already doing. This article derives the formula for a single link, extends it to a two-link arm, and works through actual numbers so you can check your own implementation against a known-good answer.</p>
+
+<h2>What gravity compensation actually is</h2>
+<p>A robot joint's motor has to produce two different kinds of torque at once. One part corrects position error, the job of the PD or PID loop. The other part simply holds the arm up against gravity, which does not go away even when the position error is zero. If you only run a PD loop, the proportional term has to build up a nonzero steady-state error before it generates enough torque to hold the arm up, which is exactly the sag you see in an undercompensated joint.</p>
+<p>Gravity compensation separates that second job into its own feedforward term, computed from a physical model instead of from error:</p>
+<pre><code>tau_total = tau_pd + tau_gravity
+tau_pd = Kp * (theta_desired - theta) - Kd * theta_dot
+tau_gravity = g(theta)</code></pre>
+<p>Because <code>tau_gravity</code> is computed directly from the current angle rather than from an error signal, it responds instantly and does not depend on the PD gains. The PD loop is then only responsible for correcting small disturbances and following trajectories, which lets you run much lower gains without sag or oscillation.</p>
+
+<h2>Deriving the torque for a single link</h2>
+<p>Consider one rigid link, length <code>l</code>, with its center of mass at the link's midpoint (a common simplification for a roughly uniform link). The link rotates about a horizontal joint axis, with <code>theta</code> measured from horizontal (theta = 0 means the link points straight out horizontally, theta = 90 degrees means it points straight up).</p>
+<p>The gravitational torque about the joint is the weight of the link times the horizontal distance from the joint axis to the center of mass:</p>
+<pre><code>tau_gravity = m * g * (l / 2) * cos(theta)</code></pre>
+<p>where <code>m</code> is the link mass in kg, <code>g</code> is 9.81 m/s^2, <code>l</code> is the link length in meters, and <code>l / 2</code> is the distance to the center of mass. The cosine term matters: torque is maximum when the link is horizontal (cos(0) = 1, full moment arm) and zero when the link points straight up or straight down (cos(90) = 0, no moment arm, gravity pulls straight through the joint axis).</p>
+<p>Worked example: a link with mass 1.2 kg, length 0.30 m, held at theta = 30 degrees above horizontal.</p>
+<pre><code>tau_gravity = 1.2 * 9.81 * (0.30 / 2) * cos(30 deg)
+            = 1.2 * 9.81 * 0.15 * 0.866
+            = 1.529 N*m</code></pre>
+<p>That 1.529 N*m is the torque the motor must supply just to hold the link at 30 degrees, before the PD loop does anything at all. If your gearbox and motor combination cannot sustain that continuously (check the motor's rated continuous torque, not peak), the joint will sag no matter how you tune the PD gains, because you are asking the position loop to compensate for an actuator that is undersized for the static load.</p>
+
+<h2>Extending to a two-link arm</h2>
+<p>A two-link arm is more representative of a real robot joint, and it introduces an important detail: the gravity torque at the shoulder joint depends on both link angles, because the shoulder has to support the weight of the entire forearm as well as its own link.</p>
+<p>Define <code>theta1</code> as the shoulder angle from horizontal and <code>theta2</code> as the elbow angle relative to the upper arm. Let link 1 (upper arm) have mass <code>m1</code> and length <code>l1</code>, and link 2 (forearm) have mass <code>m2</code> and length <code>l2</code>. The gravity torque at each joint is:</p>
+<pre><code>tau_g1 = (m1 * (l1/2) + m2 * l1) * g * cos(theta1)
+         + m2 * (l2/2) * g * cos(theta1 + theta2)
+
+tau_g2 = m2 * (l2/2) * g * cos(theta1 + theta2)</code></pre>
+<p>The elbow's gravity torque, <code>tau_g2</code>, only depends on the combined angle <code>theta1 + theta2</code>, since the forearm's orientation relative to gravity is what matters, not the shoulder angle alone. The shoulder's torque, <code>tau_g1</code>, has to carry both its own link's weight and the forearm's full weight acting at the far end of the upper arm (hence the <code>m2 * l1</code> term, not <code>m2 * l1/2</code>: the forearm's mass acts through the elbow joint, a full link-length away from the shoulder).</p>
+<p>Worked numeric example: <code>m1 = 1.5 kg</code>, <code>l1 = 0.25 m</code>, <code>m2 = 0.8 kg</code>, <code>l2 = 0.20 m</code>, with <code>theta1 = 45 deg</code> and <code>theta2 = -30 deg</code> (elbow bent back 30 degrees from straight).</p>
+<pre><code>theta1 + theta2 = 15 deg
+
+tau_g1 = (1.5 * 0.125 + 0.8 * 0.25) * 9.81 * cos(45 deg)
+         + 0.8 * 0.10 * 9.81 * cos(15 deg)
+       = (0.1875 + 0.20) * 9.81 * 0.7071
+         + 0.7848 * 0.9659
+       = 0.3875 * 9.81 * 0.7071 + 0.7580
+       = 2.688 + 0.758
+       = 3.446 N*m
+
+tau_g2 = 0.8 * 0.10 * 9.81 * cos(15 deg)
+       = 0.7848 * 0.9659
+       = 0.758 N*m</code></pre>
+<p>Notice the shoulder needs more than four times the elbow's torque here, which is typical: the shoulder motor and gearbox on a real arm are almost always sized larger than the elbow's for exactly this reason.</p>
+
+<h2>Implementing it as feedforward code</h2>
+<p>The structure below runs the gravity model every control cycle and adds it directly to the PD output before sending the command to the motor driver. This assumes you already have a joint torque control loop in place, see <a href="/blog/posts/torque-control-robot-arm-joints-current-sensing.html">torque control for robot arm joints</a> for how a torque command gets turned into a current command at the motor.</p>
+<pre><code>import math
+
+G = 9.81
+
+def gravity_torque_two_link(m1, l1, m2, l2, theta1, theta2):
+    tau_g1 = (m1 * (l1 / 2) + m2 * l1) * G * math.cos(theta1) \
+             + m2 * (l2 / 2) * G * math.cos(theta1 + theta2)
+    tau_g2 = m2 * (l2 / 2) * G * math.cos(theta1 + theta2)
+    return tau_g1, tau_g2
+
+def control_step(theta1, theta2, theta1_dot, theta2_dot,
+                  theta1_desired, theta2_desired, Kp, Kd):
+    tau_g1, tau_g2 = gravity_torque_two_link(
+        m1=1.5, l1=0.25, m2=0.8, l2=0.20,
+        theta1=theta1, theta2=theta2)
+
+    tau_pd1 = Kp * (theta1_desired - theta1) - Kd * theta1_dot
+    tau_pd2 = Kp * (theta2_desired - theta2) - Kd * theta2_dot
+
+    tau1 = tau_pd1 + tau_g1
+    tau2 = tau_pd2 + tau_g2
+    return tau1, tau2</code></pre>
+<p>A few practical points that matter more than the formula itself:</p>
+<ul>
+<li>Update the gravity term at your full control loop rate (100 Hz or higher for a smooth-moving arm), not once per trajectory waypoint. The joint angle changes continuously, and a stale gravity estimate reintroduces the sag you were trying to remove.</li>
+<li>Once gravity feedforward is doing its job, you can usually lower <code>Kp</code> and <code>Kd</code> significantly, since the PD loop is no longer being asked to fight a constant static load. Lower gains mean less audible motor buzz and less sensitivity to encoder noise.</li>
+<li>The center-of-mass-at-midpoint assumption is a simplification. If a link carries a payload, a battery, or a heavier motor at one end, measure or estimate the true center of mass and moment arm rather than assuming the geometric midpoint, or the compensation will be systematically off in one direction.</li>
+<li>Gravity compensation only cancels the static, position-dependent load. It does not replace a velocity/acceleration feedforward term for fast trajectories, and it does not account for friction. Those are separate additive terms, not something the gravity model should be stretched to cover.</li>
+</ul>
+
+<h2>Diagnosing an undercompensated joint</h2>
+<p>Two symptoms point specifically at a missing or wrong gravity term rather than a bad PD tune:</p>
+<ol>
+<li><strong>The arm sags to a lower angle at rest and only creeps back under integral action</strong>, or oscillates around the target if there is no integral term. This is the direct signature of the PD loop needing a nonzero steady-state error to generate holding torque.</li>
+<li><strong>The required PD gains change depending on the arm's pose.</strong> If a gain set that works well with the arm horizontal causes overshoot or buzz with the arm vertical, that is gravity load changing with position, not a badly tuned controller. Adding the feedforward term should make one gain set work well across the full range of motion.</li>
+</ol>
+<p>If you already have a working position loop and see either symptom, add the gravity term first before touching Kp or Kd again. It is a common mistake to keep raising gains to fight a static load that a two-line formula would have cancelled directly.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
