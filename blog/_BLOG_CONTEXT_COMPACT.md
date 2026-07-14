@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 23
-- Last published: 2026-07-13
-- Known slugs: 23
+- Total articles: 24
+- Last published: 2026-07-14
+- Known slugs: 24
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 24 | 2026-07-14 | robot-arm-gravity-compensation-worked-example | Robot Arm Gravity Compensation: A Worked Torque Calculation Example | robot arm gravity compensation, gravity compensation robotics, gravity feedforward torque, PD control gravity term | Control Systems  |
 | 23 | 2026-07-13 | ekf-slam-explained-worked-example | Extended Kalman Filter SLAM (EKF-SLAM) Explained: A Worked Numeric Example | EKF-SLAM explained, extended Kalman filter SLAM, EKF-SLAM worked example, SLAM Jacobian landmark update | Control Systems  |
 | 22 | 2026-07-13 | field-oriented-control-foc-bldc-motors-explained | Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example | field-oriented control BLDC motor, FOC explained robotics, Clarke Park transform example, Id Iq current control BLDC | Control Systems  |
 | 21 | 2026-07-12 | bldc-hall-sensor-commutation-six-step | BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch | BLDC hall sensor commutation, six-step commutation BLDC motor, hall sensor commutation table, BLDC motor control hall sensors | Hardware  |
@@ -100,7 +101,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -112,11 +113,11 @@ subject (e.g. a robotic arm joint, a PCB, a control-loop diagram rendered
 as a scene). Keep prompts specific to the article's actual subject matter.
 
 ## Recent SEO Research (last 5 entries)
-- Real-time control loops: still weak-gap per the deprioritization on 2026-07-10, skipped again.
-- Impedance control: GitHub tutorials (franklinselva, mathworks) and source-robotics already give a decent conceptual + code walkthrough; gap smaller than expected.
-- Compliant/force control for end effectors: coverage is either medical-research papers (nasopharyngeal swab study) or vendor compliance-tool product pages, not a robotics-hobbyist angle, but scope felt closer to a hardware buying guide than a control-systems explainer.
-- Chose "ROS2 executors and callback groups explained": top pages are the official ROS2 docs (dense reference style, no concrete failure scenario), a ROS Answers thread, and one Medium series; none walk through a worked example of a slow sensor callback blocking a control loop in the same mutually-exclusive callback group, with a timing diagram and the reentrant-group fix in code.
-- Weakness in current top pages: they define executors and callback group types correctly but never show the concrete bug (one slow callback stalling everything else in its group) that makes a robotics developer actually need this concept.
+- Gazebo vs PyBullet: reconfirmed saturated again (2026-07-07, 2026-07-11, 2026-07-12, 2026-07-13), skipped.
+- URDF explained: well covered already by articulatedrobotics.xyz, the official ROS2 docs, and several step-by-step blog tutorials with clear link/joint breakdowns - gap too thin.
+- PID vs state-space feedback control basics: overlaps heavily with the existing PID tuning and LQR articles, and top pages (motioncontroltips, WPILib docs, a Medium piece) already explain the conceptual difference reasonably well.
+- Chose "robot arm gravity compensation": top pages are either research papers (iterative learning schemes, ARMin feedforward study) too abstract for a hobbyist, or short vendor/product overviews (source-robotics, phospho.ai) that state the concept and the general inverse-dynamics idea but never show a worked numeric torque computation for a concrete link.
+- Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Recent Strategy Adjustments (last 3 entries)
 - Shunt vs hall-effect current sensing: already well served by solid vendor application notes (Bourns, Isabellenhuette, Elehub) with practical tradeoff tables.
