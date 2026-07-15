@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 24
-- Last published: 2026-07-14
+- Total articles: 25
+- Last published: 2026-07-15
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 25 | 2026-07-15 | real-time-considerations-robot-control-loops | Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate | real-time considerations in robot control loops, robot control loop jitter, control loop timing robotics, PREEMPT_RT robot control | Control Systems | Explains real-time considerations in robot control loops: the difference between latency and jitter, a formula for computing per-cycle jitter, real clock_nanosleep-based timer code for measuring it correctly on Linux, practical levers to reduce jitter (SCHED_FIFO priority, PREEMPT_RT kernel, MCU-side hard-real-time inner loops), and a worked derivation of how sample-time jitter perturbs the effective discrete PD derivative gain (Kd / (T + jitter)), with a practical rule of keeping worst-case jitter under 10% of the loop period and the two failure symptoms (buzzing at high gain, mushy lag at low gain) that indicate a timing problem rather than a tuning problem. |
 | 24 | 2026-07-14 | robot-arm-gravity-compensation-worked-example | Robot Arm Gravity Compensation: A Worked Torque Calculation Example | robot arm gravity compensation, gravity compensation robotics, gravity feedforward torque, PD control gravity term | Control Systems | Explains robot arm gravity compensation as a feedforward term added to a PD position loop: derives the single-link torque formula (tau = m*g*(l/2)*cos(theta)) with a worked numeric example, extends it to a two-link arm with actual shoulder/elbow torque numbers showing why the shoulder needs more torque capacity, gives Python feedforward code that runs alongside the PD loop, and lists two diagnostic symptoms (sag at rest, gain sensitivity to pose) that indicate a missing gravity term. |
 | 23 | 2026-07-13 | ekf-slam-explained-worked-example | Extended Kalman Filter SLAM (EKF-SLAM) Explained: A Worked Numeric Example | EKF-SLAM explained, extended Kalman filter SLAM, EKF-SLAM worked example, SLAM Jacobian landmark update | Control Systems | Explains EKF-SLAM by working through one full predict-update cycle with real numbers instead of staying in symbolic notation. Covers the joint state vector (robot pose plus landmark positions), the joint covariance matrix and its off-diagonal correlation terms, the motion Jacobian, a concrete odometry-based prediction step, a range-bearing measurement Jacobian evaluated at real values, the resulting Kalman gain matrix, and the state/covariance correction for a robot re-observing a known landmark. Also covers the O(N^2) scaling problem that motivates FastSLAM and graph-based SLAM for larger maps, and common implementation mistakes (data association, bearing angle wrapping, underestimated process noise). |
 | 22 | 2026-07-13 | field-oriented-control-foc-bldc-motors-explained | Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example | field-oriented control BLDC motor, FOC explained robotics, Clarke Park transform example, Id Iq current control BLDC | Control Systems | Explains field-oriented control (FOC) for BLDC/PMSM motors from first principles as a follow-up to the six-step hall commutation article: why FOC exists (torque ripple in six-step), the Clarke transform (3-phase to 2-axis stationary frame) with a full worked numeric example, the Park transform (stationary to rotor-synchronous rotating frame) with a worked example continuing the same numbers, why torque depends only on Iq and Id is held at zero, the current control loop structure (two PI loops plus inverse transforms/SVM), what angle-sensing options FOC needs (encoder, sensorless back-EMF, hall interpolation) versus six-step's sector-only requirement, a six-step vs FOC comparison table, and the common wrong-angle-offset bug diagnosed via Id not settling near zero. |
@@ -135,3 +136,8 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 24)
 - robot-arm-gravity-compensation-worked-example -> torque-control-robot-arm-joints-current-sensing (gravity feedforward torque command feeds into the same cascaded torque/current control loop)
+
+## Internal links (article 25)
+- real-time-considerations-robot-control-loops -> torque-control-robot-arm-joints-current-sensing (cascaded fast inner-loop/slow outer-loop structure as a real-time design pattern)
+- real-time-considerations-robot-control-loops -> ros2-executors-callback-groups-explained (callback group/executor choice as a source of jitter in ROS2 control callbacks)
+- real-time-considerations-robot-control-loops -> pid-controller-tuning-for-robotic-arms (connecting jitter to the discrete PID derivative term that most tuning guides assume is exact)

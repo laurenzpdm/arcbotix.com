@@ -13,6 +13,13 @@ only the most recent entries, so older ones matter less over time - that's fine.
 - Chose "stepper motor microstepping explained for robotics": top pages (Analog Devices, Faulhaber, mechtex, linearmotiontips) explain the concept and the torque-per-microstep tradeoff correctly but from a generic industrial-motion-control angle, with no worked numbers for a small robot joint, no driver-chip specifics (A4988 vs DRV8825 vs TMC2209), and no missed-step/lost-position failure scenario tied back to closed-loop correction.
 - Weakness in current top pages: none derive the holding-torque-per-microstep formula with actual numbers for a hobby-robot NEMA motor, and none connect microstepping resolution choice to real step-loss risk under load.
 
+### 2026-07-15
+- Candidates checked: ROS2 TF2 transforms explained, real-time considerations in robot control loops, absolute vs incremental encoder choice, H-bridge PWM brushed DC motor driver, robot arm homing sequence with limit switches.
+- TF2 and H-bridge PWM: both already well covered with hands-on, code-backed tutorials (articulatedrobotics.xyz/docs.ros.org for TF2; Instructables/DroneBot Workshop/HowToMechatronics for H-bridge PWM) - gap too thin.
+- Absolute vs incremental encoders: decent vendor comparison tables exist (US Digital, Hobber Drive) but no worked example - kept as a backup candidate for a future cycle.
+- Chose "real-time considerations in robot control loops": top pages are either academic PDFs (ResearchGate jitter studies) or vendor blog posts (BlackBerry QNX) that stay conceptual - no page walks through picking a concrete loop rate, measuring jitter with real timer code, and showing how much jitter a PD gain margin can tolerate before oscillation.
+- Weakness in current top pages: none show a concrete C/pseudo-code fixed-rate loop with clock_gettime-style timing, an actual jitter budget calculation, or the link between missed real-time deadlines and a specific control-loop symptom (torque spikes, instability at high gain).
+
 (No entries yet. Each cycle, before choosing a topic, add one dated entry here:
 candidate topics considered, the one chosen and why - demand signal plus the
 content-quality edge over what currently ranks - and one weakness noticed in

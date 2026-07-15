@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate – Arcbotix</title>
+  <meta name="description" content="Real-time considerations in robot control loops explained with a jitter budget formula, timer code, and the gain margin math that connects timing to stability.">
+  <meta name="keywords" content="real-time considerations in robot control loops, robot control loop jitter, control loop timing robotics, PREEMPT_RT robot control">
+  <meta property="og:title" content="Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate">
+  <meta property="og:description" content="Real-time considerations in robot control loops explained with a jitter budget formula, timer code, and the gain margin math that connects timing to stability.">
+  <meta property="og:image" content="/blog/posts/img/real-time-considerations-robot-control-loops.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-15">July 15, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate</h1>
+    <p class="blog-post-subtitle">Why a control loop that runs at 1 kHz on average can still destabilize a joint, and how to put a number on how much timing error you can tolerate</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/real-time-considerations-robot-control-loops.webp" alt="Isometric technical illustration of a glowing robot control loop diagram with a stopwatch symbol, dark background with blue and cyan lighting" loading="lazy">
+    </div>
+
+    <p>A joint controller that is supposed to run at 1 kHz almost never runs at exactly 1 kHz. Every call to your control function actually fires somewhere between 0.9 ms and 1.3 ms after the last one, depending on what the operating system, the network stack, or a garbage collector decided to do in between. That variation is called jitter, and it is one of the most common real-time considerations in robot control loops that gets glossed over until a joint starts buzzing or a gripper misses a grasp by a few milliseconds. This article gives you the vocabulary, a way to measure jitter with real code, and a formula for how much jitter your control gains can actually tolerate before things go unstable.</p>
+
+<h2>What jitter actually is (and what it is not)</h2>
+<p>Jitter is not the same as latency. Latency is how long it takes from a sensor sample to an actuator command going out; jitter is how much that timing varies from cycle to cycle. A loop with 2 ms of constant, predictable latency is often fine. A loop with an average period of 1 ms but individual cycles ranging from 0.6 ms to 2.4 ms is the one that will bite you, because your controller was designed assuming a fixed timestep.</p>
+<p>Concretely, define the target period as <code>T</code> and the actual measured period of cycle <code>i</code> as <code>T_i</code>. Jitter for that cycle is:</p>
+<blockquote>jitter_i = T_i - T</blockquote>
+<p>You care about two numbers from a run of many cycles: the maximum absolute jitter (your worst-case deadline miss) and the standard deviation of jitter (how consistently bad it is). A control loop with max jitter under 5% of <code>T</code> is usually fine for position control. Torque control loops running at several kHz are far less forgiving, because a missed deadline there shows up directly as a torque discontinuity at the joint.</p>
+
+<h2>Measuring jitter with a real timer</h2>
+<p>Do not trust a busy <code>while</code> loop with a fixed <code>sleep()</code> call to give you a fixed period; <code>sleep()</code> only guarantees you sleep <em>at least</em> that long, not exactly that long. On Linux, the standard pattern is to track an absolute wake time and sleep until it, using <code>clock_nanosleep</code> with <code>TIMER_ABSTIME</code> rather than a relative sleep:</p>
+<pre><code>struct timespec next;
+clock_gettime(CLOCK_MONOTONIC, &amp;next);
+const long period_ns = 1000000; // 1 kHz target
+
+while (running) {
+    next.tv_nsec += period_ns;
+    if (next.tv_nsec >= 1000000000L) {
+        next.tv_nsec -= 1000000000L;
+        next.tv_sec += 1;
+    }
+    clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &amp;next, NULL);
+
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &amp;now);
+    long actual_period_ns = (now.tv_sec - prev.tv_sec) * 1000000000L
+                           + (now.tv_nsec - prev.tv_nsec);
+    long jitter_ns = actual_period_ns - period_ns;
+    log_jitter(jitter_ns);
+    prev = now;
+
+    run_control_step();
+}</code></pre>
+<p>Two mistakes will corrupt this measurement before you even get to gain tuning. First, calling anything that allocates memory, locks a mutex another thread might hold, or writes a log line synchronously inside the loop; a single malloc call can occasionally take 50 to 100 microseconds due to page faults, which is enormous next to a 1 ms budget. Second, running on a stock (non-PREEMPT_RT) Linux kernel and expecting consistent sub-millisecond timing under load; the default kernel scheduler is throughput-optimized, not latency-optimized, and will happily let a control thread wait several milliseconds behind a kernel task.</p>
+
+<h2>Getting from a soft loop to a real-time one</h2>
+<p>You have three practical levers, roughly in order of effort:</p>
+<ul>
+  <li><strong>Thread priority.</strong> On Linux, set the control thread to <code>SCHED_FIFO</code> with a high priority via <code>pthread_setschedparam</code>. This alone reduces jitter significantly because the scheduler will preempt normal-priority work to run your loop.</li>
+  <li><strong>A PREEMPT_RT kernel.</strong> The mainline PREEMPT_RT patch makes almost the entire kernel preemptible, including most interrupt handlers, which cuts worst-case latency from tens of milliseconds down to tens of microseconds on typical hardware. Most ROS2 real-time setups on an industrial PC or a Raspberry Pi CM4 use this.</li>
+  <li><strong>Move to an MCU-side hard-real-time loop.</strong> For torque or current loops above a few kHz, put the innermost loop on a microcontroller with a hardware timer interrupt, and let the non-real-time host (running ROS2, planning, perception) send setpoints over a serial or CAN link at a slower, jitter-tolerant rate. This is the same cascaded-loop structure described in our <a href="/blog/posts/torque-control-robot-arm-joints-current-sensing.html">torque control article</a>: fast, deterministic inner loop on dedicated hardware; slower, jitter-tolerant outer loop on general-purpose compute.</li>
+</ul>
+<p>If you are already running ROS2, the executor and callback group choice also affects jitter directly, since a slow callback sharing a thread with your control callback will delay it; see our <a href="/blog/posts/ros2-executors-callback-groups-explained.html">ROS2 executors and callback groups</a> article for how to isolate a timing-critical callback onto its own thread.</p>
+
+<h2>How much jitter can your gains actually survive?</h2>
+<p>This is the part most articles skip: connecting a timing number to a control-stability number. A discrete PD controller implicitly assumes a fixed sample time <code>T</code> when you convert a continuous gain to its discrete form, particularly for the derivative term:</p>
+<blockquote>u_k = Kp * e_k + Kd * (e_k - e_k-1) / T</blockquote>
+<p>If the actual sample time on a given cycle is <code>T + jitter</code> instead of <code>T</code>, the effective derivative gain for that cycle becomes <code>Kd / (T + jitter)</code>, not <code>Kd / T</code>. A cycle that runs short spikes your effective derivative gain, injecting noise-amplified torque; a cycle that runs long under-damps that step. As a rough, checkable rule for a well-tuned joint loop, keep worst-case jitter under about 10% of <code>T</code>:</p>
+<blockquote>max jitter_i &lt; 0.1 * T</blockquote>
+<p>At 10% jitter on a 1 ms loop, your effective Kd varies by roughly plus or minus 10%, which most tuned PD or <a href="/blog/posts/pid-controller-tuning-for-robotic-arms.html">PID loops</a> tolerate without visible symptoms. Push past 20 to 30% jitter and you will typically see one of two failure modes: a high-gain joint starts to buzz audibly at a frequency related to your jitter pattern, or a lower-gain joint feels mushy and lags target position more than the gains alone would predict. If you see either symptom and your average loop rate looks fine on paper, log jitter before you touch a single gain, because retuning a controller to compensate for bad timing just narrows your stable operating range instead of fixing the actual problem.</p>
+
+<h2>A practical checklist</h2>
+<ul>
+  <li>Log actual cycle period, not just the target period, for at least a few thousand cycles under real load.</li>
+  <li>Compute max jitter and jitter standard deviation, not just the mean loop rate.</li>
+  <li>Keep memory allocation, blocking I/O, and logging out of the control thread itself; hand results to a separate lower-priority thread via a lock-free queue.</li>
+  <li>Match loop rate to control tier: a few kHz for current/torque loops, hundreds of Hz for velocity, tens to low hundreds of Hz for outer position or trajectory loops, since outer loops are far more jitter-tolerant.</li>
+  <li>If jitter exceeds roughly 10% of your period on a tuned joint, fix the timing first (priority, kernel, thread isolation) before retuning gains.</li>
+</ul>
+<p>Real-time considerations in robot control loops are ultimately a measurement problem before they are a tuning problem. A loop that looks fine on an oscilloscope trace of average rate can still be quietly eating into your stability margin every time a cycle runs long. Measure jitter directly, put a number on how much your gains can absorb, and you will spend far less time chasing phantom instability that was actually a scheduler problem all along.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
