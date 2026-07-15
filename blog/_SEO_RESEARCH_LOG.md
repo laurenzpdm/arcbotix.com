@@ -18,6 +18,13 @@ only the most recent entries, so older ones matter less over time - that's fine.
 - TF2 and H-bridge PWM: both already well covered with hands-on, code-backed tutorials (articulatedrobotics.xyz/docs.ros.org for TF2; Instructables/DroneBot Workshop/HowToMechatronics for H-bridge PWM) - gap too thin.
 - Absolute vs incremental encoders: decent vendor comparison tables exist (US Digital, Hobber Drive) but no worked example - kept as a backup candidate for a future cycle.
 - Chose "real-time considerations in robot control loops": top pages are either academic PDFs (ResearchGate jitter studies) or vendor blog posts (BlackBerry QNX) that stay conceptual - no page walks through picking a concrete loop rate, measuring jitter with real timer code, and showing how much jitter a PD gain margin can tolerate before oscillation.
+
+### 2026-07-15b
+- Candidates checked: computed torque control for robot arms, impedance vs admittance control, Monte Carlo localization (particle filter), absolute vs incremental encoders, ROS2 actions vs services vs topics.
+- MCL/particle filter and ROS2 actions/services/topics: both already have solid, well-structured coverage (official ROS2 docs, automaticaddison.com, roboticsknowledgebase.com) with clear conceptual breakdowns - gap too thin for a fresh piece.
+- Impedance vs admittance control: decent conceptual comparisons exist (source-robotics, patsnap) but none show a worked numeric example - kept as a backup candidate for a future cycle.
+- Chose "computed torque control for robot arms": top pages are either the Wikipedia stub, IEEE/NASA papers, or a single ping-pong-robot case study (mecharithm) - all stay in symbolic matrix notation or skip straight to a specific research application, none show a full numeric feedback-linearization computation for a simple two-link arm with real inertia/gravity terms.
+- Weakness in current top pages: none connect computed torque control back to the simpler PD-with-gravity-feedforward approach already covered on this site, or show the actual matrix arithmetic (M(q), C(q,qdot), G(q)) reducing tracking error dynamics to a simple double integrator with real numbers.
 - Weakness in current top pages: none show a concrete C/pseudo-code fixed-rate loop with clock_gettime-style timing, an actual jitter budget calculation, or the link between missed real-time deadlines and a specific control-loop symptom (torque spikes, instability at high gain).
 
 (No entries yet. Each cycle, before choosing a topic, add one dated entry here:
@@ -71,6 +78,17 @@ the current top-ranking pages for that query.)
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Strategy Adjustments
+
+### 2026-07-15c
+- Retired "Gazebo vs PyBullet" entirely from blog/_BLOG_STRATEGY.md Topic
+  Priority (cluster 3) instead of just deprioritizing it, based on 8 separate
+  research entries (2026-07-07, 2026-07-07(2), 2026-07-09, 2026-07-11,
+  2026-07-12, 2026-07-12(2), 2026-07-13, 2026-07-14) all independently
+  re-checking it and finding it saturated every single time - further
+  rechecks are wasted research effort. Also removed the now-stale
+  deprioritization of "real-time considerations in robot control loops"
+  since it was eventually found to have a real gap and published as
+  article 25 on 2026-07-15.
 
 (No entries yet. Roughly every 5 published articles, review the research
 entries above and decide whether blog/_BLOG_STRATEGY.md's "Topic Priority"

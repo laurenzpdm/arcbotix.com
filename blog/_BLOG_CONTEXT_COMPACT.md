@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 24
-- Last published: 2026-07-14
-- Known slugs: 24
+- Total articles: 25
+- Last published: 2026-07-15
+- Known slugs: 25
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 25 | 2026-07-15 | real-time-considerations-robot-control-loops | Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate | real-time considerations in robot control loops, robot control loop jitter, control loop timing robotics, PREEMPT_RT robot control | Control Systems  |
 | 24 | 2026-07-14 | robot-arm-gravity-compensation-worked-example | Robot Arm Gravity Compensation: A Worked Torque Calculation Example | robot arm gravity compensation, gravity compensation robotics, gravity feedforward torque, PD control gravity term | Control Systems  |
 | 23 | 2026-07-13 | ekf-slam-explained-worked-example | Extended Kalman Filter SLAM (EKF-SLAM) Explained: A Worked Numeric Example | EKF-SLAM explained, extended Kalman filter SLAM, EKF-SLAM worked example, SLAM Jacobian landmark update | Control Systems  |
 | 22 | 2026-07-13 | field-oriented-control-foc-bldc-motors-explained | Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example | field-oriented control BLDC motor, FOC explained robotics, Clarke Park transform example, Id Iq current control BLDC | Control Systems  |
@@ -101,7 +102,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style

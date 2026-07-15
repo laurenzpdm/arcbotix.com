@@ -52,12 +52,15 @@ research log entry; no rationale, no edit.
 
 - Default order: clusters 1, 2, 3 (evergreen, high signal), then 4, then 5.
   (baseline - 2026-07-07, no research yet)
-- Within cluster 3, deprioritize "real-time considerations in robot control
-  loops", "URDF tutorials", and "Gazebo vs PyBullet" as specific sub-topics -
-  research entries 2026-07-07, 2026-07-07(2), 2026-07-09, and 2026-07-10 each
-  re-checked these and found the gap too thin or the topic already saturated
-  by strong existing coverage every time. Favor other cluster 3 angles
-  (Isaac Sim, real ROS2 middleware internals) instead.
+- Within cluster 3, retire "Gazebo vs PyBullet" entirely - do not recheck it
+  again. It was re-checked and found saturated in 8 separate research entries
+  (2026-07-07, 2026-07-07(2), 2026-07-09, 2026-07-11, 2026-07-12,
+  2026-07-12(2), 2026-07-13, 2026-07-14) with the same verdict every time,
+  so further rechecks are wasted research effort. "URDF tutorials" stays
+  deprioritized for the same saturation reason. "Real-time considerations in
+  robot control loops" is no longer deprioritized - it was eventually found
+  to have a real gap and published as article 25 on 2026-07-15. Favor other
+  cluster 3 angles (Isaac Sim, real ROS2 middleware internals) instead.
 - Within cluster 1, deprioritize "feedback control basics for beginners" -
   research entries 2026-07-07(2), 2026-07-11, and 2026-07-12 each re-checked
   it and found only thin generic advice-blog coverage, but also consistent
