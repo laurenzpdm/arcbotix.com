@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Jul 2026 15:54:54 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 15 Jul 2026 23:58:55 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Computed Torque Control for Robot Arms: A Worked Numeric Example</title>
+      <link>https://arcbotix.com/blog/posts/computed-torque-control-robot-arm-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/computed-torque-control-robot-arm-worked-example.html</guid>
+      <pubDate>Wed, 15 Jul 2026 23:57:48 +0000</pubDate>
+      <description>Computed torque control explained with real numbers: canceling a two-link arm's nonlinear dynamics and reducing tracking error to a simple double integrator.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate</title>
       <link>https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>Harmonic drive vs planetary gearbox for robot joints: how each works, backlash, torque density, stiffness and cost tradeoffs, with guidance on picking one.</description>
       <category>Hardware</category>
-    </item>
-    <item>
-      <title>IMU Sensor Fusion Basics: Combining Accelerometer and Gyroscope Data</title>
-      <link>https://arcbotix.com/blog/posts/imu-sensor-fusion-basics.html</link>
-      <guid>https://arcbotix.com/blog/posts/imu-sensor-fusion-basics.html</guid>
-      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
-      <description>IMU sensor fusion basics explained: why raw accelerometer and gyroscope data drift, and how complementary and Kalman filters combine them for stable orientation.</description>
-      <category>Control Systems</category>
     </item>
   </channel>
 </rss>

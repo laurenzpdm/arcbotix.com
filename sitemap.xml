@@ -37,6 +37,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/computed-torque-control-robot-arm-worked-example.html</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/differential-drive-robot-kinematics-odometry.html</loc>
     <lastmod>2026-07-11</lastmod>
     <changefreq>monthly</changefreq>
