@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Jul 2026 10:33:31 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 15 Jul 2026 15:54:54 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate</title>
+      <link>https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html</link>
+      <guid>https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html</guid>
+      <pubDate>Wed, 15 Jul 2026 15:54:36 +0000</pubDate>
+      <description>Real-time considerations in robot control loops explained with a jitter budget formula, timer code, and the gain margin math that connects timing to stability.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Robot Arm Gravity Compensation: A Worked Torque Calculation Example</title>
       <link>https://arcbotix.com/blog/posts/robot-arm-gravity-compensation-worked-example.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>IMU sensor fusion basics explained: why raw accelerometer and gyroscope data drift, and how complementary and Kalman filters combine them for stable orientation.</description>
       <category>Control Systems</category>
-    </item>
-    <item>
-      <title>ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself</title>
-      <link>https://arcbotix.com/blog/posts/ros2-nodes-and-topics-explained.html</link>
-      <guid>https://arcbotix.com/blog/posts/ros2-nodes-and-topics-explained.html</guid>
-      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
-      <description>ROS2 nodes and topics explained with real code: how publishers, subscribers, and the DDS middleware let robot software components communicate.</description>
-      <category>Software</category>
     </item>
   </channel>
 </rss>
