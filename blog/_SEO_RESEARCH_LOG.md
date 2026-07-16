@@ -34,6 +34,13 @@ only the most recent entries, so older ones matter less over time - that's fine.
 - Chose "CAN bus for robot joint networks": top pages (thinkrobotics.com, WPILib docs, robotsforroboticists.com) explain CAN's benefits and wiring in general terms, but WPILib's guide is FRC-specific and the others skip the actual bit-timing and bus-load arithmetic a builder needs for their own joint network.
 - Weakness in current top pages: none show a worked bit-timing calculation (propagation delay vs bus length at a given baud rate) or a concrete bus-load percentage for a multi-joint arm's status messages, and none tie termination-resistor placement to a specific reflection/error-frame symptom.
 
+### 2026-07-16b
+- Candidates checked: impedance control vs admittance control for robot arms, absolute vs incremental encoder choice, ROS2 actions vs services vs topics, H-bridge PWM brushed DC motor driver.
+- ROS2 actions/services/topics and H-bridge PWM: both already have thorough, code-backed coverage (official ROS2 docs, automaticaddison.com for actions/services; Instructables/HowToMechatronics for H-bridge PWM) - gap too thin.
+- Absolute vs incremental encoders: decent vendor comparison tables (US Digital, Hobber Drive) but still no worked example - kept as a backup candidate again.
+- Chose "impedance control vs admittance control for robot arms": this topic has now shown the same gap across three research cycles (2026-07-15b, 2026-07-16, today) - top pages (source-robotics, patsnap, academic ROBOMECH/ICRA papers) explain the force-vs-motion conceptual distinction correctly but every one stays in symbolic notation or skips to a specific research application.
+- Weakness in current top pages: none show a worked numeric mass-spring-damper computation (actual K, D, M values) for a simple one-DOF arm contact scenario comparing what an impedance controller commands vs what an admittance controller commands for the same measured force, and none connect the choice back to a concrete failure symptom (impedance control degraded by friction vs admittance control going unstable against a rigid stop).
+
 (No entries yet. Each cycle, before choosing a topic, add one dated entry here:
 candidate topics considered, the one chosen and why - demand signal plus the
 content-quality edge over what currently ranks - and one weakness noticed in

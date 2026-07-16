@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Impedance Control vs Admittance Control for Robot Arms: A Worked Numeric Example – Arcbotix</title>
+  <meta name="description" content="Impedance control vs admittance control explained with a worked one-DOF mass-spring-damper example, real numbers, and which one fits your robot arm hardware.">
+  <meta name="keywords" content="impedance control vs admittance control, impedance control robot arm, admittance control robotics, compliant robot arm control">
+  <meta property="og:title" content="Impedance Control vs Admittance Control for Robot Arms: A Worked Numeric Example">
+  <meta property="og:description" content="Impedance control vs admittance control explained with a worked one-DOF mass-spring-damper example, real numbers, and which one fits your robot arm hardware.">
+  <meta property="og:image" content="/blog/posts/img/impedance-vs-admittance-control-robot-arm.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/impedance-vs-admittance-control-robot-arm.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/impedance-vs-admittance-control-robot-arm.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-16">July 16, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">Impedance Control vs Admittance Control for Robot Arms: A Worked Numeric Example</h1>
+    <p class="blog-post-subtitle">A worked mass-spring-damper example that shows what each controller actually commands</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/impedance-vs-admittance-control-robot-arm.webp" alt="Isometric illustration of a robot arm end-effector in contact with a surface, shown as a mass-spring-damper system" loading="lazy">
+    </div>
+
+    <p>Impedance control vs admittance control is one of those topics that gets explained twice in every paper: once correctly, and once in a way that leaves you unsure which controller your own robot arm actually needs. Both approaches make a rigid robot arm behave like it is connected to its environment through a spring and a damper instead of a rigid link. The confusion comes from the fact that they compute opposite things from the same physical model. This article works through one concrete one-degree-of-freedom example with real numbers so you can see exactly what each controller commands, then connects that back to which hardware each one actually fits.</p>
+
+<h2>The Shared Model: A Virtual Mass-Spring-Damper</h2>
+<p>Both controllers start from the same target dynamics equation, a virtual mechanical impedance the robot should present to the outside world:</p>
+<blockquote>M * xdd + D * xd + K * x = F_ext</blockquote>
+<p>where <code>x</code> is the position error between the end-effector and a reference point, <code>xd</code> and <code>xdd</code> are its velocity and acceleration, <code>M</code> is a virtual mass, <code>D</code> a virtual damping coefficient, <code>K</code> a virtual stiffness, and <code>F_ext</code> the force the environment applies at the end-effector. Pick a small, stiff-ish contact behavior for a 1 kg end-effector task: <code>M = 2 kg</code>, <code>D = 40 Ns/m</code>, <code>K = 500 N/m</code>. The two controllers use this exact equation, but they solve it for different unknowns because they assume different sensing and actuation.</p>
+
+<h2>Impedance Control: Motion In, Force Out</h2>
+<p>Impedance control assumes the robot can command joint torque directly (a torque-controlled arm, or one with accurate current-based torque estimation, see our <a href="/blog/posts/torque-control-robot-arm-joints-current-sensing.html">torque control for robot arm joints</a> article for how that current-to-torque path works). It measures the actual position and velocity, computes the position error against a reference trajectory, and rearranges the impedance equation to solve for the commanded force:</p>
+<blockquote>F_cmd = K * (x_ref - x) + D * (xd_ref - xd) - M * xdd_ref</blockquote>
+<p>Take a numeric case: the end-effector reference position is <code>x_ref = 0</code> (a fixed point, no imposed motion), and a soft object has pushed the actual tip to <code>x = 0.01 m</code> (1 cm) with velocity <code>xd = 0.05 m/s</code> as it slides in. Then:</p>
+<blockquote>F_cmd = 500 * (0 - 0.01) + 40 * (0 - 0.05) = -5 - 2 = -7 N</blockquote>
+<p>The controller commands -7 N at the end-effector, which the Jacobian transpose converts to joint torques. The robot pushes back with a force proportional to how far it was displaced, exactly like a real spring and damper would. No force sensor is required in the simplest form. The tradeoff is that the -7 N number is only as accurate as the robot's torque output, and joint friction (especially in a robot arm using a gearbox with backlash and stiction, see our <a href="/blog/posts/gearbox-backlash-compensation-robot-arm.html">gearbox backlash compensation</a> article) directly corrupts the commanded force, which is why impedance control tends to feel less precise at low forces.</p>
+
+<h2>Admittance Control: Force In, Motion Out</h2>
+<p>Admittance control assumes the opposite hardware situation: a stiff, accurately position-controlled robot (most industrial arms) with a force or torque sensor, usually at the wrist. It measures the actual contact force <code>F_ext</code> and solves the same impedance equation for acceleration, then integrates twice to get a position command for the robot's existing high-gain position loop:</p>
+<blockquote>xdd = (F_ext - D * xd - K * x) / M</blockquote>
+<p>Take a numeric case with the same virtual parameters: the wrist force sensor reads <code>F_ext = 10 N</code> as the end-effector first touches a surface, starting from rest at <code>x = 0</code>, <code>xd = 0</code>:</p>
+<blockquote>xdd = (10 - 40*0 - 500*0) / 2 = 5 m/s^2</blockquote>
+<p>Integrate over one 10 ms control step with simple Euler integration:</p>
+<blockquote>xd_new = 0 + 5 * 0.01 = 0.05 m/s<br>x_new = 0 + 0.05 * 0.01 = 0.0005 m</blockquote>
+<p>That 0.5 mm position offset is sent as the new setpoint to the robot's inner position controller for the next step. Repeat this every control cycle and the end-effector yields smoothly into the 10 N push, settling once the spring and damper terms balance the applied force. The advantage is that it reuses a robot's existing stiff position loop unchanged, which is why admittance control is the more common retrofit for industrial arms that were never designed with torque control in mind. The tradeoff shows up against rigid, non-compliant obstacles: a hard stop can produce a force spike faster than the position loop can react, causing the classic admittance instability against rigid contact that shows up repeatedly in the literature.</p>
+
+<h2>Choosing Between Them</h2>
+<ul>
+<li><strong>Torque-controlled arm, no dedicated force sensor:</strong> impedance control. It works directly from joint torque and position/velocity feedback you likely already have.</li>
+<li><strong>Stiff, position-controlled arm with a wrist force/torque sensor:</strong> admittance control. You cannot easily command torque on this hardware, so let the force sensor drive a position setpoint instead.</li>
+<li><strong>Contact against a very stiff or rigid surface:</strong> favor impedance control, or lower the admittance gains (reduce K, increase D) and slow the approach velocity to avoid the instability admittance control shows against rigid stops.</li>
+<li><strong>Precise low-force interaction (light assembly, deburring):</strong> impedance control is more sensitive to joint friction at low forces; a well-calibrated admittance controller with a good force sensor often tracks small forces more cleanly.</li>
+</ul>
+
+<h2>What This Looks Like in Code</h2>
+<p>The admittance side is the easier one to bolt onto an existing robot, since it is a small numeric integrator sitting in front of a position controller that does not need to change:</p>
+<blockquote>xdd = (F_ext - D * xd - K * x) / M<br>xd += xdd * dt<br>x += xd * dt<br>send_position_setpoint(x_ref + x)</blockquote>
+<p>The impedance side plugs directly into a torque command, replacing whatever fixed-gain PD torque law the joint was using:</p>
+<blockquote>F_cmd = K * (x_ref - x) + D * (xd_ref - xd)<br>tau_cmd = J_transpose(q) @ F_cmd</blockquote>
+<p>Both loops still need the same practical care as any other closed-loop controller on a real robot arm: a sane control rate (see our <a href="/blog/posts/real-time-considerations-robot-control-loops.html">real-time considerations in robot control loops</a> article), sensor noise filtering on the force or torque readings, and stiffness/damping values tuned down from a textbook starting point until the arm stops oscillating against the specific object it needs to touch.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
