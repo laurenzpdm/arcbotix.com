@@ -79,6 +79,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/impedance-vs-admittance-control-robot-arm.html</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/imu-sensor-fusion-basics.html</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
