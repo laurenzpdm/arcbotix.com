@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Jul 2026 23:58:55 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 16 Jul 2026 08:02:51 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>CAN Bus for Robot Joint Networks: Wiring, Bit Timing, and Bus Load Explained</title>
+      <link>https://arcbotix.com/blog/posts/can-bus-robot-joint-network-wiring-bit-timing.html</link>
+      <guid>https://arcbotix.com/blog/posts/can-bus-robot-joint-network-wiring-bit-timing.html</guid>
+      <pubDate>Thu, 16 Jul 2026 08:02:13 +0000</pubDate>
+      <description>A worked example of CAN bus for robot joint networks: termination placement, bit-timing calculation for cable length, and bus-load arithmetic for a 6-joint arm.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>Computed Torque Control for Robot Arms: A Worked Numeric Example</title>
       <link>https://arcbotix.com/blog/posts/computed-torque-control-robot-arm-worked-example.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
       <description>Learn how PID controller tuning works for robotic arm joints, with formulas, tuning methods, and practical fixes for overshoot, oscillation, and steady-state error.</description>
       <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Harmonic Drive vs Planetary Gearbox: Choosing the Right Reduction for a Robot Joint</title>
-      <link>https://arcbotix.com/blog/posts/harmonic-drive-vs-planetary-gearbox.html</link>
-      <guid>https://arcbotix.com/blog/posts/harmonic-drive-vs-planetary-gearbox.html</guid>
-      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
-      <description>Harmonic drive vs planetary gearbox for robot joints: how each works, backlash, torque density, stiffness and cost tradeoffs, with guidance on picking one.</description>
-      <category>Hardware</category>
     </item>
   </channel>
 </rss>
