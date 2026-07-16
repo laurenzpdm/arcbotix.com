@@ -27,6 +27,13 @@ only the most recent entries, so older ones matter less over time - that's fine.
 - Weakness in current top pages: none connect computed torque control back to the simpler PD-with-gravity-feedforward approach already covered on this site, or show the actual matrix arithmetic (M(q), C(q,qdot), G(q)) reducing tracking error dynamics to a simple double integrator with real numbers.
 - Weakness in current top pages: none show a concrete C/pseudo-code fixed-rate loop with clock_gettime-style timing, an actual jitter budget calculation, or the link between missed real-time deadlines and a specific control-loop symptom (torque spikes, instability at high gain).
 
+### 2026-07-16
+- Candidates checked: impedance control for robot arms, Denavit-Hartenberg parameters explained, ROS2 actions vs services vs topics, CAN bus for robot joint networks, sliding mode control for robot arms.
+- DH parameters and ROS2 actions/services/topics: both already have thorough, well-structured coverage (automaticaddison.com, universal-robots.com for DH; official ROS2 docs and automaticaddison for actions/services) - gap too thin.
+- Impedance control and sliding mode control: solid backup candidates (impedance control has decent conceptual writeups but no worked numeric example; sliding mode stays in academic/Simulink papers) - kept for a future cycle.
+- Chose "CAN bus for robot joint networks": top pages (thinkrobotics.com, WPILib docs, robotsforroboticists.com) explain CAN's benefits and wiring in general terms, but WPILib's guide is FRC-specific and the others skip the actual bit-timing and bus-load arithmetic a builder needs for their own joint network.
+- Weakness in current top pages: none show a worked bit-timing calculation (propagation delay vs bus length at a given baud rate) or a concrete bus-load percentage for a multi-joint arm's status messages, and none tie termination-resistor placement to a specific reflection/error-frame symptom.
+
 (No entries yet. Each cycle, before choosing a topic, add one dated entry here:
 candidate topics considered, the one chosen and why - demand signal plus the
 content-quality edge over what currently ranks - and one weakness noticed in

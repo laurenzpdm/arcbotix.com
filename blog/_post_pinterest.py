@@ -140,6 +140,11 @@ def main():
         print("[Pinterest] Missing POSTIZ_API_KEY or PINTEREST_INTEGRATION_ID in .env, aborting.")
         sys.exit(1)
 
+    if not PINTEREST_BOARD:
+        print("[Pinterest] PINTEREST_BOARD not configured — skipping pin (no board ID set).")
+        print("[Pinterest] To fix: set PINTEREST_BOARD=<board_id> in .env or in this script.")
+        sys.exit(2)
+
     slug = sys.argv[1]
     title = sys.argv[2]
     description = sys.argv[3]

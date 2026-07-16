@@ -79,6 +79,10 @@ def main():
             pinned_count += 1
             save_done(done)
             print(f"[Pinterest-Fallback] OK: {slug}")
+        elif result.returncode == 2:
+            # Board not configured — abort the whole fallback, no point retrying
+            print("[Pinterest-Fallback] Board not configured, skipping all pins.")
+            break
         else:
             print(f"[Pinterest-Fallback] ERROR for {slug}: {result.stderr[:200]}")
 

@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 26
-- Last published: 2026-07-15
+- Total articles: 27
+- Last published: 2026-07-16
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 27 | 2026-07-16 | can-bus-robot-joint-network-wiring-bit-timing | CAN Bus for Robot Joint Networks: Wiring, Bit Timing, and Bus Load Explained | CAN bus for robot joint networks, CAN bus robotics, CAN bus bit timing calculation, CAN bus load calculation robot arm | Hardware | Worked-example article explaining CAN bus for multi-joint robot arm networks: why CAN suits daisy-chained joint controllers, correct 120-ohm termination at exactly the two bus ends (with the common per-node termination mistake explained), a bit-timing derivation linking propagation delay to cable length and baud rate (1 Mbps up to ~30-40m, 500 kbps for longer runs), a concrete bus-load calculation for a 6-joint arm (78% load at 1 kHz status vs 16% at 200 Hz), and an arbitration-ID priority scheme (e-stop lowest ID, commands next, status highest). Links to torque-control-robot-arm-joints-current-sensing.html and quadrature-encoder-wiring-6dof-robot-arm.html. |
 | 26 | 2026-07-15 | computed-torque-control-robot-arm-worked-example | Computed Torque Control for Robot Arms: A Worked Numeric Example | computed torque control, computed torque control robot arm, feedback linearization robotics, inverse dynamics control | Control Systems | Computed torque control for a two-link robot arm, including the full M(q), C(q,qdot), G(q) derivation and a worked numeric torque computation using real mass/length/inertia values, showing how the closed-loop tracking error reduces to a simple double integrator (e_ddot + Kd*e_dot + Kp*e = 0). Covers model-accuracy, loop-rate, and torque-saturation limitations. |
 | 25 | 2026-07-15 | real-time-considerations-robot-control-loops | Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate | real-time considerations in robot control loops, robot control loop jitter, control loop timing robotics, PREEMPT_RT robot control | Control Systems | Explains real-time considerations in robot control loops: the difference between latency and jitter, a formula for computing per-cycle jitter, real clock_nanosleep-based timer code for measuring it correctly on Linux, practical levers to reduce jitter (SCHED_FIFO priority, PREEMPT_RT kernel, MCU-side hard-real-time inner loops), and a worked derivation of how sample-time jitter perturbs the effective discrete PD derivative gain (Kd / (T + jitter)), with a practical rule of keeping worst-case jitter under 10% of the loop period and the two failure symptoms (buzzing at high gain, mushy lag at low gain) that indicate a timing problem rather than a tuning problem. |
 | 24 | 2026-07-14 | robot-arm-gravity-compensation-worked-example | Robot Arm Gravity Compensation: A Worked Torque Calculation Example | robot arm gravity compensation, gravity compensation robotics, gravity feedforward torque, PD control gravity term | Control Systems | Explains robot arm gravity compensation as a feedforward term added to a PD position loop: derives the single-link torque formula (tau = m*g*(l/2)*cos(theta)) with a worked numeric example, extends it to a two-link arm with actual shoulder/elbow torque numbers showing why the shoulder needs more torque capacity, gives Python feedforward code that runs alongside the PD loop, and lists two diagnostic symptoms (sag at rest, gain sensitivity to pose) that indicate a missing gravity term. |
@@ -146,3 +147,7 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 26)
 - computed-torque-control-robot-arm-worked-example -> robot-arm-gravity-compensation-worked-example (gravity feedforward term is the G(q) piece of the full computed torque model)
 - computed-torque-control-robot-arm-worked-example -> real-time-considerations-robot-control-loops (inverse dynamics computation cost ties into loop rate and jitter budget)
+
+## Internal links (article 27)
+- can-bus-robot-joint-network-wiring-bit-timing -> torque-control-robot-arm-joints-current-sensing (joint controllers exchanging torque/status data over the CAN network)
+- can-bus-robot-joint-network-wiring-bit-timing -> quadrature-encoder-wiring-6dof-robot-arm (same 6-DOF joint hardware context, encoder status as low-priority CAN traffic)
