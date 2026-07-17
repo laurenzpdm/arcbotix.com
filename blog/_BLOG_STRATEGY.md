@@ -68,6 +68,15 @@ research log entry; no rationale, no edit.
   Real ROS2 middleware internals (cluster 3) has instead found a strong,
   concrete failure-scenario gap twice in a row (executors/callback groups,
   then QoS settings) - keep favoring that angle within cluster 3.
+- Within cluster 1, retire "Denavit-Hartenberg parameters" entirely - do not
+  recheck it again. Re-checked and found saturated in 4 separate research
+  entries (2026-07-12, 2026-07-13(2), 2026-07-16, 2026-07-17) with the same
+  verdict every time (automaticaddison.com, Robot Academy, and
+  universal-robots.com already cover it thoroughly with worked tables) -
+  further rechecks are wasted research effort. Favor other cluster 1 angles
+  with a hobbyist worked-numeric gap instead, e.g. sliding mode control
+  (backup candidate, kept for a future cycle per 2026-07-16 and 2026-07-17
+  entries).
 
 ## Image Prompt Style
 Cover images should look like clean technical illustrations, not stock-photo

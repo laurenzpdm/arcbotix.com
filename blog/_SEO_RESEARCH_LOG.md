@@ -100,6 +100,17 @@ the current top-ranking pages for that query.)
 
 ## Strategy Adjustments
 
+### 2026-07-17b
+- Retired "Denavit-Hartenberg parameters" entirely from blog/_BLOG_STRATEGY.md
+  Topic Priority (cluster 1), based on 4 separate research entries
+  (2026-07-12, 2026-07-13(2), 2026-07-16, 2026-07-17) all independently
+  re-checking it and finding it saturated every single time
+  (automaticaddison.com, Robot Academy, universal-robots.com) - further
+  rechecks are wasted research effort, same pattern as the earlier
+  Gazebo/PyBullet retirement. Noted sliding mode control for robot arms as
+  the current best backup candidate for cluster 1 (checked twice, 2026-07-16
+  and 2026-07-17, both times finding a real but MATLAB/Simulink-locked gap).
+
 ### 2026-07-15c
 - Retired "Gazebo vs PyBullet" entirely from blog/_BLOG_STRATEGY.md Topic
   Priority (cluster 3) instead of just deprioritizing it, based on 8 separate
