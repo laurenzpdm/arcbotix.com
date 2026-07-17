@@ -111,6 +111,16 @@ the current top-ranking pages for that query.)
   the current best backup candidate for cluster 1 (checked twice, 2026-07-16
   and 2026-07-17, both times finding a real but MATLAB/Simulink-locked gap).
 
+### 2026-07-17c
+- Retired "ROS2 actions vs services vs topics" entirely from
+  blog/_BLOG_STRATEGY.md Topic Priority (cluster 3), based on 3 separate
+  research entries (2026-07-12, 2026-07-17, 2026-07-17b) all independently
+  re-checking it and finding it saturated every time (docs.ros.org,
+  automaticaddison.com, The Construct) - same pattern as the DH parameters
+  and Gazebo/PyBullet retirements. Noted series elastic actuators as the
+  current best backup candidate for a hardware/hobbyist worked-numeric gap
+  (2026-07-17b), pending a tightly-scoped spring-stiffness example.
+
 ### 2026-07-15c
 - Retired "Gazebo vs PyBullet" entirely from blog/_BLOG_STRATEGY.md Topic
   Priority (cluster 3) instead of just deprioritizing it, based on 8 separate
@@ -204,3 +214,11 @@ section still reflects reality. Log either the change made and why, or
 - MPC for robot arms: current coverage is almost entirely academic (arXiv, IEEE, thesis PDFs) or MATLAB/Simulink-locked tutorials - a real gap exists but the topic needs a linearized dynamic model and QP solver to show honestly, which risks going over scope for a hobbyist-facing 800-1300 word piece.
 - Chose "absolute vs incremental encoders for robot joints, with a worked resolution-sizing example": top pages (RealPars, SICK, Hobber Drive, Snubber, gtencoder) explain the conceptual tradeoff (homing needed vs not, cost, noise immunity) well but stay qualitative.
 - Weakness in current top pages: none show how to actually size encoder resolution for a target joint accuracy - converting arcminutes of required accuracy into encoder bits/PPR, then accounting for gear ratio multiplying effective resolution. This is a different angle from the already-published quadrature encoder wiring article, which covers wiring, not selection/sizing.
+
+### 2026-07-17b
+- Candidates checked: series elastic actuators for robot joints, motor and gearbox torque sizing for a robot arm joint, ROS2 actions vs services (reconfirmed), timing belt vs direct drive joint design, robot arm workspace/reachability analysis.
+- ROS2 actions vs services: reconfirmed saturated again (2026-07-12, 2026-07-17 entries).
+- Series elastic actuators: real gap (patents, IHMC/IntechOpen research pages, one product-blog overview) but every source stays conceptual/academic - a strong backup candidate for a future cycle once a concrete spring-stiffness worked example can be scoped tightly.
+- Timing belt vs direct drive and workspace reachability: both reasonably covered already (GrabCAD/Dorna blog for belt vs direct drive tradeoffs; several arXiv reachability-map papers with sampling-based methods) - thinner gap than the motor sizing candidate.
+- Chose "motor and gearbox torque sizing for a robot arm joint, worked example": a Physics Forums thread lays out the general worst-case-torque method in prose, but no page turns it into a full worked numeric calculation with a concrete link mass/length, a chosen safety factor, and a resulting gear ratio/motor selection.
+- Weakness in current top pages: none show the complete chain from load torque (mass, length, gravity, acceleration) through a safety factor to a specific gear ratio choice and a check against the motor's continuous vs peak torque rating - builders are left to guess at safety margins.

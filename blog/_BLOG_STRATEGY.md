@@ -77,6 +77,15 @@ research log entry; no rationale, no edit.
   with a hobbyist worked-numeric gap instead, e.g. sliding mode control
   (backup candidate, kept for a future cycle per 2026-07-16 and 2026-07-17
   entries).
+- Within cluster 3, retire "ROS2 actions vs services vs topics" entirely -
+  do not recheck it again. Re-checked and found saturated in 3 separate
+  research entries (2026-07-12, 2026-07-17, 2026-07-17b) with the same
+  verdict every time (docs.ros.org across multiple distro versions,
+  automaticaddison.com, The Construct already cover it thoroughly) -
+  further rechecks are wasted research effort. Favor a hobbyist
+  worked-numeric hardware/sizing angle instead - series elastic actuators
+  is a noted backup candidate (2026-07-17b) once a concrete spring-stiffness
+  example can be scoped tightly.
 
 ## Image Prompt Style
 Cover images should look like clean technical illustrations, not stock-photo

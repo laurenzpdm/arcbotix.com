@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 29
+- Total articles: 30
 - Last published: 2026-07-17
-- Known slugs: 29
+- Known slugs: 30
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 30 | 2026-07-17 | robot-arm-joint-friction-compensation-coulomb-viscous | Robot Arm Joint Friction Compensation: A Worked Coulomb and Viscous Example | robot arm joint friction compensation, Coulomb friction robot joint, viscous friction compensation, stick-slip robot arm | Control Systems  |
 | 29 | 2026-07-17 | absolute-vs-incremental-encoder-robot-joint-resolution | Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need | absolute vs incremental encoder robot joint, encoder resolution sizing robotics, absolute encoder robot arm, encoder bits PPR calculation | Hardware  |
 | 28 | 2026-07-16 | impedance-vs-admittance-control-robot-arm | Impedance Control vs Admittance Control for Robot Arms: A Worked Numeric Example | impedance control vs admittance control, impedance control robot arm, admittance control robotics, compliant robot arm control | Control Systems  |
 | 27 | 2026-07-16 | can-bus-robot-joint-network-wiring-bit-timing | CAN Bus for Robot Joint Networks: Wiring, Bit Timing, and Bus Load Explained | CAN bus for robot joint networks, CAN bus robotics, CAN bus bit timing calculation, CAN bus load calculation robot arm | Hardware  |
@@ -106,7 +107,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style

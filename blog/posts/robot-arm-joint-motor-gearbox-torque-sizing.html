@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation – Arcbotix</title>
+  <meta name="description" content="Motor and gearbox sizing for a robot arm joint explained with a full worked example: load torque, safety factor, gear ratio choice, and a continuous-torque check.">
+  <meta name="keywords" content="motor and gearbox sizing for a robot arm joint, robot arm motor torque sizing, gear ratio selection robot joint, continuous vs peak torque motor">
+  <meta property="og:title" content="Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation">
+  <meta property="og:description" content="Motor and gearbox sizing for a robot arm joint explained with a full worked example: load torque, safety factor, gear ratio choice, and a continuous-torque check.">
+  <meta property="og:image" content="/blog/posts/img/robot-arm-joint-motor-gearbox-torque-sizing.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Build Guides</span>
+      <time datetime="2026-07-17">July 17, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation</h1>
+    <p class="blog-post-subtitle">How to turn a link's mass and length into an actual motor and gear ratio choice, with real numbers</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/robot-arm-joint-motor-gearbox-torque-sizing.webp" alt="Isometric technical illustration of a robot arm shoulder joint with a motor and gearbox assembly and torque vectors" loading="lazy">
+    </div>
+
+    <p>Picking a motor and gearbox for a robot arm joint before you have built anything is mostly guesswork unless you actually run the numbers. Undersize it and the joint stalls or overheats under load; oversize it and you are paying for weight, cost, and current draw the joint never needs. <strong>Motor and gearbox sizing for a robot arm joint</strong> comes down to one core exercise: find the worst-case torque the joint will ever see, add a safety margin, then pick a gear ratio and motor combination that clears that number on continuous duty, not just peak. This article works through that full chain with a concrete link, motor, and gearbox so you can plug your own numbers into the same steps.</p>
+
+<h2>Step 1: Find the Worst-Case Load Torque</h2>
+<p>The worst case for almost any arm joint is the arm fully extended horizontally, holding the heaviest payload it will ever carry, at the joint closest to the base (the shoulder carries everything downstream of it). Two components add together at that moment: the static torque from gravity, and the dynamic torque from acceleration.</p>
+<p>Static (gravity) torque for a link of mass <code>m_link</code> and length <code>l</code>, plus a payload mass <code>m_load</code> at the end of the link, both acting at their respective moment arms:</p>
+<blockquote>tau_static = m_link * g * (l / 2) + m_load * g * l</blockquote>
+<p>Dynamic torque from angular acceleration comes from the joint's total moment of inertia about the pivot. Treating the link as a uniform rod pivoting at one end (inertia = m_link * l^2 / 3) and the payload as a point mass at the tip (inertia = m_load * l^2):</p>
+<blockquote>tau_dynamic = (m_link * l^2 / 3 + m_load * l^2) * alpha</blockquote>
+<p>where <code>alpha</code> is the target peak angular acceleration in rad/s^2, a number you choose based on how snappy you want the joint's motion profile to be (see <a href="/blog/posts/trajectory-planning-for-robotic-arms.html">trajectory planning for robotic arms</a> for how acceleration limits get set in the first place).</p>
+
+<h2>Step 2: Worked Numeric Example</h2>
+<p>Take a shoulder joint with link mass <code>m_link = 0.6 kg</code>, link length <code>l = 0.35 m</code>, a payload of <code>m_load = 1.0 kg</code> at the tip, and a target peak acceleration of <code>alpha = 4 rad/s^2</code>.</p>
+<pre><code>tau_static = 0.6 * 9.81 * (0.35 / 2) + 1.0 * 9.81 * 0.35
+           = 0.6 * 9.81 * 0.175 + 1.0 * 9.81 * 0.35
+           = 1.030 + 3.434
+           = 4.464 N*m
+
+I_total = 0.6 * 0.35^2 / 3 + 1.0 * 0.35^2
+        = 0.6 * 0.1225 / 3 + 0.1225
+        = 0.0245 + 0.1225
+        = 0.1470 kg*m^2
+
+tau_dynamic = 0.1470 * 4
+            = 0.588 N*m
+
+tau_worst_case = tau_static + tau_dynamic
+               = 4.464 + 0.588
+               = 5.052 N*m</code></pre>
+<p>That 5.05 N*m is the torque the joint output has to deliver at the single worst moment in its duty cycle: fully extended, loaded, and accelerating hard.</p>
+
+<h2>Step 3: Apply a Safety Factor</h2>
+<p>Real joints see friction losses, gearbox efficiency losses, underestimated payload, and control transients the simplified model above does not capture. A safety factor of 1.5 to 2.0 on the worst-case torque is standard practice for a first build; use the lower end if your mass and length numbers are measured accurately, the higher end if they are rough estimates.</p>
+<pre><code>tau_design = tau_worst_case * safety_factor
+           = 5.052 * 1.5
+           = 7.58 N*m</code></pre>
+<p>This 7.58 N*m, not the raw 5.05 N*m, is the number the gearbox output actually needs to sustain.</p>
+
+<h2>Step 4: Choose a Gear Ratio and Check the Motor</h2>
+<p>A small brushless or geared DC motor suited to a hobby arm typically has a continuous stall torque in the range of 0.05 to 0.3 N*m at the motor shaft, before any gearing. To reach 7.58 N*m at the output, the required gear ratio (ignoring efficiency for a first pass) is:</p>
+<blockquote>ratio_required = tau_design / tau_motor_continuous</blockquote>
+<p>For a motor rated at 0.12 N*m continuous torque:</p>
+<pre><code>ratio_required = 7.58 / 0.12 = 63.2</code></pre>
+<p>Gearboxes come in fixed ratios, so round up to the nearest available stage, for example a 70:1 planetary gearbox (see <a href="/blog/posts/harmonic-drive-vs-planetary-gearbox.html">harmonic drive vs planetary gearbox</a> for how to pick between gearbox types once you know the ratio range you need). Rounding up rather than down leaves margin instead of eating into it. Then apply the gearbox's rated efficiency, typically 70 to 90 percent for a planetary stage, to check the actual delivered torque:</p>
+<pre><code>tau_delivered = tau_motor_continuous * ratio * efficiency
+              = 0.12 * 70 * 0.85
+              = 7.14 N*m</code></pre>
+<p>That comes in just under the 7.58 N*m design target, so this specific motor and ratio combination is undersized once efficiency is accounted for. The fix is either a slightly higher ratio (80:1 gives 8.16 N*m delivered), a motor with more continuous torque, or accepting a lower safety factor if the mass and length estimates are trustworthy. This is the step builders skip most often: sizing against the motor's peak or stall torque number on a datasheet rather than its continuous rating, which is the number that actually matters for a joint holding a static load for more than a few seconds.</p>
+
+<h2>Step 5: Continuous vs Peak Torque, and Duty Cycle</h2>
+<p>Motor datasheets list both a peak (or stall) torque and a continuous torque, sometimes buried in a thermal curve rather than a single number. Peak torque is only available briefly before winding temperature rises past the motor's insulation rating. A joint that has to hold a fixed pose against gravity for extended periods, like a shoulder joint supporting an outstretched arm, is a continuous-duty load and must be sized against the continuous rating, not the peak one, even though the peak number looks far more attractive on a spec sheet.</p>
+<p>A joint that only sees torque briefly during a fast move and then relaxes, like a gripper actuator that closes and releases, can be sized closer to the peak rating with a shorter duty cycle, since the winding has time to cool between actuations. Check the motor's thermal time constant against your actual hold times before assuming a peak-rated sizing is safe.</p>
+
+<h2>Putting the Chain Together</h2>
+<ul>
+<li>Compute worst-case static torque (gravity on link plus payload) and dynamic torque (moment of inertia times target acceleration), added together.</li>
+<li>Multiply by a safety factor of 1.5 to 2.0 to get the design torque target.</li>
+<li>Divide by the motor's continuous torque rating to get the required gear ratio, then round up to the nearest available gearbox.</li>
+<li>Multiply the motor's continuous torque by the chosen ratio and the gearbox's rated efficiency to verify the delivered torque still clears the design target.</li>
+<li>Confirm whether the joint's actual duty cycle is continuous or intermittent, and size against the matching torque rating rather than the largest number on the datasheet.</li>
+</ul>
+<p>Skipping any one of these steps, especially the efficiency check and the continuous-vs-peak distinction, is why a motor that looked adequate on paper ends up stalling or overheating in a real arm. Running the full chain with your own link masses, lengths, and target accelerations before ordering hardware is cheaper than discovering the gap after the joint is already wired up.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
