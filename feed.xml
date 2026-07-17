@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 17 Jul 2026 08:13:33 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 17 Jul 2026 16:16:33 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation</title>
+      <link>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</link>
+      <guid>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</guid>
+      <pubDate>Fri, 17 Jul 2026 16:15:52 +0000</pubDate>
+      <description>Motor and gearbox sizing for a robot arm joint explained with a full worked example: load torque, safety factor, gear ratio choice, and a continuous-torque check.</description>
+      <category>Build Guides</category>
+    </item>
     <item>
       <title>Robot Arm Joint Friction Compensation: A Worked Coulomb and Viscous Example</title>
       <link>https://arcbotix.com/blog/posts/robot-arm-joint-friction-compensation-coulomb-viscous.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</guid>
       <pubDate>Tue, 07 Jul 2026 21:52:27 +0000</pubDate>
       <description>Learn how to size and choose a battery for a quadruped robot, covering chemistry, voltage, capacity, discharge rate, and mounting tradeoffs.</description>
-      <category>Build Guides</category>
-    </item>
-    <item>
-      <title>Power Budgeting for Mobile Robots: From Component List to Wire Gauge</title>
-      <link>https://arcbotix.com/blog/posts/power-budgeting-for-mobile-robots.html</link>
-      <guid>https://arcbotix.com/blog/posts/power-budgeting-for-mobile-robots.html</guid>
-      <pubDate>Tue, 07 Jul 2026 21:52:17 +0000</pubDate>
-      <description>Learn how to build a real power budget for a mobile robot: peak vs average current, battery capacity, wire gauge, and fuse sizing with worked numbers.</description>
       <category>Build Guides</category>
     </item>
   </channel>
