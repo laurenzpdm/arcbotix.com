@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 17 Jul 2026 00:09:50 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 17 Jul 2026 08:13:33 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Robot Arm Joint Friction Compensation: A Worked Coulomb and Viscous Example</title>
+      <link>https://arcbotix.com/blog/posts/robot-arm-joint-friction-compensation-coulomb-viscous.html</link>
+      <guid>https://arcbotix.com/blog/posts/robot-arm-joint-friction-compensation-coulomb-viscous.html</guid>
+      <pubDate>Fri, 17 Jul 2026 08:12:51 +0000</pubDate>
+      <description>Learn robot arm joint friction compensation with a worked Coulomb and viscous friction example: measure coefficients, add a feedforward term, fix stick-slip.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need</title>
       <link>https://arcbotix.com/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Tue, 07 Jul 2026 21:52:17 +0000</pubDate>
       <description>Learn how to build a real power budget for a mobile robot: peak vs average current, battery capacity, wire gauge, and fuse sizing with worked numbers.</description>
       <category>Build Guides</category>
-    </item>
-    <item>
-      <title>Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator</title>
-      <link>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</link>
-      <guid>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</guid>
-      <pubDate>Tue, 07 Jul 2026 12:02:15 +0000</pubDate>
-      <description>Compare servo, stepper, and BLDC motors for robotics: torque, precision, cost, and control complexity, with clear guidance on which to pick for your build.</description>
-      <category>Hardware</category>
     </item>
   </channel>
 </rss>
