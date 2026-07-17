@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need – Arcbotix</title>
+  <meta name="description" content="Absolute vs incremental encoder for robot joints, explained with a worked example: converting a target joint accuracy into encoder bits, PPR, and gear ratio.">
+  <meta name="keywords" content="absolute vs incremental encoder robot joint, encoder resolution sizing robotics, absolute encoder robot arm, encoder bits PPR calculation">
+  <meta property="og:title" content="Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need">
+  <meta property="og:description" content="Absolute vs incremental encoder for robot joints, explained with a worked example: converting a target joint accuracy into encoder bits, PPR, and gear ratio.">
+  <meta property="og:image" content="/blog/posts/img/absolute-vs-incremental-encoder-robot-joint-resolution.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-17">July 17, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need</h1>
+    <p class="blog-post-subtitle">Choosing between absolute and incremental encoders is only half the decision. The other half is picking a resolution that actually meets your joint's accuracy target.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/absolute-vs-incremental-encoder-robot-joint-resolution.webp" alt="Isometric technical illustration of a rotary encoder disk mounted on a robot joint motor shaft, dark background with blue and cyan lighting" loading="lazy">
+    </div>
+
+    <p>Every robot joint needs to know its own angle, and that means picking an encoder. The absolute vs incremental encoder decision for a robot joint gets covered a lot, but almost always as a qualitative tradeoff table: absolute encoders skip homing, incremental encoders are cheaper. What gets skipped is the actual sizing question: how many bits, or how many pulses per revolution, do you need to hit a specific joint accuracy target? Get this wrong and you either overpay for resolution you can't use, or build a joint that can't hold the position you asked for.</p>
+
+<h2>Absolute vs Incremental: The Real Difference</h2>
+<p>An incremental encoder outputs quadrature pulses (channels A and B, 90 degrees out of phase) as the shaft turns. A microcontroller counts edges to track relative motion. It has no idea what the absolute angle is until it passes a reference, usually an index pulse or a physical homing switch. Lose power mid-motion and the count is gone; the joint has to re-home before it can be trusted.</p>
+<p>An absolute encoder outputs a unique code (via SSI, BiSS-C, or an analog/digital protocol) for every distinct shaft position within one turn, or across multiple turns for a multi-turn absolute encoder. Power it up and it reports the real angle immediately, no homing sequence, no lost count if the joint gets bumped while the controller is off.</p>
+<p>For a robot arm joint that must be safe to power on in an arbitrary pose (a collaborative arm, a pick-and-place joint near people or fragile parts), absolute encoding is usually worth the extra cost. For a joint that always starts from a known, safe home position, such as most hobby and small mobile-robot builds, incremental is cheaper and simpler. This is the same wiring pattern used in <a href="quadrature-encoder-wiring-6dof-robot-arm.html">quadrature encoder wiring for a 6-DOF robot arm</a>, which assumes you already picked incremental and need to get channel A/B onto your microcontroller correctly.</p>
+
+<h2>Sizing Encoder Resolution for a Target Joint Accuracy</h2>
+<p>Whichever type you pick, the resolution question is the same: how fine does the encoder need to be so the joint can actually hold the position accuracy your application needs? Work backward from the requirement.</p>
+<h3>Step 1: Define the required joint accuracy</h3>
+<p>Say a 6-DOF arm needs its wrist joint to be positioned within 0.05 degrees (3 arcminutes) at the joint itself, a reasonable target for a small precision arm doing light assembly work.</p>
+<h3>Step 2: Convert to required encoder counts per revolution</h3>
+<p>One full revolution is 360 degrees. To resolve 0.05 degrees, you need at least:</p>
+<pre><code>counts_needed = 360 / 0.05 = 7200 counts per revolution</code></pre>
+<p>For an incremental quadrature encoder, remember that each physical line produces 4 counts (one per edge on both A and B channels), so the required line count (PPR) is:</p>
+<pre><code>PPR_needed = counts_needed / 4 = 7200 / 4 = 1800 lines</code></pre>
+<p>For an absolute encoder, resolution is usually specified directly in bits. The number of unique positions per revolution is 2^bits, so:</p>
+<pre><code>bits_needed = log2(counts_needed) = log2(7200) = 12.8 -> round up to 13 bits</code></pre>
+<p>A 13-bit absolute encoder gives 8192 counts per revolution, or 360/8192 = 0.044 degrees per count, comfortably inside the 0.05 degree target. A common off-the-shelf 12-bit encoder (4096 counts, 0.088 degrees per count) would not meet this spec on its own.</p>
+<h3>Step 3: Account for the gearbox</h3>
+<p>Most robot joints mount the encoder on the motor shaft, before a gear reduction, not on the output link directly. This works in your favor: the gearbox multiplies the effective output resolution by the reduction ratio. If this joint uses a 50:1 gearbox and a 12-bit (4096 count) absolute encoder on the motor shaft, the effective resolution at the output is:</p>
+<pre><code>output_resolution = 360 / (4096 * 50) = 0.00176 degrees per count</code></pre>
+<p>That is far finer than the 0.05 degree target, so in this configuration a 12-bit motor-side encoder is actually overkill, and a cheaper 10-bit (1024 count) part would still deliver 360/(1024*50) = 0.007 degrees, well within spec. This is why motor-side encoding is so common: the gear ratio does a lot of the resolution work for free. The tradeoff is that motor-side encoding can't detect backlash or shaft windup between the gearbox output and the encoder; see <a href="gearbox-backlash-compensation-robot-arm.html">gearbox backlash compensation for robot arm joints</a> if that matters for your application.</p>
+
+<h2>Quantization Error and Control Loop Implications</h2>
+<p>Resolution sets a hard floor on position error even with a perfect control loop: the joint can never be commanded more precisely than one encoder count, so worst-case quantization error is half a count (+/- 0.5 LSB). For the 1800-line incremental example above, that is +/- 0.025 degrees, half of the original 0.05 degree budget, which is a reasonable margin. If you size resolution exactly to the accuracy target with no margin, sensor noise, gear backlash, and structural compliance will eat into that budget and the joint will underperform its spec on paper. A practical rule of thumb: size for at least 2-4x finer resolution than your final accuracy target, not 1x.</p>
+<p>Velocity estimation adds a second constraint. A PID or LQR velocity term differentiates position over a fixed control period. At low encoder resolution and low speed, the joint may barely tick over one count per control cycle, making velocity estimates noisy and quantized in steps rather than smooth. If your joint needs to run slowly and smoothly (a common requirement near the end of a trajectory), that pushes you toward finer resolution than the static position-accuracy calculation alone would suggest.</p>
+
+<h2>Putting It Together</h2>
+<ul>
+<li>Start from the required joint accuracy in degrees or arcminutes, not from a part number.</li>
+<li>Convert to required counts per revolution, then to PPR (incremental) or bits (absolute), applying a 2-4x safety margin.</li>
+<li>If the encoder sits on the motor shaft ahead of a gearbox, multiply resolution by the gear ratio before comparing against your target, this usually lets you use a coarser, cheaper encoder than the naive calculation suggests.</li>
+<li>Choose absolute over incremental when the joint must report a trustworthy position immediately on power-up, without a homing move.</li>
+</ul>
+<p>Skipping this sizing step is how builders end up with either an oversized, expensive 20-bit absolute encoder on a joint that only needed 12 bits, or a joint that visibly steps and hunts around its setpoint because the encoder resolution was never checked against the actual accuracy requirement in the first place.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 27
-- Last published: 2026-07-16
-- Known slugs: 27
+- Total articles: 29
+- Last published: 2026-07-17
+- Known slugs: 29
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,8 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 29 | 2026-07-17 | absolute-vs-incremental-encoder-robot-joint-resolution | Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need | absolute vs incremental encoder robot joint, encoder resolution sizing robotics, absolute encoder robot arm, encoder bits PPR calculation | Hardware  |
+| 28 | 2026-07-16 | impedance-vs-admittance-control-robot-arm | Impedance Control vs Admittance Control for Robot Arms: A Worked Numeric Example | impedance control vs admittance control, impedance control robot arm, admittance control robotics, compliant robot arm control | Control Systems  |
 | 27 | 2026-07-16 | can-bus-robot-joint-network-wiring-bit-timing | CAN Bus for Robot Joint Networks: Wiring, Bit Timing, and Bus Load Explained | CAN bus for robot joint networks, CAN bus robotics, CAN bus bit timing calculation, CAN bus load calculation robot arm | Hardware  |
 | 26 | 2026-07-15 | computed-torque-control-robot-arm-worked-example | Computed Torque Control for Robot Arms: A Worked Numeric Example | computed torque control, computed torque control robot arm, feedback linearization robotics, inverse dynamics control | Control Systems  |
 | 25 | 2026-07-15 | real-time-considerations-robot-control-loops | Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate | real-time considerations in robot control loops, robot control loop jitter, control loop timing robotics, PREEMPT_RT robot control | Control Systems  |
@@ -104,7 +106,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -123,6 +125,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- Shunt vs hall-effect current sensing: already well served by solid vendor application notes (Bourns, Isabellenhuette, Elehub) with practical tradeoff tables.
-- Chose "Extended Kalman Filter SLAM (EKF-SLAM) explained": top pages (andrewjkramer.net's EKF tutorial series, a UMass lecture PDF, jihongju.github.io's "hands-on" post) stay in symbolic matrix notation (x, P, F, H, K) or jump straight to code without showing the arithmetic for one full prediction+update cycle.
-- Weakness in current top pages: none walk through a full numeric prediction+update cycle for a small concrete example (a differential-drive robot observing 2 landmarks) with actual state vector values, an actual covariance matrix, actual Jacobian entries, and an actual Kalman gain computed by hand.
+- MPC for robot arms: current coverage is almost entirely academic (arXiv, IEEE, thesis PDFs) or MATLAB/Simulink-locked tutorials - a real gap exists but the topic needs a linearized dynamic model and QP solver to show honestly, which risks going over scope for a hobbyist-facing 800-1300 word piece.
+- Chose "absolute vs incremental encoders for robot joints, with a worked resolution-sizing example": top pages (RealPars, SICK, Hobber Drive, Snubber, gtencoder) explain the conceptual tradeoff (homing needed vs not, cost, noise immunity) well but stay qualitative.
+- Weakness in current top pages: none show how to actually size encoder resolution for a target joint accuracy - converting arcminutes of required accuracy into encoder bits/PPR, then accounting for gear ratio multiplying effective resolution. This is a different angle from the already-published quadrature encoder wiring article, which covers wiring, not selection/sizing.

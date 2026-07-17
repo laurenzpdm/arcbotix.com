@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 28
-- Last published: 2026-07-16
+- Total articles: 29
+- Last published: 2026-07-17
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 29 | 2026-07-17 | absolute-vs-incremental-encoder-robot-joint-resolution | Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need | absolute vs incremental encoder robot joint, encoder resolution sizing robotics, absolute encoder robot arm, encoder bits PPR calculation | Hardware | Explains the absolute vs incremental encoder tradeoff for robot joints (homing requirement, cost, power-loss behavior) and then walks through a worked resolution-sizing example: converting a target joint accuracy (0.05 degrees) into required encoder counts per revolution, PPR for incremental encoders, bits for absolute encoders, and how gear ratio multiplies effective output resolution when the encoder is mounted on the motor shaft. Covers quantization error as a position-error floor and a 2-4x resolution safety margin rule of thumb. Distinct from the existing quadrature encoder wiring article, which covers physical wiring rather than selection and resolution sizing. |
 | 28 | 2026-07-16 | impedance-vs-admittance-control-robot-arm | Impedance Control vs Admittance Control for Robot Arms: A Worked Numeric Example | impedance control vs admittance control, impedance control robot arm, admittance control robotics, compliant robot arm control | Control Systems | Explains impedance control vs admittance control for robot arms using a shared mass-spring-damper target dynamics equation (M*xdd + D*xd + K*x = F_ext). Works a numeric one-DOF example for each: impedance control solving for commanded force from a position/velocity error (F_cmd = -7 N for K=500, D=40, x=0.01m, xd=0.05m/s), and admittance control solving for a position setpoint from a measured 10 N contact force via numeric integration (xdd=5 m/s^2, one 10ms step producing a 0.5mm position command). Gives hardware-based selection guidance (torque-controlled arm vs stiff position-controlled arm with wrist F/T sensor) and short code sketches for both control loops. |
 | 27 | 2026-07-16 | can-bus-robot-joint-network-wiring-bit-timing | CAN Bus for Robot Joint Networks: Wiring, Bit Timing, and Bus Load Explained | CAN bus for robot joint networks, CAN bus robotics, CAN bus bit timing calculation, CAN bus load calculation robot arm | Hardware | Worked-example article explaining CAN bus for multi-joint robot arm networks: why CAN suits daisy-chained joint controllers, correct 120-ohm termination at exactly the two bus ends (with the common per-node termination mistake explained), a bit-timing derivation linking propagation delay to cable length and baud rate (1 Mbps up to ~30-40m, 500 kbps for longer runs), a concrete bus-load calculation for a 6-joint arm (78% load at 1 kHz status vs 16% at 200 Hz), and an arbitration-ID priority scheme (e-stop lowest ID, commands next, status highest). Links to torque-control-robot-arm-joints-current-sensing.html and quadrature-encoder-wiring-6dof-robot-arm.html. |
 | 26 | 2026-07-15 | computed-torque-control-robot-arm-worked-example | Computed Torque Control for Robot Arms: A Worked Numeric Example | computed torque control, computed torque control robot arm, feedback linearization robotics, inverse dynamics control | Control Systems | Computed torque control for a two-link robot arm, including the full M(q), C(q,qdot), G(q) derivation and a worked numeric torque computation using real mass/length/inertia values, showing how the closed-loop tracking error reduces to a simple double integrator (e_ddot + Kd*e_dot + Kp*e = 0). Covers model-accuracy, loop-rate, and torque-saturation limitations. |
@@ -157,3 +158,7 @@ hand-edit the table below except to fix a clear data error.
 - impedance-vs-admittance-control-robot-arm -> torque-control-robot-arm-joints-current-sensing (impedance control needs joint torque output, linked to the torque control article's current-to-torque path)
 - impedance-vs-admittance-control-robot-arm -> gearbox-backlash-compensation-robot-arm (friction/backlash corrupting commanded force at low torque in impedance control)
 - impedance-vs-admittance-control-robot-arm -> real-time-considerations-robot-control-loops (both control loops need a sane, jitter-bounded control rate)
+
+## Internal links (article 29)
+- absolute-vs-incremental-encoder-robot-joint-resolution -> quadrature-encoder-wiring-6dof-robot-arm (links to the wiring guide for readers who choose incremental and need physical channel A/B wiring)
+- absolute-vs-incremental-encoder-robot-joint-resolution -> gearbox-backlash-compensation-robot-arm (links to backlash compensation for readers using motor-side encoding, which can't see backlash directly)
