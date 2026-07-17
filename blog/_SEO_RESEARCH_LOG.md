@@ -6,6 +6,13 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-17
+- Candidates checked: Denavit-Hartenberg parameters (forward kinematics), sliding mode control for robot arms, joint friction compensation (Coulomb/viscous/Stribeck), strain-gauge force/torque sensors for grippers, RRT path planning for robot arms.
+- DH parameters: still gap-too-thin, confirmed already thoroughly covered (see 2026-07-16 entry).
+- Sliding mode control and RRT for robot arms: both stay locked in MATLAB/Simulink examples or academic papers (IntechOpen, MathWorks, IEEE) with no hobbyist-scale worked numbers - kept sliding mode as a backup candidate, RRT already has a decent hobbyist writeup (fusybots.com) so gap is thinner there.
+- Chose "Coulomb and viscous friction compensation for robot arm joints": top pages (ResearchGate friction-compensation overviews, IET papers, a KUKA-specific Wiley study) stay in symbolic model-identification language or are locked to a specific industrial robot, and MathWorks' example requires Simulink System Identification.
+- Weakness in current top pages: none show a builder how to actually estimate Coulomb + viscous coefficients from a simple constant-velocity test on their own joint, then add the feedforward friction term to an existing PD/PID loop with real torque numbers - and none connect the fix to the concrete symptom (stick-slip jitter and dead zone near zero velocity) that tells a builder they are missing it.
+
 ### 2026-07-11
 - Candidates checked: Gazebo vs PyBullet simulation choice, feedback control basics for beginners, URDF explained for a robot arm, A* vs RRT path planning, stepper motor microstepping and torque.
 - Gazebo vs PyBullet: still saturated - godrift.ai, blackcoffeerobotics.com and roboticscenter.ai already published detailed 2026 ROS2-integration comparisons.
