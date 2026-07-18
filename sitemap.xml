@@ -193,6 +193,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/ros2-tf2-transforms-explained-worked-example.html</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>

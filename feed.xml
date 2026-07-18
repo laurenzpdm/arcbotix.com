@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Jul 2026 08:22:20 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2026 16:26:36 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>ROS2 tf2 Transforms Explained: A Worked Example (and Why Lookups Fail)</title>
+      <link>https://arcbotix.com/blog/posts/ros2-tf2-transforms-explained-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/ros2-tf2-transforms-explained-worked-example.html</guid>
+      <pubDate>Sat, 18 Jul 2026 16:26:16 +0000</pubDate>
+      <description>ROS2 tf2 transforms explained with a worked homogeneous transform example and the real reasons lookupTransform throws extrapolation and frame-not-found errors.</description>
+      <category>Software</category>
+    </item>
     <item>
       <title>Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained</title>
       <link>https://arcbotix.com/blog/posts/robot-arm-e-stop-circuit-design-category-3.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/robot-arm-singularity-avoidance-jacobian.html</guid>
       <pubDate>Thu, 09 Jul 2026 22:01:20 +0000</pubDate>
       <description>Learn robot arm singularity avoidance with a worked Jacobian example: detect singular poses, compare plain pseudo-inverse vs damped least squares.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Gearbox Backlash Compensation for Robot Arm Joints: Measuring and Correcting Mechanical Play</title>
-      <link>https://arcbotix.com/blog/posts/gearbox-backlash-compensation-robot-arm.html</link>
-      <guid>https://arcbotix.com/blog/posts/gearbox-backlash-compensation-robot-arm.html</guid>
-      <pubDate>Thu, 09 Jul 2026 09:58:25 +0000</pubDate>
-      <description>How to measure gearbox backlash from encoder data and compensate for it in software: dead-band inversion, lookup tables, and when compensation is not enough.</description>
       <category>Control Systems</category>
     </item>
   </channel>
