@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 31
-- Last published: 2026-07-17
+- Total articles: 32
+- Last published: 2026-07-18
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 32 | 2026-07-18 | robot-gripper-force-sensing-load-cell-calibration | Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example | load cell force sensing robot gripper, robot gripper force control, strain gauge calibration robotics, PID force control gripper | Build Guides | Explains load cell force sensing for robot grippers end to end: strain gauge bridge mV/V output, instrumentation amplifier gain (HX711 example), two-point calibration to a counts-per-newton scale factor with worked numbers, then a PID force control loop with concrete gains and a contact-detection state machine to avoid slamming the gripper closed on open air. |
 | 31 | 2026-07-17 | robot-arm-joint-motor-gearbox-torque-sizing | Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation | motor and gearbox sizing for a robot arm joint, robot arm motor torque sizing, gear ratio selection robot joint, continuous vs peak torque motor | Build Guides | Explains how to size a motor and gearbox for a robot arm joint with a full worked numeric chain: computing worst-case static torque (gravity on link plus payload) and dynamic torque (moment of inertia times target angular acceleration), summing them, applying a 1.5-2.0 safety factor to get a design torque target, dividing by the motor's continuous torque rating to find the required gear ratio, rounding to an available gearbox ratio, then verifying delivered torque against gearbox efficiency. Also explains the continuous-vs-peak torque distinction and duty cycle (continuous-hold joints like a shoulder must be sized against continuous torque, not peak/stall torque). Uses a concrete example: 0.6 kg/0.35 m link, 1.0 kg payload, 4 rad/s^2 target acceleration, yielding 5.05 N*m worst-case torque, 7.58 N*m design target, and a 70:1 to 80:1 gear ratio check against a 0.12 N*m continuous motor. |
 | 30 | 2026-07-17 | robot-arm-joint-friction-compensation-coulomb-viscous | Robot Arm Joint Friction Compensation: A Worked Coulomb and Viscous Example | robot arm joint friction compensation, Coulomb friction robot joint, viscous friction compensation, stick-slip robot arm | Control Systems | Worked example measuring Coulomb and viscous friction coefficients for a robot joint from a constant-velocity test, then adding a feedforward friction term to a PD/PID position loop, with diagnosis of under- vs over-compensation symptoms (stick-slip jitter, buzz, growing tracking error). |
 | 29 | 2026-07-17 | absolute-vs-incremental-encoder-robot-joint-resolution | Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need | absolute vs incremental encoder robot joint, encoder resolution sizing robotics, absolute encoder robot arm, encoder bits PPR calculation | Hardware | Explains the absolute vs incremental encoder tradeoff for robot joints (homing requirement, cost, power-loss behavior) and then walks through a worked resolution-sizing example: converting a target joint accuracy (0.05 degrees) into required encoder counts per revolution, PPR for incremental encoders, bits for absolute encoders, and how gear ratio multiplies effective output resolution when the encoder is mounted on the motor shaft. Covers quantization error as a position-error floor and a 2-4x resolution safety margin rule of thumb. Distinct from the existing quadrature encoder wiring article, which covers physical wiring rather than selection and resolution sizing. |
@@ -172,3 +173,6 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 31)
 - robot-arm-joint-motor-gearbox-torque-sizing -> trajectory-planning-for-robotic-arms (linked where target peak acceleration for the dynamic torque term is discussed)
 - robot-arm-joint-motor-gearbox-torque-sizing -> harmonic-drive-vs-planetary-gearbox (linked where choosing a gearbox type for the required ratio is discussed)
+
+## Internal links (article 32)
+- robot-gripper-force-sensing-load-cell-calibration -> torque-control-robot-arm-joints-current-sensing (both cover closing a control loop on a sensed force/torque signal with safety clamping)

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example – Arcbotix</title>
+  <meta name="description" content="Load cell force sensing for robot grippers explained: bridge output to amplifier gain to ADC counts to grams, then a worked PID force control example.">
+  <meta name="keywords" content="load cell force sensing robot gripper, robot gripper force control, strain gauge calibration robotics, PID force control gripper">
+  <meta property="og:title" content="Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example">
+  <meta property="og:description" content="Load cell force sensing for robot grippers explained: bridge output to amplifier gain to ADC counts to grams, then a worked PID force control example.">
+  <meta property="og:image" content="/blog/posts/img/robot-gripper-force-sensing-load-cell-calibration.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/robot-gripper-force-sensing-load-cell-calibration.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/robot-gripper-force-sensing-load-cell-calibration.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Build Guides</span>
+      <time datetime="2026-07-18">July 18, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example</h1>
+    <p class="blog-post-subtitle">From a strain gauge bridge's millivolt output to a calibrated force value and a closed PID force loop, with real numbers.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/robot-gripper-force-sensing-load-cell-calibration.webp" alt="Isometric illustration of a robot gripper finger with an embedded strain gauge load cell, dark background with blue and cyan lighting" loading="lazy">
+    </div>
+
+    <p>Most small grippers control force indirectly, by watching motor current and hoping it correlates with grip pressure. That works until friction, gear preload, or a worn cable changes the relationship. A load cell gives you a direct, calibrated force measurement at the point of contact, which is what you actually want to control. This article walks through robot gripper force control from a raw strain gauge signal to a tuned PID force loop, using one concrete numeric example end to end.</p>
+
+<h2>Why load cell force sensing beats current sensing for a gripper</h2>
+<p>Current sensing estimates torque at the motor shaft, then infers force at the fingertip through the gear ratio and linkage geometry. Any backlash, friction, or belt stretch between the motor and the contact point turns into force estimation error. A load cell sitting directly in the finger's load path removes that chain of assumptions: it measures the force where the part actually touches the object.</p>
+<p>The tradeoff is signal quality. A load cell's raw output is a few millivolts across a resistive bridge, buried in noise, and it needs real calibration before the number means anything in grams or newtons. That calibration work is the part most gripper writeups skip.</p>
+
+<h3>The strain gauge bridge</h3>
+<p>A typical miniature load cell (for example a 5 kg or 10 kg beam-type cell) is a Wheatstone bridge of four strain gauges bonded to a metal beam. Under load, the beam flexes a fraction of a millimeter, two gauges stretch and two compress, and the bridge produces a differential voltage proportional to strain. The key spec on the datasheet is <strong>rated output</strong>, typically given in mV/V: for example, 2.0 mV/V at rated capacity.</p>
+<p>For a 5 kg (49 N) load cell excited at 5 V with a 2.0 mV/V rating:</p>
+<blockquote>Full-scale bridge output = 5 V &times; 2.0 mV/V = 10 mV at 49 N</blockquote>
+<p>That means 1 N of force produces roughly 0.204 mV of bridge output. This is far too small and too noisy to feed straight into a microcontroller's ADC.</p>
+
+<h2>Amplifying and digitizing the signal</h2>
+<p>An instrumentation amplifier (such as an HX711 module, common on hobby load cells, or a discrete INA125-style chip) sits between the bridge and the ADC. The HX711 has a fixed internal gain of 128 on channel A, and outputs a 24-bit digital value directly, so there is no separate external ADC step. Using the numbers above:</p>
+<blockquote>Amplified output = 0.204 mV/N &times; 128 = 26.1 mV/N (referred to the amplifier's internal full-scale range)</blockquote>
+<p>With a 24-bit ADC and a differential input range of roughly &plusmn;20 mV (typical for the HX711 at gain 128, referenced to a 5 V excitation), the code-to-force scale factor becomes a single calibration constant you compute once and store:</p>
+<blockquote>scale_factor (counts per newton) = (raw_reading_at_known_load - raw_reading_at_zero_load) / known_load_in_newtons</blockquote>
+<p>In practice you find this constant experimentally, not purely from datasheet math, because amplifier gain tolerance and cable resistance shift the real number. The procedure:</p>
+<ol>
+<li>Read the raw ADC value with nothing on the load cell. Call this <code>raw_zero</code>. This is your tare offset.</li>
+<li>Hang a known calibration mass (a 500 g weight is a convenient bench reference) and read the raw value. Call this <code>raw_cal</code>.</li>
+<li>Compute <code>scale_factor = (raw_cal - raw_zero) / (0.500 kg * 9.81 m/s^2)</code>, giving counts per newton.</li>
+<li>For any later reading: <code>force_N = (raw_reading - raw_zero) / scale_factor</code>.</li>
+</ol>
+<p>Worked example with plausible numbers: <code>raw_zero = 8,388,000</code>, <code>raw_cal = 8,507,500</code> after hanging 500 g (4.905 N):</p>
+<blockquote>scale_factor = (8,507,500 - 8,388,000) / 4.905 N = 119,500 / 4.905 = 24,363 counts/N</blockquote>
+<p>Now if the gripper is squeezing an object and the live reading is <code>8,461,000</code>:</p>
+<blockquote>force_N = (8,461,000 - 8,388,000) / 24,363 = 73,000 / 24,363 = 3.0 N</blockquote>
+<p>That is the number your control loop actually uses. Repeat the two-point calibration with a second known mass to confirm linearity; strain gauge load cells are linear to within about 0.1-0.5% of full scale over most of their range, so a two-point fit is normally sufficient for gripper work.</p>
+
+<h2>Closing a PID loop on measured force</h2>
+<p>Once you have a clean, calibrated force reading at some update rate (the HX711 typically outputs 10 or 80 samples per second, low enough that you should low-pass filter or average a few samples before feeding the controller), the force loop looks structurally identical to a position loop, except the setpoint and feedback are both in newtons instead of radians.</p>
+<pre><code>error = force_setpoint - force_measured
+integral += error * dt
+derivative = (error - previous_error) / dt
+motor_command = Kp * error + Ki * integral + Kd * derivative
+previous_error = error</code></pre>
+<p>A concrete starting point for a small gripper finger driven by a geared DC motor: target grip force 3.0 N on a plastic part, sample time <code>dt = 0.02 s</code> (50 Hz, well within the HX711's practical rate after averaging).</p>
+<p>Start conservative and raise gain until you see the first sign of oscillation, then back off:</p>
+<ul>
+<li><code>Kp = 40</code> (motor duty-cycle percent per newton of error) as a first guess, since even a large 3 N error should not saturate the driver.</li>
+<li><code>Ki = 15</code>, small enough that integral windup does not overshoot once contact is made; this term mainly corrects the small steady-state offset from static friction in the finger linkage.</li>
+<li><code>Kd = 2</code>, just enough to damp the sudden step in force when the finger first touches the object, which is the main source of overshoot in force control (contact events are much sharper transients than typical position moves).</li>
+</ul>
+<p>Clamp the integral term and the final motor command to the driver's safe duty-cycle range, and clamp <code>motor_command</code> to zero or negative (open the finger slightly) if <code>force_measured</code> exceeds a hard safety ceiling, for example 1.5 times the setpoint, so a control glitch cannot crush a fragile part. This is the same current-limiting instinct used in <a href="/blog/posts/torque-control-robot-arm-joints-current-sensing.html">torque control for robot arm joints from motor current sensing</a>, just applied to a direct force measurement instead of an inferred one.</p>
+
+<h3>Contact detection: the step you cannot skip</h3>
+<p>A force PID loop should not run continuously while the finger is moving through open air, because the error term (setpoint minus zero) would drive the motor at full command before any contact exists. The usual structure is a two-phase state machine:</p>
+<ol>
+<li><strong>Approach phase:</strong> position or velocity control closes the gripper at a moderate speed while the force reading is monitored but not used as the control variable.</li>
+<li><strong>Contact phase:</strong> the instant <code>force_measured</code> crosses a small threshold (for example 0.2 N, well above sensor noise floor but well below the target), switch control mode to the force PID loop described above, with the setpoint held at the target grip force.</li>
+</ol>
+<p>This threshold-triggered handoff, not the PID gains themselves, is usually what determines whether a gripper feels smooth or slams into objects.</p>
+
+<h2>Practical calibration checklist</h2>
+<ul>
+<li>Always re-tare (re-read <code>raw_zero</code>) right before each grip cycle if the gripper orientation changes, since gravity loading on the load cell itself shifts the zero point.</li>
+<li>Excitation voltage drift changes the mV/V output directly; if you are not using a ratiometric ADC like the HX711 (which measures relative to its own excitation), regulate the excitation supply.</li>
+<li>Temperature affects gauge resistance; for hobby-grade grippers operating indoors at roughly constant temperature this is usually negligible, but it matters for outdoor or thermally cycled applications.</li>
+<li>Mechanical creep in the load cell's beam after sudden loading can shift readings by a small percentage over a few seconds; if your grip cycles are fast this rarely matters, but for sustained holds, expect a small reading drift.</li>
+</ul>
+
+<p>The full chain, from a 2.0 mV/V bridge rating through a known 128x gain and a two-point calibration to a scale factor in counts per newton, then into a PID loop with a contact-detection threshold, gives you a gripper that actually controls force at the fingertip instead of guessing from motor current.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
