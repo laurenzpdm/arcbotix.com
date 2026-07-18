@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 17 Jul 2026 16:16:33 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2026 00:19:12 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example</title>
+      <link>https://arcbotix.com/blog/posts/robot-gripper-force-sensing-load-cell-calibration.html</link>
+      <guid>https://arcbotix.com/blog/posts/robot-gripper-force-sensing-load-cell-calibration.html</guid>
+      <pubDate>Sat, 18 Jul 2026 00:18:57 +0000</pubDate>
+      <description>Load cell force sensing for robot grippers explained: bridge output to amplifier gain to ADC counts to grams, then a worked PID force control example.</description>
+      <category>Build Guides</category>
+    </item>
     <item>
       <title>Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation</title>
       <link>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Wed, 08 Jul 2026 21:55:13 +0000</pubDate>
       <description>A worked introduction to LQR control for robot arms: state-space setup, Q/R tuning, and a side-by-side comparison against a tuned PID loop.</description>
       <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Choosing a Battery for a Quadruped Robot: A Practical Sizing Guide</title>
-      <link>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</link>
-      <guid>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</guid>
-      <pubDate>Tue, 07 Jul 2026 21:52:27 +0000</pubDate>
-      <description>Learn how to size and choose a battery for a quadruped robot, covering chemistry, voltage, capacity, discharge rate, and mounting tradeoffs.</description>
-      <category>Build Guides</category>
     </item>
   </channel>
 </rss>
