@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained – Arcbotix</title>
+  <meta name="description" content="A worked Category 3 e-stop circuit design example for a robot arm: dual-channel wiring, cross-fault detection, and a stop-response time budget with real numbers.">
+  <meta name="keywords" content="e-stop circuit design robot arm, Category 3 safety wiring, dual-channel emergency stop, robot arm safety relay">
+  <meta property="og:title" content="Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained">
+  <meta property="og:description" content="A worked Category 3 e-stop circuit design example for a robot arm: dual-channel wiring, cross-fault detection, and a stop-response time budget with real numbers.">
+  <meta property="og:image" content="/blog/posts/img/robot-arm-e-stop-circuit-design-category-3.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/robot-arm-e-stop-circuit-design-category-3.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/robot-arm-e-stop-circuit-design-category-3.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-18">July 18, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained</h1>
+    <p class="blog-post-subtitle">Wiring a redundant e-stop loop into your motor driver's enable line, with a worked cross-fault and stop-time budget</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/robot-arm-e-stop-circuit-design-category-3.webp" alt="Isometric technical illustration of a dual-channel emergency stop circuit wired into a robot arm base with a redundant safety relay" loading="lazy">
+    </div>
+
+    <p>Most hobbyist and small industrial robot arms ship with a single wire running from a push button to a driver's enable pin. That wire is not an e-stop circuit design that meets Category 3 requirements, it is a single point of failure. If the wire breaks, if the button's contact welds shut, or if the driver's enable pin fails high, the arm keeps moving when someone hits the button. This article walks through building an actual dual-channel Category 3 e-stop circuit for a robot arm, with real part numbers, a cross-fault detection check, and a worked stop-response time budget.</p>
+
+<h2>What Category 3 Actually Requires</h2>
+<p>Category 3, as defined in ISO 13849-1, requires two things that a single push button and a single wire cannot provide:</p>
+<ul>
+<li><strong>Redundancy.</strong> A single fault (broken wire, stuck contact, shorted output) must not by itself cause loss of the safety function. This means two independent signal channels, not one.</li>
+<li><strong>Fault detection.</strong> The system must detect when the two channels disagree (cross-fault) and stop rather than continuing to trust whichever channel still reports safe.</li>
+</ul>
+<p>In practice this means the e-stop push button has two normally-closed (NC) contacts, wired as two separate loops, both feeding a dedicated safety relay rather than a general-purpose I/O pin on your motor controller.</p>
+
+<h2>The Circuit: Button, Safety Relay, Driver Enable</h2>
+<p>A minimal Category 3 e-stop loop for a small robot arm looks like this:</p>
+<ol>
+<li>A dual-channel e-stop push button (for example a Schneider XB4 or IDEC HW-series mushroom head with two NC contacts, channel A and channel B).</li>
+<li>Both channels wired into a safety relay module rated for Category 3/4 (for example a Pilz PNOZ or an IDEC HR6S). These relays run internal cross-fault detection: they compare channel A and channel B on every cycle and latch a fault if they disagree for longer than a few milliseconds.</li>
+<li>The safety relay's two independent output contacts (OSSD or dry contacts, depending on model) wired into the enable/STO (Safe Torque Off) pins of your motor driver, not into a GPIO pin read by your microcontroller's firmware.</li>
+</ol>
+<p>The critical design decision is step 3. If the driver has a hardware STO input, use it. STO physically disconnects gate drive to the motor's power stage, so even a firmware crash or a runaway control loop cannot keep the motor powered. If your driver has no STO input, wire the safety relay output in series with the main power contactor feeding the driver instead of relying on a software-read enable pin.</p>
+
+<blockquote>A common mistake is wiring the e-stop button's two channels in series into a single GPIO pin, then reading that pin in firmware and calling <code>motor.disable()</code>. This is a Category B design at best: a single firmware hang, a stuck interrupt, or a shorted pin defeats the entire safety function.</blockquote>
+
+<h2>Worked Cross-Fault Detection Example</h2>
+<p>Say your safety relay's datasheet specifies a maximum discrepancy time of 3 ms between channels before it declares a fault. Consider a failure where channel A's wire chafes against the arm's base and shorts to 24V while channel B remains correctly wired.</p>
+<ul>
+<li>Before the short: both channels read closed (0V drop, current flowing, contacts intact). Relay sees agreement, output stays enabled.</li>
+<li>At the short: channel A now reads permanently closed regardless of button state, channel B still tracks the button correctly.</li>
+<li>When the button is pressed: channel B opens immediately, channel A stays shorted closed. The relay sees the two channels disagree for longer than its 3 ms discrepancy window.</li>
+<li>Result: the relay latches a fault and drops both output channels, disabling the driver, even though channel A alone would have kept reporting "safe".</li>
+</ul>
+<p>This is the entire point of the redundant wiring: the single-fault (the chafed wire) does not silently disable the safety function, it gets caught and converted into a safe stop.</p>
+
+<h2>Sizing the Stop-Response Time Budget</h2>
+<p>Category 3 also implies a performance requirement: the arm must actually stop before it can do harm. Budget the total stop time as three stacked delays:</p>
+<ol>
+<li><strong>Button and relay reaction time</strong>, typically 10-20 ms for a mechanical e-stop button plus a hardware safety relay (check the relay datasheet's own response time, separate from its discrepancy window).</li>
+<li><strong>Driver STO turn-off time</strong>, typically under 5 ms once STO is asserted, since it is a hardware gate-drive cutoff, not a software ramp-down.</li>
+<li><strong>Mechanical coast-down time</strong>, which depends on the joint's inertia and any braking. For an unbraked joint this is the dominant term.</li>
+</ol>
+<p>Take a shoulder joint spinning at a worst-case 90 deg/s (about 1.57 rad/s) with a reflected inertia at the motor shaft that gives it roughly 150 ms to coast to zero once torque is removed (measured empirically by cutting power and timing the joint with a stopwatch or encoder log). The total stop time is:</p>
+<pre>t_stop = t_button+relay + t_STO + t_coast
+t_stop = 15 ms + 5 ms + 150 ms = 170 ms</pre>
+<p>In that 170 ms, the joint sweeps roughly <code>1.57 rad/s x 0.170 s = 0.267 rad</code>, about 15.3 degrees, before it is fully stopped. If your safety distance calculation (per ISO 13855, using an approach speed of 1.6 m/s for a human hand) requires the arm to be stopped before an operator's hand can cross a given guard distance, this 170 ms number, not the marketing spec of the safety relay alone, is what you plug into that calculation. If 15 degrees of travel is unacceptable near a pinch point, add a mechanical brake on that joint to cut the coast-down term, since it is almost always the largest contributor.</p>
+
+<h2>Common Wiring Mistakes</h2>
+<ul>
+<li><strong>Wiring both channels through the same connector or the same cable jacket.</strong> A single crush or cut event can then take out both channels at once, defeating redundancy. Route channel A and channel B through physically separate cable paths where possible.</li>
+<li><strong>Daisy-chaining the e-stop in series with unrelated safety devices</strong> (light curtains, door switches) without separate relay inputs. This makes it impossible to tell which device tripped, which slows diagnosis and tempts people to bypass the whole chain during debugging.</li>
+<li><strong>Relying on the motor driver's software fault flag</strong> as the only feedback that the e-stop worked. Add a physical indicator (the safety relay's own status LED, or a dry contact feeding a separate indicator light) so a bypassed or miswired e-stop is visually obvious before someone reaches into the workspace.</li>
+</ul>
+<p>None of this replaces a full risk assessment for your specific arm and application, but the pattern above, dual-channel button into a dedicated safety relay into a hardware STO or main contactor, with a measured stop-time budget, is the concrete baseline that turns "we have an e-stop" into something that actually satisfies Category 3.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

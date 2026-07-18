@@ -6,6 +6,12 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-18
+- Candidates checked: Denavit-Hartenberg parameters (still saturated per prior entries), H-bridge PWM current limiting/chopping (same broad H-bridge/PWM topic flagged saturated on 2026-07-15), RRT vs A* path planning for mobile robots (multiple academic comparison papers already cover it well), ROS2 tf2 transforms (already well covered, confirmed again), emergency stop (E-stop) circuit design for a robot arm.
+- RRT vs A* and DH parameters: confirmed still gap-too-thin, skipped again.
+- Chose "emergency stop (E-stop) circuit design for a robot arm, Category 3 dual-channel wiring": top pages are either generic industrial-safety-relay vendor blogs (Industrial Monitor Direct, PLC ladder-logic guides) written for factory conveyor/press contexts, or academic-safety-standard summaries, with nothing scoped to a hobbyist/small robot-arm builder wiring their own dual-channel E-stop into a motor driver enable line.
+- Weakness in current top pages: none show a builder how to wire a dual-channel Category 3 E-stop loop into a small robot arm's driver enable/STO pins with real component numbers, how to size the cross-fault detection, or how to budget the stop-response time against the arm's worst-case joint velocity.
+
 ### 2026-07-17
 - Candidates checked: Denavit-Hartenberg parameters (forward kinematics), sliding mode control for robot arms, joint friction compensation (Coulomb/viscous/Stribeck), strain-gauge force/torque sensors for grippers, RRT path planning for robot arms.
 - DH parameters: still gap-too-thin, confirmed already thoroughly covered (see 2026-07-16 entry).
