@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Jul 2026 00:19:12 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2026 08:22:20 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained</title>
+      <link>https://arcbotix.com/blog/posts/robot-arm-e-stop-circuit-design-category-3.html</link>
+      <guid>https://arcbotix.com/blog/posts/robot-arm-e-stop-circuit-design-category-3.html</guid>
+      <pubDate>Sat, 18 Jul 2026 08:22:05 +0000</pubDate>
+      <description>A worked Category 3 e-stop circuit design example for a robot arm: dual-channel wiring, cross-fault detection, and a stop-response time budget with real numbers.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example</title>
       <link>https://arcbotix.com/blog/posts/robot-gripper-force-sensing-load-cell-calibration.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/gearbox-backlash-compensation-robot-arm.html</guid>
       <pubDate>Thu, 09 Jul 2026 09:58:25 +0000</pubDate>
       <description>How to measure gearbox backlash from encoder data and compensate for it in software: dead-band inversion, lookup tables, and when compensation is not enough.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>LQR Control for Robot Arms: A Practical Introduction</title>
-      <link>https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html</link>
-      <guid>https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html</guid>
-      <pubDate>Wed, 08 Jul 2026 21:55:13 +0000</pubDate>
-      <description>A worked introduction to LQR control for robot arms: state-space setup, Q/R tuning, and a side-by-side comparison against a tuned PID loop.</description>
       <category>Control Systems</category>
     </item>
   </channel>
