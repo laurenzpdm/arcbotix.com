@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 32
+- Total articles: 33
 - Last published: 2026-07-18
-- Known slugs: 32
+- Known slugs: 33
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 33 | 2026-07-18 | robot-arm-e-stop-circuit-design-category-3 | Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained | e-stop circuit design robot arm, Category 3 safety wiring, dual-channel emergency stop, robot arm safety relay | Hardware  |
 | 32 | 2026-07-18 | robot-gripper-force-sensing-load-cell-calibration | Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example | load cell force sensing robot gripper, robot gripper force control, strain gauge calibration robotics, PID force control gripper | Build Guides  |
 | 31 | 2026-07-17 | robot-arm-joint-motor-gearbox-torque-sizing | Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation | motor and gearbox sizing for a robot arm joint, robot arm motor torque sizing, gear ratio selection robot joint, continuous vs peak torque motor | Build Guides  |
 | 30 | 2026-07-17 | robot-arm-joint-friction-compensation-coulomb-viscous | Robot Arm Joint Friction Compensation: A Worked Coulomb and Viscous Example | robot arm joint friction compensation, Coulomb friction robot joint, viscous friction compensation, stick-slip robot arm | Control Systems  |
@@ -109,7 +110,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
