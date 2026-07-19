@@ -6,6 +6,11 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-19
+- Candidates checked: robot arm homing sequence with limit switches (source-robotics blog and PAROL6 docs already cover the sequence reasonably well, viable backup), ROS2 actions vs services (well covered by ROS2 official docs, The Construct, Foxglove), quaternion vs Euler angle gimbal lock for robot orientation (Wikipedia, CH Robotics, and a few blogs explain the concept clearly already), sensorless BLDC motor commutation via back-EMF zero-crossing.
+- Chose "sensorless BLDC motor commutation, back-EMF zero-crossing timing": top pages (mechtex, DigiKey, NXP app note, Infineon forum) explain the zero-crossing concept and the 30-degree phase lag qualitatively, but stay at block-diagram level.
+- Weakness in current top pages: none work through an actual numeric commutation timing example (electrical period at a given RPM/pole-pair count, the resulting 30-degree phase-lag delay in microseconds, and how that delay must be recalculated as speed changes) or connect it to the PWM demagnetization/blanking time that corrupts zero-crossing detection at low duty cycle - builders get "detect the zero crossing, wait 30 degrees" without the actual math or the low-speed failure mode.
+
 ### 2026-07-18
 - Candidates checked: Denavit-Hartenberg parameters (still saturated per prior entries), H-bridge PWM current limiting/chopping (same broad H-bridge/PWM topic flagged saturated on 2026-07-15), RRT vs A* path planning for mobile robots (multiple academic comparison papers already cover it well), ROS2 tf2 transforms (already well covered, confirmed again), emergency stop (E-stop) circuit design for a robot arm.
 - RRT vs A* and DH parameters: confirmed still gap-too-thin, skipped again.
@@ -105,6 +110,19 @@ the current top-ranking pages for that query.)
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Strategy Adjustments
+
+### 2026-07-19
+- No change - reviewed the last 10 published articles (26-35) and all research
+  entries since the last audit. The already-retired topics (Gazebo vs
+  PyBullet, DH parameters, ROS2 actions vs services, feedback control basics)
+  were reconfirmed saturated again this cycle (quaternion vs Euler/gimbal
+  lock also newly checked and found saturated) with no new pattern beyond
+  what the current Topic Priority list already reflects. Hardware and
+  Control Systems clusters keep finding strong worked-numeric-example gaps
+  (5 of the last 10 articles were Control Systems, 4 were Hardware, only 1
+  was Software), consistent with the existing guidance to favor those
+  clusters over generic ROS2/software conceptual topics - not a new finding,
+  just a continued confirmation, so no edit made.
 
 ### 2026-07-17b
 - Retired "Denavit-Hartenberg parameters" entirely from blog/_BLOG_STRATEGY.md

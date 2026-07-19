@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 34
-- Last published: 2026-07-18
+- Total articles: 35
+- Last published: 2026-07-19
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 35 | 2026-07-19 | sensorless-bldc-motor-commutation-back-emf-timing | Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example | sensorless BLDC motor commutation, back-EMF zero crossing detection, BLDC commutation timing calculation, sensorless BLDC low speed | Hardware | Explains sensorless BLDC motor commutation via back-EMF zero-crossing detection with a full worked numeric example: converting mechanical RPM and pole-pair count to electrical frequency and period, computing the actual 30-electrical-degree commutation delay in microseconds at multiple speeds, explaining why the delay must be recomputed every step via an adaptive timer/PLL approach rather than a fixed constant, and detailing the low-speed failure mode caused by PWM demagnetization/blanking time consuming an increasing fraction of the shrinking detection window plus weakening back-EMF amplitude, with practical implications for choosing sensorless vs sensored control for robot joints and wheel motors. |
 | 34 | 2026-07-18 | ros2-tf2-transforms-explained-worked-example | ROS2 tf2 Transforms Explained: A Worked Example (and Why Lookups Fail) | ROS2 tf2 transforms explained, tf2 lookupTransform error, ROS2 extrapolation exception, homogeneous transform robot arm | Software | Explains ROS2 tf2 transforms with a fully worked homogeneous transform composition (translation and rotation matrix multiplication across a base-to-shoulder-to-elbow chain with real numbers), then breaks down the three common lookupTransform exceptions (LookupException, ConnectivityException, ExtrapolationException) by what tf2's timestamped buffer is actually doing internally. Focuses specifically on the extrapolation/timing case, showing why a slow-arriving message and a limited buffer duration cause lookup failures that frame-name checks won't fix, with three ranked fixes (reduce latency, canTransform with timeout, look up latest available transform). Also covers static vs dynamic transform publishing and the common mistake of leaving a joint transform static after the joint becomes actuated. |
 | 33 | 2026-07-18 | robot-arm-e-stop-circuit-design-category-3 | Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained | e-stop circuit design robot arm, Category 3 safety wiring, dual-channel emergency stop, robot arm safety relay | Hardware | Worked design guide for a Category 3 dual-channel emergency stop circuit for a robot arm: explains why a single wire into a GPIO enable pin fails redundancy, shows the button-to-safety-relay-to-STO wiring pattern, walks a worked cross-fault detection example (chafed wire shorting one channel), and computes a stop-response time budget (button+relay + STO turn-off + mechanical coast-down) against joint velocity to get a numeric sweep distance for safety-distance sizing. Lists common wiring mistakes (shared cable paths, daisy-chained safety devices, software-only fault feedback). |
 | 32 | 2026-07-18 | robot-gripper-force-sensing-load-cell-calibration | Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example | load cell force sensing robot gripper, robot gripper force control, strain gauge calibration robotics, PID force control gripper | Build Guides | Explains load cell force sensing for robot grippers end to end: strain gauge bridge mV/V output, instrumentation amplifier gain (HX711 example), two-point calibration to a counts-per-newton scale factor with worked numbers, then a PID force control loop with concrete gains and a contact-detection state machine to avoid slamming the gripper closed on open air. |
@@ -184,3 +185,7 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 34)
 - ros2-tf2-transforms-explained-worked-example -> ros2-qos-settings-explained (closing line connects tf timing discipline to QoS mismatch causing silent zero-message failures, both being ROS2 middleware timing/communication issues)
+
+## Internal links (article 35)
+- sensorless-bldc-motor-commutation-back-emf-timing -> bldc-hall-sensor-commutation-six-step (linked when contrasting adaptive commutation timing error against the inherent six-step torque ripple discussed there)
+- bldc-hall-sensor-commutation-six-step -> sensorless-bldc-motor-commutation-back-emf-timing (backlink added where the six-step article mentions sensorless back-EMF estimation as the alternative to hall sensors)

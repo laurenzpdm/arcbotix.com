@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 33
+- Total articles: 34
 - Last published: 2026-07-18
-- Known slugs: 33
+- Known slugs: 34
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 34 | 2026-07-18 | ros2-tf2-transforms-explained-worked-example | ROS2 tf2 Transforms Explained: A Worked Example (and Why Lookups Fail) | ROS2 tf2 transforms explained, tf2 lookupTransform error, ROS2 extrapolation exception, homogeneous transform robot arm | Software  |
 | 33 | 2026-07-18 | robot-arm-e-stop-circuit-design-category-3 | Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained | e-stop circuit design robot arm, Category 3 safety wiring, dual-channel emergency stop, robot arm safety relay | Hardware  |
 | 32 | 2026-07-18 | robot-gripper-force-sensing-load-cell-calibration | Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example | load cell force sensing robot gripper, robot gripper force control, strain gauge calibration robotics, PID force control gripper | Build Guides  |
 | 31 | 2026-07-17 | robot-arm-joint-motor-gearbox-torque-sizing | Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation | motor and gearbox sizing for a robot arm joint, robot arm motor torque sizing, gear ratio selection robot joint, continuous vs peak torque motor | Build Guides  |
@@ -110,7 +111,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -129,6 +130,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- H-bridge deadtime: allaboutcircuits already has a solid technical article on shoot-through and break-before-make timing, though it stops short of a worked deadtime-value calculation - a viable backup candidate for a future cycle.
-- Chose "force sensing in robot grippers with a load cell, worked calibration and PID force control example": top pages (Robotiq blog, FUTEK, Interface, sensorsandgauges.com) are vendor/product pages that explain the concept and mention strain-gauge bridges qualitatively but never show the numeric chain from bridge output to a commanded force.
-- Weakness in current top pages: none walk through converting a strain-gauge bridge's mV/V output through an instrumentation amplifier gain and ADC resolution into a calibrated force value, then closing a PID loop on that force signal with real numbers - builders are left without a concrete reference for tuning gain or interpreting ADC counts as grams of force.
+- Homing/limit switches: real forum activity (LinuxCNC forum, edaboard) but coverage is scattered CNC-axis-homing advice, not robot-arm-specific, and one vendor blog (source-robotics) already covers mastering/homing/calibration reasonably well - viable backup candidate.
+- Chose "ROS2 tf2 transforms explained, with a worked homogeneous-transform example and why lookups fail": ROS Answers threads and a Foxglove blog post explain buffer/lookupTransform and canTransform conceptually, but stay at the API level.
+- Weakness in current top pages: none show an actual worked 4x4 homogeneous transform composition (translation + rotation matrices multiplied through two or three frames with real numbers) next to a concrete explanation of the extrapolation-into-the-past/future error tied to buffer duration and message timestamps - builders get generic "check your frame names" advice instead of the actual timing/math mechanics.

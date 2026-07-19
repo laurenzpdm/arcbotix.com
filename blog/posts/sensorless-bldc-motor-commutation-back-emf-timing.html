@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example – Arcbotix</title>
+  <meta name="description" content="Sensorless BLDC motor commutation explained with real numbers: the electrical period, the 30-degree phase-lag delay in microseconds, and the low-speed blanking-time failure mode.">
+  <meta name="keywords" content="sensorless BLDC motor commutation, back-EMF zero crossing detection, BLDC commutation timing calculation, sensorless BLDC low speed">
+  <meta property="og:title" content="Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example">
+  <meta property="og:description" content="Sensorless BLDC motor commutation explained with real numbers: the electrical period, the 30-degree phase-lag delay in microseconds, and the low-speed blanking-time failure mode.">
+  <meta property="og:image" content="/blog/posts/img/sensorless-bldc-motor-commutation-back-emf-timing.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-19">July 19, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example</h1>
+    <p class="blog-post-subtitle">Working out the actual commutation delay in microseconds, and why it has to be recalculated every single step</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/sensorless-bldc-motor-commutation-back-emf-timing.webp" alt="Isometric technical illustration of a BLDC motor cross-section with a floating phase winding highlighted showing a back-EMF waveform" loading="lazy">
+    </div>
+
+    <p>Sensored BLDC commutation reads three hall sensors and looks up the next phase state in a table. Sensorless BLDC motor commutation throws the hall sensors away and infers rotor position from the motor's own electrical behavior instead: at any instant, one of the three phases is left unenergized (floating), and that floating phase still shows a voltage induced by the rotor magnets sweeping past it. That induced voltage is the back-EMF, and the moment it crosses the motor's electrical midpoint is a reliable, fixed marker of rotor position. Most guides stop at "detect the zero crossing, then wait 30 electrical degrees before commutating." This article works through what that wait actually costs in microseconds, why it changes every commutation step, and where the whole scheme falls apart at low speed.</p>
+
+<h2>What back-EMF zero-crossing detection actually measures</h2>
+<p>In six-step (trapezoidal) commutation, only two of the three phases are driven at any time; the third is floating. As the rotor's permanent magnets sweep past that floating winding, they induce a back-EMF voltage in it proportional to rotor speed. For an ideally wound trapezoidal BLDC motor, that floating-phase voltage crosses the electrical midpoint (roughly half the bus voltage, referenced through a resistor divider) exactly once per 60-degree commutation sector, at the point 90 electrical degrees away from the sector's start and 30 electrical degrees before the next commutation event is due.</p>
+<p>So the control loop is simple in principle: watch the floating phase's voltage, compare it against the midpoint reference with a comparator or ADC, latch the moment it crosses, then commutate to the next step exactly 30 electrical degrees later. The entire scheme hinges on that 30-degree delay being timed correctly, and that delay is not a fixed number, it depends on how fast the motor is currently spinning.</p>
+
+<h2>The worked example: turning 30 degrees into microseconds</h2>
+<p>Take a small robot wheel-hub BLDC motor with 4 pole pairs (8 magnet poles), spinning at 3000 mechanical RPM. First convert mechanical speed to electrical frequency, since commutation timing lives entirely in the electrical domain:</p>
+<pre><code>mechanical_rev_per_sec = 3000 / 60 = 50 rev/s
+electrical_freq_Hz = mechanical_rev_per_sec * pole_pairs
+electrical_freq_Hz = 50 * 4 = 200 Hz</code></pre>
+<p>One full electrical cycle (360 electrical degrees) takes:</p>
+<pre><code>electrical_period_us = 1,000,000 / electrical_freq_Hz
+electrical_period_us = 1,000,000 / 200 = 5000 us</code></pre>
+<p>The 30-degree delay after a zero crossing is then a fixed fraction of that period:</p>
+<pre><code>delay_us = electrical_period_us * (30 / 360)
+delay_us = 5000 * 0.0833 = 416.7 us</code></pre>
+<p>At 3000 RPM with this motor, the controller waits roughly 417 microseconds after each detected zero crossing before switching to the next commutation step. Now double the speed to 6000 RPM and redo the same three lines: electrical frequency becomes 400 Hz, the electrical period halves to 2500 us, and the delay halves to about 208 microseconds. Halve the speed to 1500 RPM instead and the delay doubles to roughly 833 microseconds. The delay is inversely proportional to speed, which is the whole reason a fixed-microsecond delay constant does not work for sensorless BLDC control across any real speed range: it has to be recomputed from the time between the last two zero crossings (or the last two commutation events), every single step.</p>
+
+<h2>Why the timer has to be adaptive, not a lookup constant</h2>
+<p>In practice, firmware measures the time between consecutive commutation events (call it <code>T_step</code>, nominally one sixth of the electrical period) using a hardware timer, then arms the next commutation to fire at <code>T_step / 2</code> after the most recent zero crossing, since the crossing falls at the midpoint of a commutation step for an idealized trapezoidal back-EMF waveform. This is effectively a simple phase-locked loop: each new <code>T_step</code> measurement updates the estimate used for the next delay, so the commutation timing tracks acceleration and deceleration instead of assuming constant speed. A motor accelerating quickly under load will have its most recent <code>T_step</code> measurement run slightly stale by the time it is used, which is one source of the commutation timing error that shows up as extra current draw and audible noise during hard accelerations, distinct from the six-step torque ripple inherent to trapezoidal drive discussed in <a href="/blog/posts/bldc-hall-sensor-commutation-six-step.html">hall sensor commutation</a>.</p>
+
+<h2>The low-speed blind spot: blanking time and weak back-EMF</h2>
+<p>The zero-crossing scheme has two compounding problems at low speed, and both come from the same physics: back-EMF amplitude is proportional to rotor speed. Below some threshold, usually a few percent of rated RPM, the signal becomes too weak relative to switching noise to detect reliably at all. That is the well-known reason sensorless BLDC controllers cannot start from a dead stop using zero-crossing detection and instead use an open-loop "align and go" ramp: force a fixed commutation sequence at increasing frequency for a short startup period, building enough speed for a usable back-EMF signal, then hand off to closed-loop zero-crossing detection once a few consecutive valid crossings are seen.</p>
+<p>The second problem is PWM demagnetization (blanking) time. Every time a phase switches, the freewheeling diode current and winding inductance produce ringing on the floating phase for a short window after each PWM edge, large enough to trigger false zero crossings if sampled during that window. Firmware handles this by blanking, ignoring the floating-phase reading for a fixed window after every PWM transition, typically tens of microseconds. Compare that blanking window against the worked numbers above: at 3000 RPM the entire delay-to-commutation window is only about 417 microseconds, so a 50-microsecond blanking window consumes over 10 percent of the available detection time. At low speed the ratio gets worse in the wrong direction, since the electrical period stretches out but the blanking window (tied to switching transients, not electrical speed) stays roughly constant, which is why sensorless zero-crossing detection becomes unreliable well before the back-EMF signal itself vanishes entirely.</p>
+
+<h3>Practical implications for a robot joint or wheel motor</h3>
+<ul>
+<li>Sensorless commutation removes hall sensor wiring and cost, which matters for a small mobile robot wheel motor, but it costs you low-speed control authority, which matters more for a robot arm joint that needs precise slow-speed positioning.</li>
+<li>If your application spends significant time below roughly 10 percent of rated RPM, for example a robot arm joint holding a slow pose, plan for a hall sensor, encoder, or hybrid startup ramp instead of relying on zero-crossing detection down to zero speed.</li>
+<li>When debugging jittery or stalling sensorless commutation, check the actual computed delay against your PWM blanking time at the speeds where it fails, using the same period and delay calculation shown above, before assuming the comparator threshold or filtering is wrong.</li>
+</ul>
+
+<h2>Conclusion</h2>
+<p>Sensorless back-EMF commutation is not magic, it is a timing problem with a clean closed-form answer: electrical frequency from pole-pair count and RPM, electrical period from frequency, and a 30-degree delay that is a fixed fraction of that period recomputed every step. The scheme's real limits show up doing that same arithmetic at low speed, where the fixed blanking window starts eating a large fraction of an electrical period that has grown long, and where a weakening back-EMF signal runs into switching noise. Knowing the actual numbers, not just the qualitative "detect the crossing, wait 30 degrees" description, is what tells you whether sensorless control is even a reasonable choice for your specific joint or wheel motor's speed range.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
