@@ -20,7 +20,7 @@
   </url>
   <url>
     <loc>https://arcbotix.com/blog/</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
@@ -32,7 +32,7 @@
   </url>
   <url>
     <loc>https://arcbotix.com/blog/posts/bldc-hall-sensor-commutation-six-step.html</loc>
-    <lastmod>2026-07-12</lastmod>
+    <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -195,6 +195,12 @@
   <url>
     <loc>https://arcbotix.com/blog/posts/ros2-tf2-transforms-explained-worked-example.html</loc>
     <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html</loc>
+    <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

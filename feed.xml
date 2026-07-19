@@ -5,8 +5,24 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Jul 2026 16:26:36 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 19 Jul 2026 00:30:38 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example</title>
+      <link>https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html</link>
+      <guid>https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html</guid>
+      <pubDate>Sun, 19 Jul 2026 00:29:40 +0000</pubDate>
+      <description>Sensorless BLDC motor commutation explained with real numbers: the electrical period, the 30-degree phase-lag delay in microseconds, and the low-speed blanking-time failure mode.</description>
+      <category>Hardware</category>
+    </item>
+    <item>
+      <title>BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch</title>
+      <link>https://arcbotix.com/blog/posts/bldc-hall-sensor-commutation-six-step.html</link>
+      <guid>https://arcbotix.com/blog/posts/bldc-hall-sensor-commutation-six-step.html</guid>
+      <pubDate>Sun, 19 Jul 2026 00:29:37 +0000</pubDate>
+      <description>BLDC hall sensor commutation explained from first principles: the six hall states, the electrical-angle math behind the switching table, and portable C code.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>ROS2 tf2 Transforms Explained: A Worked Example (and Why Lookups Fail)</title>
       <link>https://arcbotix.com/blog/posts/ros2-tf2-transforms-explained-worked-example.html</link>
@@ -112,14 +128,6 @@
       <category>Control Systems</category>
     </item>
     <item>
-      <title>BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch</title>
-      <link>https://arcbotix.com/blog/posts/bldc-hall-sensor-commutation-six-step.html</link>
-      <guid>https://arcbotix.com/blog/posts/bldc-hall-sensor-commutation-six-step.html</guid>
-      <pubDate>Sun, 12 Jul 2026 22:21:18 +0000</pubDate>
-      <description>BLDC hall sensor commutation explained from first principles: the six hall states, the electrical-angle math behind the switching table, and portable C code.</description>
-      <category>Hardware</category>
-    </item>
-    <item>
       <title>ROS2 QoS Settings Explained: Why Your Subscriber Gets Zero Messages</title>
       <link>https://arcbotix.com/blog/posts/ros2-qos-settings-explained.html</link>
       <guid>https://arcbotix.com/blog/posts/ros2-qos-settings-explained.html</guid>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/torque-control-robot-arm-joints-current-sensing.html</guid>
       <pubDate>Fri, 10 Jul 2026 10:04:34 +0000</pubDate>
       <description>Learn robot joint torque control from current sensing: the Kt torque constant, a cascaded current/velocity/position loop, and a worked PI current-loop tuning example.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Robot Arm Singularity Avoidance with the Jacobian: A Worked Example</title>
-      <link>https://arcbotix.com/blog/posts/robot-arm-singularity-avoidance-jacobian.html</link>
-      <guid>https://arcbotix.com/blog/posts/robot-arm-singularity-avoidance-jacobian.html</guid>
-      <pubDate>Thu, 09 Jul 2026 22:01:20 +0000</pubDate>
-      <description>Learn robot arm singularity avoidance with a worked Jacobian example: detect singular poses, compare plain pseudo-inverse vs damped least squares.</description>
       <category>Control Systems</category>
     </item>
   </channel>
