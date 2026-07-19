@@ -6,6 +6,11 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-19 (2)
+- Candidates checked: series elastic actuator (SEA) design for robot joints, DH-parameter kinematic calibration (still flagged gap-too-thin in repeated prior entries, confirmed saturated again), quaternion vs Euler angle gimbal lock (Wikipedia, CH Robotics, and several 2026 blog posts already explain this clearly, saturated), current-sense shunt resistor sizing for motor drivers (DigiKey/NXP cover the generic electronics case well), ROS2 lifecycle nodes (official design doc, Foxglove, and Medium walkthroughs already cover the state machine well).
+- Chose "series elastic actuator (SEA) spring stiffness sizing for a robot joint": top pages (IntechOpen chapter, ResearchGate papers, a robotis forum PDF) explain the concept - compliance, impact tolerance, force control benefit - at a research/academic level, and a YouTube video shows a build but skips the math.
+- Weakness in current top pages: none walk through picking an actual torsional spring stiffness (Nm/rad) for a specific joint given the desired force-control bandwidth and expected peak torque, or show the resulting deflection-to-torque calibration a builder needs to read torque from a position sensor across the spring - it stays at "add a spring in series" without the numbers.
+
 ### 2026-07-19
 - Candidates checked: robot arm homing sequence with limit switches (source-robotics blog and PAROL6 docs already cover the sequence reasonably well, viable backup), ROS2 actions vs services (well covered by ROS2 official docs, The Construct, Foxglove), quaternion vs Euler angle gimbal lock for robot orientation (Wikipedia, CH Robotics, and a few blogs explain the concept clearly already), sensorless BLDC motor commutation via back-EMF zero-crossing.
 - Chose "sensorless BLDC motor commutation, back-EMF zero-crossing timing": top pages (mechtex, DigiKey, NXP app note, Infineon forum) explain the zero-crossing concept and the 30-degree phase lag qualitatively, but stay at block-diagram level.

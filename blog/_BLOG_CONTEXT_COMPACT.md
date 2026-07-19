@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 35
+- Total articles: 36
 - Last published: 2026-07-19
-- Known slugs: 35
+- Known slugs: 36
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 36 | 2026-07-19 | robot-arm-homing-limit-switches-encoder-offset | Homing a Robot Arm Joint with a Limit Switch: The Encoder-Offset Math | homing robot arm joint, limit switch robot arm, encoder offset homing, robot joint homing sequence | Build Guides  |
 | 35 | 2026-07-19 | sensorless-bldc-motor-commutation-back-emf-timing | Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example | sensorless BLDC motor commutation, back-EMF zero crossing detection, BLDC commutation timing calculation, sensorless BLDC low speed | Hardware  |
 | 34 | 2026-07-18 | ros2-tf2-transforms-explained-worked-example | ROS2 tf2 Transforms Explained: A Worked Example (and Why Lookups Fail) | ROS2 tf2 transforms explained, tf2 lookupTransform error, ROS2 extrapolation exception, homogeneous transform robot arm | Software  |
 | 33 | 2026-07-18 | robot-arm-e-stop-circuit-design-category-3 | Emergency Stop Circuit Design for a Robot Arm: Category 3 Dual-Channel Wiring Explained | e-stop circuit design robot arm, Category 3 safety wiring, dual-channel emergency stop, robot arm safety relay | Hardware  |
@@ -112,7 +113,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+robot-arm-homing-limit-switches-encoder-offset, sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -131,6 +132,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- Homing/limit switches: real forum activity (LinuxCNC forum, edaboard) but coverage is scattered CNC-axis-homing advice, not robot-arm-specific, and one vendor blog (source-robotics) already covers mastering/homing/calibration reasonably well - viable backup candidate.
-- Chose "ROS2 tf2 transforms explained, with a worked homogeneous-transform example and why lookups fail": ROS Answers threads and a Foxglove blog post explain buffer/lookupTransform and canTransform conceptually, but stay at the API level.
-- Weakness in current top pages: none show an actual worked 4x4 homogeneous transform composition (translation + rotation matrices multiplied through two or three frames with real numbers) next to a concrete explanation of the extrapolation-into-the-past/future error tied to buffer duration and message timestamps - builders get generic "check your frame names" advice instead of the actual timing/math mechanics.
+- H-bridge PWM driver: Arduino Forum, Instructables, DroneBot Workshop, and howtomechatronics all cover L298N/H-bridge wiring and code in detail - saturated for a general intro, though the deadtime/shoot-through angle noted earlier remains a viable backup.
+- Chose "homing sequence and limit switch wiring for a robot arm joint, with a worked encoder-offset example": LinuxCNC forum and edaboard threads discuss homing informally and source-robotics covers mastering/calibration at a product level, but none walk through the actual encoder-count math (raw count at the switch trigger point, back-off distance, and the resulting home offset used to zero the joint) for a specific joint with real numbers.
+- Weakness in current top pages: builders get generic "add a limit switch and home on startup" advice without seeing how the switch trigger point, a back-off/re-approach step for repeatability, and the encoder's counts-per-revolution combine into the actual offset constant used in firmware.

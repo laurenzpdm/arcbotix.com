@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Series Elastic Actuator Design: Sizing the Spring Stiffness for a Robot Joint – Arcbotix</title>
+  <meta name="description" content="A worked example for sizing series elastic actuator spring stiffness: bandwidth, peak torque, and deflection-to-torque calibration for a robot joint.">
+  <meta name="keywords" content="series elastic actuator design, SEA spring stiffness sizing, series elastic actuator robot joint, torsional spring robot actuator">
+  <meta property="og:title" content="Series Elastic Actuator Design: Sizing the Spring Stiffness for a Robot Joint">
+  <meta property="og:description" content="A worked example for sizing series elastic actuator spring stiffness: bandwidth, peak torque, and deflection-to-torque calibration for a robot joint.">
+  <meta property="og:image" content="/blog/posts/img/series-elastic-actuator-robot-joint-stiffness-sizing.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/series-elastic-actuator-robot-joint-stiffness-sizing.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/series-elastic-actuator-robot-joint-stiffness-sizing.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-19">July 19, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Series Elastic Actuator Design: Sizing the Spring Stiffness for a Robot Joint</h1>
+    <p class="blog-post-subtitle">Turning 'add a spring in series' into an actual stiffness number, with a worked deflection-to-torque calibration.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/series-elastic-actuator-robot-joint-stiffness-sizing.webp" alt="Isometric illustration of a robot joint actuator with a torsional spring element in series between the gearbox and the output arm" loading="lazy">
+    </div>
+
+    <p>A series elastic actuator (SEA) puts a compliant element, usually a torsional spring, between the gearbox output and the joint's link. This is the opposite of how most robot arm joints are built: normally you want the drivetrain as stiff as possible so that a commanded position translates directly into a real position. An SEA design deliberately gives that up. In return you get low output impedance, tolerance to impact loads, and a straightforward way to measure joint torque - you read the spring's deflection instead of adding a separate torque sensor.</p>
+<p>The problem with most series elastic actuator design writeups is that they stop at the concept. They explain why compliance helps force control and human-robot interaction, then move straight to a research paper's finished prototype. Nobody shows you how to pick the actual number: what torsional stiffness, in Nm/rad, should the spring have for your joint. This article walks through that calculation for a concrete example.</p>
+<h2>Why series elastic actuator stiffness is a real design variable</h2>
+<p>The spring in an SEA is not just a shock absorber. Its stiffness <code>k</code> (Nm/rad) sets a tradeoff between two things you care about directly:</p>
+<ul>
+<li><strong>Torque resolution and safety margin.</strong> A softer spring deflects more for a given torque, so a fixed-resolution position sensor across the spring gives you finer torque resolution. It also means the mechanism physically yields before something breaks during an unexpected impact.</li>
+<li><strong>Force control bandwidth.</strong> A softer spring also lowers the natural frequency of the coupled system (motor-side inertia against the spring), which caps how fast your torque control loop can respond. Too soft, and the joint feels sluggish and can even become underdamped and oscillate under closed-loop force control.</li>
+</ul>
+<p>This is a real design tradeoff, not a rule of thumb. Get it wrong in the stiff direction and you have lost most of the benefit of adding a spring at all. Get it wrong in the soft direction and your force control loop cannot hit the bandwidth you need.</p>
+<h3>The governing relationship</h3>
+<p>Model the SEA as a two-inertia system: motor and gearbox inertia <code>J_m</code> on one side of the spring, load inertia <code>J_l</code> on the other, coupled by spring stiffness <code>k</code>. The resonance frequency that limits your achievable closed-loop torque bandwidth is approximately:</p>
+<blockquote>omega_n = sqrt(k * (1/J_m + 1/J_l))</blockquote>
+<p>As a practical design rule, most SEA implementations aim for this resonance to sit at least 3-5 times above the desired closed-loop torque control bandwidth, so the control loop has margin before it runs into the spring's structural dynamics.</p>
+<h2>Worked example: sizing a spring for a 30 Nm arm joint</h2>
+<p>Take a mid-size robot arm shoulder joint with these targets:</p>
+<ul>
+<li>Peak joint torque: <code>T_peak = 30 Nm</code></li>
+<li>Desired closed-loop force control bandwidth: <code>f_bw = 8 Hz</code> (a reasonable target for compliant manipulation, not high-speed dynamic legged locomotion)</li>
+<li>Reflected motor-side inertia (motor + gearbox, referred to the joint): <code>J_m = 0.004 kg*m^2</code></li>
+<li>Link-side inertia at this joint: <code>J_l = 0.03 kg*m^2</code></li>
+<li>Maximum allowed spring deflection at peak torque: <code>theta_max = 12 degrees = 0.209 rad</code> (a mechanical stop limit you set for packaging reasons)</li>
+</ul>
+<h3>Step 1: minimum stiffness from deflection limit</h3>
+<p>The spring must not bottom out before reaching peak torque. That gives a lower bound on stiffness:</p>
+<blockquote>k_min = T_peak / theta_max = 30 / 0.209 = 143.5 Nm/rad</blockquote>
+<h3>Step 2: check the resonance against your bandwidth target</h3>
+<p>Target resonance, with a 4x margin over the 8 Hz bandwidth:</p>
+<blockquote>omega_n_target = 2*pi*(4*8) = 201 rad/s</blockquote>
+<p>Solve the two-inertia formula for <code>k</code>:</p>
+<blockquote>k = omega_n_target^2 / (1/J_m + 1/J_l)<br>1/J_m + 1/J_l = 1/0.004 + 1/0.03 = 250 + 33.3 = 283.3<br>k = 201^2 / 283.3 = 40401 / 283.3 = 142.6 Nm/rad</blockquote>
+<p>The two numbers land almost on top of each other here (143.5 vs 142.6 Nm/rad), which is a useful sanity check: at this joint size, the deflection-limit constraint and the bandwidth constraint agree. If they disagreed by an order of magnitude, that would tell you either the deflection limit is too tight for the bandwidth you want, or the bandwidth target is unrealistic for the inertia you have. In that case the fix is usually to loosen the mechanical deflection stop, increase gearbox reduction to raise reflected motor inertia, or accept a lower bandwidth target. Pick <code>k = 145 Nm/rad</code> and specify that stiffness to your spring or flexure manufacturer.</p>
+<h2>From spring deflection to measured torque</h2>
+<p>Once the spring is built, you calibrate it rather than trust the nominal stiffness, because real torsion springs and flexures vary a few percent from their design value and often have a small nonlinearity near zero deflection.</p>
+<ol>
+<li>Lock the load side of the joint rigidly.</li>
+<li>Apply a series of known reference torques (a calibrated weight on a known lever arm works well) from zero up to <code>T_peak</code>.</li>
+<li>At each step, record the deflection angle measured by your sensor (an encoder or potentiometer reading the relative angle across the spring).</li>
+<li>Fit torque versus deflection. Use a straight line if the data looks linear; use a quadratic or piecewise fit if you see softening or stiffening near the ends of travel.</li>
+</ol>
+<p>For this example, a clean linear fit gave a measured stiffness of <code>k_measured = 138 Nm/rad</code>, about 5% below the 145 Nm/rad design target. That is well within normal spring manufacturing tolerance. Use <code>k_measured</code>, not the datasheet or design value, in your torque control firmware:</p>
+<blockquote>T_measured = k_measured * (theta_output_side - theta_motor_side)</blockquote>
+<p>Any deflection sensor offset must also be zeroed with the joint unloaded before this calibration is valid, the same way you would zero an encoder-based joint before using it, as covered in our <a href="/blog/posts/robot-arm-homing-limit-switches-encoder-offset.html">homing and encoder-offset article</a>.</p>
+<h2>Common mistakes when sizing SEA stiffness</h2>
+<ul>
+<li><strong>Choosing stiffness from a paper built for a different scale.</strong> A humanoid ankle SEA and a small arm shoulder SEA can differ in required stiffness by two orders of magnitude. Always run the inertia and bandwidth numbers for your own joint.</li>
+<li><strong>Ignoring the motor-side inertia term.</strong> It is tempting to size stiffness only from the load inertia. At low gear ratios, motor-side inertia dominates the two-inertia resonance and changes the answer significantly.</li>
+<li><strong>Skipping calibration.</strong> Using the nominal spring rate instead of a measured one introduces a torque error that is constant in percentage terms but grows in absolute Nm at high load, exactly where accurate force control matters most.</li>
+</ul>
+<h2>Conclusion</h2>
+<p>Series elastic actuator design is not just a spring bolted in series with a motor. The stiffness value is a first-order design decision that trades deflection range and torque resolution against force control bandwidth, and it follows directly from the two-inertia resonance formula once you know your joint's peak torque, target bandwidth, and reflected inertias. Compute a candidate stiffness from both the deflection limit and the bandwidth target, check that they roughly agree, and then calibrate the built spring's actual torque-deflection curve rather than trusting the design number in your control loop.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
