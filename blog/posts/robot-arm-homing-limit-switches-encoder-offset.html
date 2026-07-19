@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Homing a Robot Arm Joint with a Limit Switch: The Encoder-Offset Math – Arcbotix</title>
+  <meta name="description" content="How to home a robot arm joint with a limit switch: mounting, the approach/back-off sequence, and a worked encoder-offset calculation with real numbers.">
+  <meta name="keywords" content="homing robot arm joint, limit switch robot arm, encoder offset homing, robot joint homing sequence">
+  <meta property="og:title" content="Homing a Robot Arm Joint with a Limit Switch: The Encoder-Offset Math">
+  <meta property="og:description" content="How to home a robot arm joint with a limit switch: mounting, the approach/back-off sequence, and a worked encoder-offset calculation with real numbers.">
+  <meta property="og:image" content="/blog/posts/img/robot-arm-homing-limit-switches-encoder-offset.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/robot-arm-homing-limit-switches-encoder-offset.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/robot-arm-homing-limit-switches-encoder-offset.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Build Guides</span>
+      <time datetime="2026-07-19">July 19, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Homing a Robot Arm Joint with a Limit Switch: The Encoder-Offset Math</h1>
+    <p class="blog-post-subtitle">Turning a single switch trigger into a reliable, repeatable zero position for an incremental encoder.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/robot-arm-homing-limit-switches-encoder-offset.webp" alt="Isometric technical illustration of a robot arm joint with a limit switch mounted near the joint housing" loading="lazy">
+    </div>
+
+    <p>An incremental encoder only counts pulses. It has no idea what angle the joint is actually at until you tell it. Every time you power off a robot arm, that count resets to zero at whatever position the joint happens to be sitting in, not at the joint's true zero position. Homing is the routine that fixes this: it moves the joint to a physical reference point, usually a limit switch, and uses that trigger point to compute the offset between the raw encoder count and the joint's real-world angle.</p>
+
+<p>Get the homing sequence and the offset math right and the joint lands within a fraction of a degree of the same position every single startup. Get it wrong and you get a joint that homes to a slightly different angle each time, drifting worse the faster it approaches the switch.</p>
+
+<h2>Why robot joints need homing</h2>
+<p>Two encoder types show up in robot joints: absolute and incremental. An absolute encoder reports a unique angle immediately at power-up, so it never needs homing. An incremental (quadrature) encoder only reports relative motion, counting up or down as the shaft turns, so the controller has to establish where zero actually is every time the system powers on. Incremental encoders are far more common on hobbyist and mid-size robot arms because they are cheaper and simpler to wire, which is exactly why homing shows up as a recurring build step.</p>
+
+<p>A limit switch is the simplest way to give an incremental joint a fixed physical reference: a mechanical microswitch, an optical interrupter, or a Hall-effect sensor mounted so that a flag or cam on the joint trips it at one specific angle.</p>
+
+<h2>Where to mount the switch</h2>
+<p>Mount the switch so it triggers at, or just past, one mechanical end of the joint's travel, not in the middle of the working range. If it trips mid-range, the homing routine has to know which direction to search, which adds ambiguity. At an end-of-travel position there is only one direction to approach from.</p>
+<p>Also decide whether the switch is on the motor side or the output side of the gearbox. If it is on the output side (after the reduction), one trigger event maps directly to one joint angle, which is what you want. If it is on the motor side, a single trigger only tells you the motor shaft position modulo one output-shaft revolution, and you need extra logic (like a known start position) to resolve which output revolution you are actually in. For any joint with more than one output revolution of travel per limit switch trigger, mount the switch on the output side or use an absolute encoder with a single-turn range that covers the joint's motion.</p>
+
+<h2>The homing sequence</h2>
+<p>A repeatable homing routine has three phases, not one:</p>
+<ol>
+<li><strong>Fast approach.</strong> Move the joint toward the switch at moderate speed until it trips. This gets you close quickly but not precisely, because switch trigger points shift slightly with approach speed due to debounce filtering and mechanical overtravel.</li>
+<li><strong>Back off.</strong> Reverse a small, fixed distance (typically a few degrees of joint travel) until the switch releases.</li>
+<li><strong>Slow re-approach.</strong> Move forward again at low speed until the switch trips a second time. Latch the encoder count at this exact trigger point.</li>
+</ol>
+<p>The slow re-approach is the step builders skip, and it is the one that makes homing repeatable. Approaching fast means the joint travels further between the controller's poll of the switch state and the actual mechanical trigger, so the logged count varies with speed and even with battery voltage sag. Approaching slowly, after already being close from the back-off step, minimizes that overtravel and gives a consistent trigger count run to run.</p>
+
+<h2>Worked example: from trigger count to home offset</h2>
+<p>Take a joint with a quadrature encoder rated at 4096 counts per revolution (CPR) mounted on the motor shaft, driving a 100:1 gearbox, with the limit switch mounted on the output side so one trigger corresponds to one specific joint angle. See our <a href='/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html'>encoder resolution guide</a> for how CPR and gear ratio combine into output-shaft resolution.</p>
+<p>Output-shaft counts per revolution:</p>
+<blockquote>4096 CPR &times; 100 (gear ratio) = 409,600 counts per output revolution</blockquote>
+<p>Resolution at the joint: 360&deg; / 409,600 counts = 0.00088&deg; per count, plenty fine for a homing reference.</p>
+<p>During the slow re-approach, the switch trips at a raw encoder count of <strong>132,480</strong> (measured from whatever the count happened to be at power-up, not from a real zero). Suppose the switch is physically positioned so that its trigger point corresponds to a joint angle of <strong>-5.0&deg;</strong> relative to the joint's true zero (you get this number from the CAD model or a one-time measurement with a protractor or dial indicator during assembly).</p>
+<p>The home offset is the constant you add to every future raw count to convert it into a real joint angle:</p>
+<blockquote>counts_per_degree = 409,600 / 360 = 1137.8 counts/&deg;<br>
+angle_at_trigger_counts = -5.0&deg; &times; 1137.8 = -5689 counts<br>
+offset = angle_at_trigger_counts - raw_trigger_count<br>
+offset = -5689 - 132,480 = -138,169 counts</blockquote>
+<p>From that point on, every raw count reading converts to a true joint angle with:</p>
+<blockquote>joint_angle_deg = (raw_count + offset) / counts_per_degree</blockquote>
+<p>Immediately after homing, raw_count is 132,480, so joint_angle_deg = (132,480 - 138,169) / 1137.8 = -5.0&deg;, matching the known switch position. As the joint moves away from the switch, raw_count changes and the same offset keeps producing the correct angle. Store this offset in non-volatile memory or recompute it every power-up by re-running the homing sequence; do not assume it stays valid if you ever recalibrate the switch's physical mounting position, since that changes the true angle the trigger corresponds to.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>No back-off/re-approach step.</strong> Homing directly off the fast approach bakes in a variable overtravel error, so the offset silently drifts by a degree or more between runs.</li>
+<li><strong>Switch debounce not filtered in firmware.</strong> A mechanical switch can chatter for a few milliseconds; latch the trigger only after the input has been stable for a short debounce window (a few milliseconds is usually enough), otherwise you might record the count from the first bounce rather than a settled contact.</li>
+<li><strong>Homing torque left at full power.</strong> Reduce motor current or PWM duty cycle during the approach phases so a missed stop doesn't drive the joint into a hard mechanical limit.</li>
+<li><strong>Forgetting which direction is "home."</strong> If the joint can be manually moved past the switch during assembly or maintenance, always home in the same direction of approach the offset was calibrated against, since approaching from the opposite side trips the switch at a different mechanical point.</li>
+</ul>
+
+<p>The switch itself is the easy part of this build. The offset math, and specifically doing the back-off/re-approach dance before you latch a count, is what turns a homing routine from "usually close enough" into a joint that lands on the same angle every time you power it on.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
