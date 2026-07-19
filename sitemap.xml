@@ -211,6 +211,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/series-elastic-actuator-robot-joint-stiffness-sizing.html</loc>
+    <lastmod>2026-07-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/servo-vs-stepper-vs-bldc-motor-robotics.html</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
