@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 Jul 2026 00:39:51 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 20 Jul 2026 08:43:16 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works</title>
+      <link>https://arcbotix.com/blog/posts/ethercat-robot-joint-network-cycle-time-budget.html</link>
+      <guid>https://arcbotix.com/blog/posts/ethercat-robot-joint-network-cycle-time-budget.html</guid>
+      <pubDate>Mon, 20 Jul 2026 08:42:56 +0000</pubDate>
+      <description>EtherCAT for robot joint networks explained with a worked cycle-time budget: frame transmission time, per-slave forwarding delay, and cable propagation.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>Zero Moment Point for Legged Robot Balance: A Worked Numeric Example</title>
       <link>https://arcbotix.com/blog/posts/zero-moment-point-legged-robot-balance-worked-example.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Sun, 12 Jul 2026 10:17:10 +0000</pubDate>
       <description>ROS2 QoS settings explained with a real reliability mismatch bug: a subscriber that silently receives zero messages, how to diagnose it, and the fix.</description>
       <category>Software</category>
-    </item>
-    <item>
-      <title>Stepper Motor Microstepping Explained: Torque, Resolution, and Missed Steps</title>
-      <link>https://arcbotix.com/blog/posts/stepper-motor-microstepping-explained.html</link>
-      <guid>https://arcbotix.com/blog/posts/stepper-motor-microstepping-explained.html</guid>
-      <pubDate>Sat, 11 Jul 2026 22:13:55 +0000</pubDate>
-      <description>Stepper motor microstepping explained with real formulas: holding torque per microstep, driver chip choices (A4988, DRV8825, TMC2209), and missed-step risk.</description>
-      <category>Hardware</category>
     </item>
   </channel>
 </rss>

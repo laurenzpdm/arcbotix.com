@@ -67,6 +67,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/ethercat-robot-joint-network-cycle-time-budget.html</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/field-oriented-control-foc-bldc-motors-explained.html</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>monthly</changefreq>
