@@ -6,6 +6,11 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-20 (2)
+- Candidates checked: Denavit-Hartenberg parameters worked example (still saturated per repeated prior entries, confirmed again), PID anti-windup/actuator saturation for robot arms (arXiv papers and a Simulink/Medium writeup already explain clamping vs back-calculation clearly at a generic-control-theory level), ball screw vs lead screw actuator sizing (still generic industrial-catalog level per 2026-07-20 strategy note, viable backup), RS-485/Modbus wiring for robot joint networks.
+- Chose "RS-485/Modbus for robot joint networks: wiring, addressing, and polling-rate budget": top pages (Schneider Electric, Ozeki, Measurlogic, electrical-engineering-portal) cover generic RS-485 cabling rules (twisted pair, 120-ohm termination, A/B polarity, 32-device limit) for building-automation contexts, not robot joints.
+- Weakness in current top pages: none show the actual arithmetic of how Modbus RTU frame time at a given baud rate, plus per-slave turnaround delay, combines with the number of daisy-chained joint drivers to determine the achievable polling rate - builders get wiring rules but no way to check whether N joints at a given baud rate can hit their control loop's update rate, the same gap the CAN bus and EtherCAT articles already closed for those protocols.
+
 ### 2026-07-20
 - Candidates checked: RRT path planning for robot arms (still stuck in academic RRT*/DAPF-RRT papers with no hobbyist worked example, confirmed gap-too-thin again per prior entries), ROS2 actions vs services vs topics (well covered by official ROS2 docs, The Construct, Foxglove, automaticaddison - saturated), Denavit-Hartenberg parameters (still saturated, confirmed again), Madgwick filter IMU orientation (AHRS docs, several Medium/PDF writeups already explain the algorithm and quaternion math clearly), zero moment point (ZMP) for legged robot balance.
 - Chose "zero moment point (ZMP) for legged robot balance, worked numeric example": top pages are patents, IEEE/arXiv papers, and a Dutch thesis PDF that define ZMP formally and discuss control schemes, with nothing scoped to a hobbyist quadruped/biped builder.

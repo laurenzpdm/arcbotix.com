@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 38
+- Total articles: 39
 - Last published: 2026-07-20
-- Known slugs: 38
+- Known slugs: 39
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 39 | 2026-07-20 | ethercat-robot-joint-network-cycle-time-budget | EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works | EtherCAT for robot joint networks, EtherCAT cycle time calculation, EtherCAT vs CANopen robotics, EtherCAT robot arm axis count | Hardware  |
 | 38 | 2026-07-20 | zero-moment-point-legged-robot-balance-worked-example | Zero Moment Point for Legged Robot Balance: A Worked Numeric Example | zero moment point legged robot, ZMP stability criterion, ZMP worked example, legged robot balance control | Control Systems  |
 | 37 | 2026-07-19 | series-elastic-actuator-robot-joint-stiffness-sizing | Series Elastic Actuator Design: Sizing the Spring Stiffness for a Robot Joint | series elastic actuator design, SEA spring stiffness sizing, series elastic actuator robot joint, torsional spring robot actuator | Hardware  |
 | 36 | 2026-07-19 | robot-arm-homing-limit-switches-encoder-offset | Homing a Robot Arm Joint with a Limit Switch: The Encoder-Offset Math | homing robot arm joint, limit switch robot arm, encoder offset homing, robot joint homing sequence | Build Guides  |
@@ -115,7 +116,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-zero-moment-point-legged-robot-balance-worked-example, series-elastic-actuator-robot-joint-stiffness-sizing, robot-arm-homing-limit-switches-encoder-offset, sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+ethercat-robot-joint-network-cycle-time-budget, zero-moment-point-legged-robot-balance-worked-example, series-elastic-actuator-robot-joint-stiffness-sizing, robot-arm-homing-limit-switches-encoder-offset, sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -134,6 +135,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- H-bridge PWM driver: Arduino Forum, Instructables, DroneBot Workshop, and howtomechatronics all cover L298N/H-bridge wiring and code in detail - saturated for a general intro, though the deadtime/shoot-through angle noted earlier remains a viable backup.
-- Chose "homing sequence and limit switch wiring for a robot arm joint, with a worked encoder-offset example": LinuxCNC forum and edaboard threads discuss homing informally and source-robotics covers mastering/calibration at a product level, but none walk through the actual encoder-count math (raw count at the switch trigger point, back-off distance, and the resulting home offset used to zero the joint) for a specific joint with real numbers.
-- Weakness in current top pages: builders get generic "add a limit switch and home on startup" advice without seeing how the switch trigger point, a back-off/re-approach step for repeatability, and the encoder's counts-per-revolution combine into the actual offset constant used in firmware.
+- Ball screw vs lead screw: decent generic industrial-actuator coverage (Progressive Automations, Tolomatic, Actuonix) but stays at a component-catalog level, not robot-specific numeric sizing - viable backup.
+- Chose "EtherCAT for robot joint networks: how the cycle-time budget actually works": Elmo, Honpine, and JEM Electronics compare EtherCAT vs CANopen at a feature/topology level (daisy-chain, on-the-fly processing, cable type), but none show the actual arithmetic of how per-slave forwarding delay, frame transmission time, and cable propagation combine into a real cycle time for N joints - a natural follow-up to the already-published CAN bus bit-timing article which did this for CAN.
+- Weakness in current top pages: builders get "EtherCAT is faster because it processes on the fly" without ever seeing the actual budget math (frame length -> transmission time at 100 Mbit/s, plus per-slave forwarding delay, plus cable propagation) that determines whether a given axis count fits inside a 1 kHz or 4 kHz control cycle.

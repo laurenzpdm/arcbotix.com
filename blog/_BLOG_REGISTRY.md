@@ -4,7 +4,7 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 39
+- Total articles: 40
 - Last published: 2026-07-20
 
 ## Keyword Pool (not yet used)
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 40 | 2026-07-20 | rs485-modbus-robot-joint-network-wiring-polling-budget | RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget | RS-485 Modbus robot joint network, Modbus RTU polling rate calculation, RS-485 wiring robot arm, Modbus robot joint addressing | Hardware | Explains RS-485/Modbus RTU wiring for daisy-chained robot joint drivers (twisted pair, 120-ohm termination, bias resistors, addressing) and works through the frame-time math (11 bits/char, baud rate, turnaround delay) to compute achievable polling rate for a 6-joint arm at 115200 and 460800 baud, comparing scaling limits against the site's existing CAN bus and EtherCAT articles. |
 | 39 | 2026-07-20 | ethercat-robot-joint-network-cycle-time-budget | EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works | EtherCAT for robot joint networks, EtherCAT cycle time calculation, EtherCAT vs CANopen robotics, EtherCAT robot arm axis count | Hardware | Worked-example article explaining EtherCAT for multi-joint robot arm networks: why EtherCAT processes frames on the fly instead of arbitrating like CAN, the four components of a cycle-time budget (frame transmission time at 100 Mbit/s, per-slave forwarding delay, cable propagation delay, master/application processing time), and a full worked calculation for a 6-DOF arm with 6 joint drives showing roughly 20.4 microseconds of wire time against a 1 kHz (1000 microsecond) cycle. Covers where the budget actually breaks in practice: faster cycle rates (4 kHz), larger PDO payloads per slave, and non-real-time master jitter as the real limiting factors rather than axis count alone. Links to the CAN bus joint network article for a contrasting protocol and to the real-time control loop article for how to budget the remaining cycle time. |
 | 38 | 2026-07-20 | zero-moment-point-legged-robot-balance-worked-example | Zero Moment Point for Legged Robot Balance: A Worked Numeric Example | zero moment point legged robot, ZMP stability criterion, ZMP worked example, legged robot balance control | Control Systems | Explains the zero moment point (ZMP) stability criterion for legged robots. Derives the linear inverted pendulum ZMP formula (x_zmp = x_com - (z_com/g)*x_com_ddot), works a numeric example for a quadruped in single-support trot stance (z_com=0.18m, x_com=0.02m, x_com_ddot=0.6 m/s^2, giving x_zmp=0.009m), shows how to check the result against the support polygon with a safety margin, and covers where the linear ZMP approximation breaks down (large CoM height changes, soft terrain, airborne gaits). Links to the LQR control article as the regulator that would track ZMP to the support polygon center. |
 | 37 | 2026-07-19 | series-elastic-actuator-robot-joint-stiffness-sizing | Series Elastic Actuator Design: Sizing the Spring Stiffness for a Robot Joint | series elastic actuator design, SEA spring stiffness sizing, series elastic actuator robot joint, torsional spring robot actuator | Hardware | Worked example for sizing series elastic actuator (SEA) spring stiffness for a robot joint: derives the two-inertia resonance formula relating spring stiffness k to force control bandwidth, works a concrete 30 Nm shoulder joint example computing k from both a deflection limit and a bandwidth target, then shows how to calibrate deflection to torque from real measurements rather than trusting the nominal spring rate. Links to the homing/encoder-offset article for sensor zeroing. |
@@ -206,3 +207,7 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 39)
 - ethercat-robot-joint-network-cycle-time-budget -> can-bus-robot-joint-network-wiring-bit-timing (contrast with CAN bus arbitration and bit-timing approach for the same joint-network use case)
 - ethercat-robot-joint-network-cycle-time-budget -> real-time-considerations-robot-control-loops (how the remaining cycle-time budget after wire time gets spent on control loop execution and jitter)
+
+## Internal links (article 40)
+- rs485-modbus-robot-joint-network-wiring-polling-budget -> can-bus-robot-joint-network-wiring-bit-timing (compares Modbus RTU's poll-and-wait model to CAN's arbitration-based broadcast timing)
+- rs485-modbus-robot-joint-network-wiring-polling-budget -> ethercat-robot-joint-network-cycle-time-budget (compares Modbus RTU scaling limits to EtherCAT's on-the-fly frame processing)

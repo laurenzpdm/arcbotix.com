@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget – Arcbotix</title>
+  <meta name="description" content="RS-485/Modbus robot joint network wiring, addressing, and the frame-time math that determines how fast you can actually poll N daisy-chained joint drivers.">
+  <meta name="keywords" content="RS-485 Modbus robot joint network, Modbus RTU polling rate calculation, RS-485 wiring robot arm, Modbus robot joint addressing">
+  <meta property="og:title" content="RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget">
+  <meta property="og:description" content="RS-485/Modbus robot joint network wiring, addressing, and the frame-time math that determines how fast you can actually poll N daisy-chained joint drivers.">
+  <meta property="og:image" content="/blog/posts/img/rs485-modbus-robot-joint-network-wiring-polling-budget.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/rs485-modbus-robot-joint-network-wiring-polling-budget.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/rs485-modbus-robot-joint-network-wiring-polling-budget.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-20">July 20, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget</h1>
+    <p class="blog-post-subtitle">The wiring rules are the easy part. The real question is whether your joint count and baud rate can hit your control loop's update rate.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/rs485-modbus-robot-joint-network-wiring-polling-budget.webp" alt="Isometric illustration of robot joint controller modules connected in a daisy chain by a twisted-pair data cable" loading="lazy">
+    </div>
+
+    <p>RS-485/Modbus shows up constantly in robot joint networks because the drivers are cheap, the wiring is a two-wire twisted pair, and most stepper and servo driver boards already speak Modbus RTU out of the box. Most wiring guides stop at cable specs and termination resistors. What they skip is the question that actually determines whether the protocol works for your robot: given N joint drivers on one bus at a given baud rate, what polling rate can you actually sustain, and does it meet your control loop's update rate?</p>
+
+<h2>RS-485/Modbus wiring for a robot joint network</h2>
+<p>RS-485 is a differential two-wire bus: A (non-inverting) and B (inverting), plus a common ground reference. Every joint driver's A terminal connects to every other joint driver's A terminal, and likewise for B, forming a single linear daisy chain, not a star. A star topology causes reflections at the branch points and will corrupt frames intermittently, which is a common source of "it works until I add the fourth joint" bugs.</p>
+<ul>
+<li><strong>Cable:</strong> shielded twisted pair, 22-24 AWG, characteristic impedance close to 120 ohms (e.g. Belden 9841 or equivalent).</li>
+<li><strong>Termination:</strong> a 120-ohm resistor across A/B at each physical end of the chain only, never at intermediate nodes.</li>
+<li><strong>Ground:</strong> a common reference wire between all nodes, plus shield grounded at one end only to avoid ground loops.</li>
+<li><strong>Bias resistors:</strong> pull-up on A and pull-down on B (typically 560 ohm to 1 k ohm) at one node keep the bus in a known idle state when no driver is transmitting, preventing false frame detection.</li>
+<li><strong>Device limit:</strong> standard RS-485 transceivers support 32 unit loads on one segment. Many modern transceivers are quarter or eighth unit load, which lets you exceed 32 physical devices on the same bus, but check the transceiver datasheet before assuming this.</li>
+</ul>
+<p>Every joint driver gets a unique Modbus slave address (1-247), typically set with onboard DIP switches or a one-time serial command at commissioning. Address 0 is reserved for broadcast messages that all slaves accept without replying.</p>
+
+<h2>Modbus RTU frame time: the number that actually matters</h2>
+<p>Modbus RTU is a master-polls-slave protocol: the controller (master) sends a request frame, the addressed joint driver replies, and only then can the master poll the next joint. There is no multi-master arbitration and no broadcast telemetry like CAN's message-based model, so your achievable update rate is set entirely by how long each request/response pair takes.</p>
+<p>A Modbus RTU frame is built from 11-bit character frames (1 start bit, 8 data bits, 1 parity or extra stop bit, 1 stop bit) at your chosen baud rate. Frame transmission time in milliseconds:</p>
+<blockquote>t_frame (ms) = (bytes_in_frame * 11 bits) / baud_rate * 1000</blockquote>
+<p>A typical "read joint position and current" request is 8 bytes (address, function code, register address, register count, 2-byte CRC), and the response carrying two 16-bit registers is 9 bytes. At 115200 baud:</p>
+<blockquote>t_request = (8 * 11) / 115200 * 1000 = 0.76 ms<br>t_response = (9 * 11) / 115200 * 1000 = 0.86 ms</blockquote>
+<p>To that you must add the turnaround delay: the time the slave's microcontroller takes to decode the request, read its sensors, and start transmitting the reply. This is driver-specific but commonly 1-3 ms for a joint driver running its own current-loop firmware. Modbus RTU also defines a mandatory inter-frame silence of 3.5 character times to mark frame boundaries, which at 115200 baud is about 0.33 ms and is small enough to fold into your turnaround margin.</p>
+<blockquote>t_cycle_per_joint = t_request + t_turnaround + t_response</blockquote>
+<p>Using a 2 ms turnaround: t_cycle_per_joint = 0.76 + 2.0 + 0.86 = 3.62 ms.</p>
+
+<h2>Worked example: 6-joint arm on a shared bus</h2>
+<p>For a 6-DOF arm polling every joint once per control cycle:</p>
+<blockquote>t_total = 6 * 3.62 ms = 21.7 ms</blockquote>
+<p>That caps your update rate at roughly 1 / 0.0217 s = 46 Hz. If your position control loop needs 100 Hz (10 ms per cycle), this bus configuration cannot keep up, no matter how well it is wired. You have three practical levers:</p>
+<ul>
+<li><strong>Raise the baud rate.</strong> Modbus RTU over RS-485 commonly runs to 921600 baud on short, well-terminated runs. Going from 115200 to 460800 baud cuts frame time roughly 4x, moving t_cycle_per_joint from 3.62 ms toward 2.4 ms (turnaround now dominates, not the wire time), for a 6-joint total near 14.6 ms and about 68 Hz.</li>
+<li><strong>Reduce turnaround.</strong> If the joint driver firmware can reply immediately from a pre-computed register instead of blocking on a fresh ADC read, turnaround can often drop under 1 ms, which matters more once baud rate is already high.</li>
+<li><strong>Split the bus.</strong> Put 3 joints on one RS-485 segment and 3 on a second, each with its own UART on the controller, and poll both segments in parallel. This roughly halves the effective chain length for the same per-joint frame time.</li>
+</ul>
+<p>This is the same kind of budget arithmetic covered for CAN bus timing in <a href="/posts/can-bus-robot-joint-network-wiring-bit-timing.html">CAN Bus for Robot Joint Networks</a> and for EtherCAT in <a href="/posts/ethercat-robot-joint-network-cycle-time-budget.html">EtherCAT for Robot Joint Networks</a>, and the comparison is worth being explicit about: CAN broadcasts short frames with hardware arbitration and no per-node turnaround wait, so it scales to more nodes at a given update rate; EtherCAT processes frames on the fly through every slave in one pass, which is why it can hit kHz-class cycle times on many axes. Modbus RTU's strict poll-and-wait model is the simplest to wire and debug, but it does not scale past a handful of joints once you need triple-digit control rates.</p>
+
+<h2>When RS-485/Modbus is the right choice</h2>
+<p>Modbus RTU remains a solid pick when the update rate requirement is modest: a gripper, a slow-moving gantry axis, or a joint whose position loop runs locally on the driver and only needs a setpoint update at 20-50 Hz from the host. It is also the easiest protocol to bring up with a bench multimeter and a USB-RS485 adapter, since most Modbus master libraries (pymodbus, libmodbus) will talk to a driver in a few lines of code. For a fast multi-joint arm running a tight position or torque loop above roughly 100 Hz across all joints, budget the frame-time arithmetic above before committing to the bus, or plan to move to CAN or EtherCAT instead.</p>
+<p>A quick sanity check before wiring anything: multiply your target control rate's period (ms) by the number of joints, and see how much time per joint that leaves. If it is less than roughly 2-3 ms per joint, RS-485/Modbus RTU is the wrong bus for that update rate, regardless of how carefully you terminate the cable.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
