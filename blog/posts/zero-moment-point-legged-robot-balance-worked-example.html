@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Zero Moment Point for Legged Robot Balance: A Worked Numeric Example – Arcbotix</title>
+  <meta name="description" content="Learn the zero moment point (ZMP) stability criterion for legged robots with a worked numeric example: computing ZMP location and checking it against the support polygon.">
+  <meta name="keywords" content="zero moment point legged robot, ZMP stability criterion, ZMP worked example, legged robot balance control">
+  <meta property="og:title" content="Zero Moment Point for Legged Robot Balance: A Worked Numeric Example">
+  <meta property="og:description" content="Learn the zero moment point (ZMP) stability criterion for legged robots with a worked numeric example: computing ZMP location and checking it against the support polygon.">
+  <meta property="og:image" content="/blog/posts/img/zero-moment-point-legged-robot-balance-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/zero-moment-point-legged-robot-balance-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/zero-moment-point-legged-robot-balance-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-20">July 20, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">Zero Moment Point for Legged Robot Balance: A Worked Numeric Example</h1>
+    <p class="blog-post-subtitle">Computing the ZMP location from center-of-mass motion and checking it against the support polygon</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/zero-moment-point-legged-robot-balance-worked-example.webp" alt="Isometric technical illustration of a quadruped robot standing with a highlighted support polygon and a projected ground point beneath its center of mass" loading="lazy">
+    </div>
+
+    <p>The <strong>zero moment point (ZMP)</strong> is the standard stability criterion for legged robots: a point on the ground where the net moment of all forces acting on the robot, projected onto the ground plane, is zero. If that point stays inside the robot's support polygon, the robot is dynamically balanced. If it leaves the polygon, the robot tips. Most explanations of the zero moment point for legged robot balance stop at the definition. This article works through the actual numbers for a simple stance so you can compute it for your own robot.</p>
+
+<h2>What the Zero Moment Point Actually Measures</h2>
+<p>A static robot only needs its center of mass (CoM) above its support polygon to stay upright. A moving robot is different: acceleration of the CoM creates inertial forces that shift the effective point where ground reaction forces must act to keep the robot from rotating. The zero moment point accounts for this. It is not the CoM projection, it is the point where the horizontal moment caused by gravity, inertia, and any external forces cancels out.</p>
+<p>For a robot with a roughly constant CoM height (a reasonable approximation during a stance phase or slow gait), the ZMP position along one horizontal axis is:</p>
+<blockquote>x_zmp = x_com - (z_com / g) * x_com_ddot</blockquote>
+<p>where <code>x_com</code> is the horizontal CoM position, <code>z_com</code> is the CoM height above the ground, <code>g</code> is gravitational acceleration (9.81 m/s^2), and <code>x_com_ddot</code> is the horizontal CoM acceleration. The same formula applies independently along the y-axis. This is the simplified cart-table or linear inverted pendulum form, and it is accurate enough for most hobbyist and mid-size legged robots as long as the CoM height stays roughly constant and foot contact stays flat.</p>
+
+<h2>Worked Example: A Quadruped in Single-Support Stance</h2>
+<p>Take a small quadruped robot with the following numbers during a trot gait, at the instant one diagonal pair of legs is in the air and the robot is supported by a single front-left and rear-right foot pair (a two-point support 'line' rather than a full polygon, which is the harder case to balance):</p>
+<ul>
+<li>CoM height: z_com = 0.18 m</li>
+<li>CoM horizontal position (from the midpoint of the support line): x_com = 0.02 m</li>
+<li>CoM horizontal acceleration: x_com_ddot = 0.6 m/s^2 (the robot is accelerating forward as it pushes off)</li>
+</ul>
+<p>Plugging into the formula:</p>
+<blockquote>x_zmp = 0.02 - (0.18 / 9.81) * 0.6 = 0.02 - 0.011 = 0.009 m</blockquote>
+<p>The ZMP sits 9 mm forward of the support-line midpoint, only slightly ahead of where the CoM itself is. Now compare that to the support polygon. For a diagonal two-foot support pattern, the 'polygon' collapses to a line segment between the two contact points, and a real 2D margin only exists once the next foot lands. If the two support feet are 0.14 m apart along the line and the ZMP's lateral offset from that line is under about 0.01 m (accounting for foot pad width), the robot is still within tolerance. If x_com_ddot had instead been 3.5 m/s^2 from a sudden lunge, the shift term becomes (0.18/9.81) * 3.5 = 0.064 m, an offset large enough to push the ZMP off the support line entirely, meaning the robot would need the next foot down before that acceleration happens, not after.</p>
+
+<h2>Checking Against the Support Polygon</h2>
+<p>With four feet on the ground, the support polygon is the convex hull of the foot contact points, typically a rectangle roughly 0.15 m by 0.25 m for a small quadruped. The stability check is simple in principle:</p>
+<ol>
+<li>Compute x_zmp and y_zmp from the CoM trajectory using the formula above.</li>
+<li>Compute the support polygon vertices from the current foot placements.</li>
+<li>Check whether (x_zmp, y_zmp) lies inside the polygon, with a safety margin (commonly 10-20 mm) subtracted from each edge to account for foot pad compliance and model error.</li>
+</ol>
+<p>In code, the point-in-polygon check is a standard geometric test (ray casting or the cross-product sign method), applied every control cycle as the CoM trajectory is planned or replanned. Static-only stability margin from the CoM projection alone would have called the single-support example above safe (since x_com = 0.02 m is closer to the midpoint than x_zmp), while ZMP correctly shows the inertial term pushing the effective stability point further from center, which is the entire reason the criterion exists.</p>
+
+<h2>Where ZMP Breaks Down</h2>
+<p>The linear inverted pendulum simplification assumes constant CoM height and flat, rigid ground contact. It degrades in three common situations:</p>
+<ul>
+<li><strong>Large CoM height changes</strong>, such as a jumping or crouching gait, where the vertical acceleration term (usually dropped) becomes significant.</li>
+<li><strong>Soft or uneven terrain</strong>, where the actual ground reaction point does not match the assumed rigid contact geometry.</li>
+<li><strong>Fast dynamic gaits</strong> (running, hopping) where the robot is airborne for part of the cycle and there is no support polygon at all; stability there is judged by different criteria, such as the capture point.</li>
+</ul>
+<p>For a walking or trotting gait on flat ground at moderate speed, though, the ZMP formula above is the right tool, and it is exactly the reference signal that a balance controller regulates to zero relative to the support polygon center. A common way to build that controller is with a state-space regulator: see our <a href="/blog/posts/lqr-control-robot-arm-practical-introduction.html">LQR control practical introduction</a> for the mechanics of setting up the state-space model and cost weights that a ZMP-tracking balance loop would use.</p>
+
+<h2>Practical Notes for Implementation</h2>
+<p>A few numbers worth keeping in mind when you compute this for your own robot:</p>
+<ul>
+<li>Measure z_com from your actual robot's mass distribution, not just the body height off the ground; leg mass shifts the effective CoM height noticeably on a light robot.</li>
+<li>Estimate x_com_ddot from your planned CoM trajectory (if you are pre-computing a gait) or from IMU/kinematic state estimation in real time; a noisy acceleration estimate will make the ZMP jump around even when the robot is actually stable.</li>
+<li>Build in the safety margin on the polygon edges before you rely on this in hardware. A margin of 15-20% of the polygon's shortest dimension is a reasonable starting point for a small robot with some foot compliance.</li>
+</ul>
+<p>The core idea is simple once you have run the numbers once: the zero moment point is just the CoM projection corrected for how hard you are accelerating it, and keeping that corrected point inside your feet is what keeps a legged robot from tipping over.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

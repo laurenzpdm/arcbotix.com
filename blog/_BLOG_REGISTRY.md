@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 37
-- Last published: 2026-07-19
+- Total articles: 38
+- Last published: 2026-07-20
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 38 | 2026-07-20 | zero-moment-point-legged-robot-balance-worked-example | Zero Moment Point for Legged Robot Balance: A Worked Numeric Example | zero moment point legged robot, ZMP stability criterion, ZMP worked example, legged robot balance control | Control Systems | Explains the zero moment point (ZMP) stability criterion for legged robots. Derives the linear inverted pendulum ZMP formula (x_zmp = x_com - (z_com/g)*x_com_ddot), works a numeric example for a quadruped in single-support trot stance (z_com=0.18m, x_com=0.02m, x_com_ddot=0.6 m/s^2, giving x_zmp=0.009m), shows how to check the result against the support polygon with a safety margin, and covers where the linear ZMP approximation breaks down (large CoM height changes, soft terrain, airborne gaits). Links to the LQR control article as the regulator that would track ZMP to the support polygon center. |
 | 37 | 2026-07-19 | series-elastic-actuator-robot-joint-stiffness-sizing | Series Elastic Actuator Design: Sizing the Spring Stiffness for a Robot Joint | series elastic actuator design, SEA spring stiffness sizing, series elastic actuator robot joint, torsional spring robot actuator | Hardware | Worked example for sizing series elastic actuator (SEA) spring stiffness for a robot joint: derives the two-inertia resonance formula relating spring stiffness k to force control bandwidth, works a concrete 30 Nm shoulder joint example computing k from both a deflection limit and a bandwidth target, then shows how to calibrate deflection to torque from real measurements rather than trusting the nominal spring rate. Links to the homing/encoder-offset article for sensor zeroing. |
 | 36 | 2026-07-19 | robot-arm-homing-limit-switches-encoder-offset | Homing a Robot Arm Joint with a Limit Switch: The Encoder-Offset Math | homing robot arm joint, limit switch robot arm, encoder offset homing, robot joint homing sequence | Build Guides | Explains why incremental-encoder robot joints need homing, how to mount a limit switch (output side vs motor side, end-of-travel placement), the fast-approach/back-off/slow-re-approach sequence for repeatability, and a full worked numeric example converting a raw encoder trigger count (409,600 counts/rev output, trigger at raw count 132,480 corresponding to -5.0 degrees) into a home offset constant and the resulting angle conversion formula. Also covers common mistakes: skipping the back-off step, switch debounce, full-torque homing, and approach-direction consistency. |
 | 35 | 2026-07-19 | sensorless-bldc-motor-commutation-back-emf-timing | Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example | sensorless BLDC motor commutation, back-EMF zero crossing detection, BLDC commutation timing calculation, sensorless BLDC low speed | Hardware | Explains sensorless BLDC motor commutation via back-EMF zero-crossing detection with a full worked numeric example: converting mechanical RPM and pole-pair count to electrical frequency and period, computing the actual 30-electrical-degree commutation delay in microseconds at multiple speeds, explaining why the delay must be recomputed every step via an adaptive timer/PLL approach rather than a fixed constant, and detailing the low-speed failure mode caused by PWM demagnetization/blanking time consuming an increasing fraction of the shrinking detection window plus weakening back-EMF amplitude, with practical implications for choosing sensorless vs sensored control for robot joints and wheel motors. |
@@ -197,3 +198,6 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 37)
 - series-elastic-actuator-robot-joint-stiffness-sizing -> robot-arm-homing-limit-switches-encoder-offset (deflection sensor zeroing parallels joint encoder zeroing/homing)
+
+## Internal links (article 38)
+- zero-moment-point-legged-robot-balance-worked-example -> lqr-control-robot-arm-practical-introduction (LQR is the natural state-space regulator for a ZMP-tracking balance controller)

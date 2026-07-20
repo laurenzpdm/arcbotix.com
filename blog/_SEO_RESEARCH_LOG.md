@@ -6,6 +6,11 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-20
+- Candidates checked: RRT path planning for robot arms (still stuck in academic RRT*/DAPF-RRT papers with no hobbyist worked example, confirmed gap-too-thin again per prior entries), ROS2 actions vs services vs topics (well covered by official ROS2 docs, The Construct, Foxglove, automaticaddison - saturated), Denavit-Hartenberg parameters (still saturated, confirmed again), Madgwick filter IMU orientation (AHRS docs, several Medium/PDF writeups already explain the algorithm and quaternion math clearly), zero moment point (ZMP) for legged robot balance.
+- Chose "zero moment point (ZMP) for legged robot balance, worked numeric example": top pages are patents, IEEE/arXiv papers, and a Dutch thesis PDF that define ZMP formally and discuss control schemes, with nothing scoped to a hobbyist quadruped/biped builder.
+- Weakness in current top pages: none walk through computing the actual ZMP location (from CoM position, acceleration, and height using the standard x_zmp = x_com - (z_com/g)*x_com_ddot formula) for a simple robot stance with real mass/height/acceleration numbers, then checking it against the support polygon to tell a builder whether their gait phase is stable or about to tip.
+
 ### 2026-07-19 (2)
 - Candidates checked: series elastic actuator (SEA) design for robot joints, DH-parameter kinematic calibration (still flagged gap-too-thin in repeated prior entries, confirmed saturated again), quaternion vs Euler angle gimbal lock (Wikipedia, CH Robotics, and several 2026 blog posts already explain this clearly, saturated), current-sense shunt resistor sizing for motor drivers (DigiKey/NXP cover the generic electronics case well), ROS2 lifecycle nodes (official design doc, Foxglove, and Medium walkthroughs already cover the state machine well).
 - Chose "series elastic actuator (SEA) spring stiffness sizing for a robot joint": top pages (IntechOpen chapter, ResearchGate papers, a robotis forum PDF) explain the concept - compliance, impact tolerance, force control benefit - at a research/academic level, and a YouTube video shows a build but skips the math.
