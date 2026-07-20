@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works – Arcbotix</title>
+  <meta name="description" content="EtherCAT for robot joint networks explained with a worked cycle-time budget: frame transmission time, per-slave forwarding delay, and cable propagation.">
+  <meta name="keywords" content="EtherCAT for robot joint networks, EtherCAT cycle time calculation, EtherCAT vs CANopen robotics, EtherCAT robot arm axis count">
+  <meta property="og:title" content="EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works">
+  <meta property="og:description" content="EtherCAT for robot joint networks explained with a worked cycle-time budget: frame transmission time, per-slave forwarding delay, and cable propagation.">
+  <meta property="og:image" content="/blog/posts/img/ethercat-robot-joint-network-cycle-time-budget.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/ethercat-robot-joint-network-cycle-time-budget.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/ethercat-robot-joint-network-cycle-time-budget.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-20">July 20, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works</h1>
+    <p class="blog-post-subtitle">Processing on the fly sounds fast in theory. Here is the actual arithmetic that tells you how many joints fit inside a 1 kHz control cycle.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/ethercat-robot-joint-network-cycle-time-budget.webp" alt="Isometric illustration of robot joint servo drives connected in an EtherCAT daisy chain with glowing data packets flowing through each node" loading="lazy">
+    </div>
+
+    <p>EtherCAT for robot joint networks gets pitched with one line: it processes frames "on the fly," so it is fast enough for real-time servo control. That is true, but it hides the actual question a builder needs answered before wiring six or twelve joint drives into a chain: how many axes actually fit inside your control cycle, and at what point does adding one more joint blow your timing budget? Answering that takes an actual calculation, not a marketing bullet point.</p>
+
+<h2>Why EtherCAT processes frames differently than CAN</h2>
+<p>On a classic CAN bus (see our <a href="/blog/posts/can-bus-robot-joint-network-wiring-bit-timing.html">CAN bus joint network article</a> for the bit-timing side of that protocol), every node listens to a shared electrical bus and arbitrates for access one message at a time. EtherCAT works differently. The master sends a single Ethernet frame that travels through the whole chain of slave devices in a physical loop. Each slave's EtherCAT Slave Controller (ESC) reads the data addressed to it and writes its own response into the same frame as it passes through, without stopping to fully receive, decode, and re-transmit like a normal Ethernet switch would. This is the "processing on the fly" part, and it is the reason EtherCAT cycle times can get into the tens of microseconds even with a dozen nodes on the chain.</p>
+<p>But "on the fly" does not mean zero time. Every slave still adds a small, real delay as the frame passes through it, and the frame itself still takes a fixed amount of time to transmit at the physical line rate. Your cycle time is the sum of those pieces, not a fixed number a datasheet hands you.</p>
+
+<h2>The four pieces of an EtherCAT cycle-time budget</h2>
+<p>For a robot arm or mobile base with N joint drives daisy-chained on one EtherCAT segment, the cycle time has four components:</p>
+<ol>
+<li><strong>Frame transmission time.</strong> At the standard 100 Mbit/s EtherCAT physical layer, transmission time is frame length in bits divided by 100,000,000 bits/s.</li>
+<li><strong>Per-slave forwarding delay.</strong> Each ESC introduces a small delay as it reads and writes its process data segment before forwarding the frame to the next node. This is on the order of a few hundred nanoseconds per slave, and it applies twice per slave on a standard EtherCAT ring topology (once on the way out to the last node, once on the way back).</li>
+<li><strong>Cable propagation delay.</strong> Signal propagation through Ethernet cable is roughly 5 nanoseconds per meter. For joint-to-joint cable runs of a meter or less inside a robot arm, this term is small but not always negligible once you sum it across many hops.</li>
+<li><strong>Master and application processing time.</strong> The time your master's real-time task needs to prepare the outgoing frame and process the incoming one before the next cycle can start. This is set by your control software, not the fieldbus, and is easy to forget when people only quote the "wire time."</li>
+</ol>
+
+<h2>Worked example: six joints on one EtherCAT segment</h2>
+<p>Take a 6-DOF arm with one drive per joint, each drive contributing 8 bytes of process data in each direction (typical for target position, target torque, actual position, and status word packed into a compact PDO mapping). We want to know if this fits inside a 1 kHz (1000 microsecond) control cycle.</p>
+<h3>Step 1: frame length and transmission time</h3>
+<p>The Ethernet frame carries an EtherCAT header, one datagram header plus payload per slave, a working counter, and the standard Ethernet frame overhead (preamble, addresses, type field, frame check sequence, inter-frame gap). Adding up 6 slaves at roughly 8 bytes payload plus about 12 bytes of per-slave datagram overhead, plus around 60 bytes of fixed frame overhead, gives a total frame length of approximately 60 + 6 x (12 + 8) = 180 bytes, or 1440 bits.</p>
+<p>At 100 Mbit/s, transmission time is:</p>
+<blockquote>t_frame = 1440 bits / 100,000,000 bits/s = 14.4 microseconds</blockquote>
+
+<h3>Step 2: forwarding delay</h3>
+<p>Assume a representative forwarding delay of 500 nanoseconds per slave, a typical order of magnitude for real ESC hardware. With 6 slaves and the frame passing through each one twice (out and back on the ring), that is:</p>
+<blockquote>t_forward = 6 slaves x 2 passes x 500 ns = 6 microseconds</blockquote>
+
+<h3>Step 3: cable propagation</h3>
+<p>With six 0.5-meter cable segments between joints, round trip distance is 6 x 0.5 m x 2 = 6 meters at roughly 5 ns/m:</p>
+<blockquote>t_cable = 6 m x 5 ns/m = 30 nanoseconds</blockquote>
+<p>This term is small enough to fold into your margin rather than track precisely, which is exactly why it is safe to ignore for short in-arm cable runs but not for a robot with joints spread across several meters of cabling, like a large gantry or a multi-arm cell.</p>
+
+<h3>Step 4: total wire time and the real budget</h3>
+<blockquote>t_wire = t_frame + t_forward + t_cable = 14.4 + 6 + 0.03 ≈ 20.4 microseconds</blockquote>
+<p>Against a 1000 microsecond (1 kHz) cycle, 20.4 microseconds of wire time leaves roughly 98% of the cycle for the master's application logic: reading sensor data, running your control loop (see our <a href="/blog/posts/real-time-considerations-robot-control-loops.html">real-time control loop article</a> for how to budget the rest of that time against jitter), and preparing the next frame. This is the actual reason EtherCAT scales well: the wire time for a realistic joint count is a tiny fraction of a typical servo control cycle, not because the protocol is magic, but because the arithmetic genuinely works out that way at 100 Mbit/s.</p>
+
+<h2>Where the budget actually breaks</h2>
+<p>The wire-time math scales roughly linearly with slave count, so doubling to 12 joints roughly doubles t_forward to 12 microseconds and modestly increases t_frame, keeping total wire time comfortably under 1000 microseconds. The budget does not break from axis count alone at 1 kHz; it breaks from three other places builders hit in practice:</p>
+<ul>
+<li><strong>Faster cycle rates.</strong> Push to a 4 kHz cycle (250 microseconds) for a high-bandwidth force-control application, and a 20 microsecond wire time is suddenly 8% of the budget instead of 2%, leaving much less room for jitter and master processing.</li>
+<li><strong>Larger payloads per slave.</strong> A drive reporting full motor current waveforms or multi-turn absolute position data instead of a compact 8-byte PDO can push frame length up significantly, since frame transmission time scales directly with total payload across all slaves.</li>
+<li><strong>Master jitter, not fieldbus jitter.</strong> A non-real-time operating system task scheduler missing its deadline by hundreds of microseconds will blow a 1 kHz budget long before the EtherCAT wire time does. This is a software problem, not a fieldbus problem, and it is the most common cause of a robot arm that "should" hit 1 kHz on paper but does not in practice.</li>
+</ul>
+
+<h2>Practical takeaway</h2>
+<p>Before committing to an axis count and cycle rate for an EtherCAT robot joint network, run the same four-step calculation with your actual PDO sizes, slave count, and target cycle time. If wire time comfortably clears 10-20% of your cycle budget, you have margin for real-world jitter and master processing. If it starts approaching 50% or more, either drop the cycle rate, trim PDO payload per slave, or split the chain across multiple EtherCAT masters. The protocol's speed comes from real, calculable numbers, and treating it that way during design saves you from discovering the limit on a robot that is already wired.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
