@@ -20,7 +20,7 @@
   </url>
   <url>
     <loc>https://arcbotix.com/blog/</loc>
-    <lastmod>2026-07-19</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
@@ -243,6 +243,12 @@
   <url>
     <loc>https://arcbotix.com/blog/posts/trajectory-planning-for-robotic-arms.html</loc>
     <lastmod>2026-07-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://arcbotix.com/blog/posts/zero-moment-point-legged-robot-balance-worked-example.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
