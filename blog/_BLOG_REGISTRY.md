@@ -4,7 +4,7 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 42
+- Total articles: 43
 - Last published: 2026-07-21
 
 ## Keyword Pool (not yet used)
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 43 | 2026-07-21 | sliding-mode-control-robot-arm-joint-worked-example | Sliding Mode Control for Robot Arm Joints: A Worked Numeric Example | sliding mode control robot arm, sliding mode control worked example, chattering sliding mode control, boundary layer sliding mode robotics | Control Systems | Worked numeric example of sliding mode control for a single robot arm joint: models the joint as a second-order system with inertia/friction mismatch and a bounded disturbance torque, derives the sliding surface s = e_dot + lambda*e, sizes lambda from a settling-time target, derives the equivalent-control-plus-switching-term control law, sizes the switching gain K from worst-case disturbance and model mismatch using real numbers, and sizes a boundary layer phi (saturation function replacing sign(s)) to eliminate chattering while bounding steady-state error to encoder resolution. Ends with a comparison of when to use SMC vs PID vs computed torque control. |
 | 42 | 2026-07-21 | ball-screw-vs-lead-screw-robot-linear-actuator-sizing | Ball Screw vs Lead Screw for a Robot Linear Actuator: A Worked Torque Sizing Example | ball screw vs lead screw, robot linear actuator sizing, lead screw torque calculation, ball screw backdrive robot arm | Build Guides | Worked torque sizing example comparing a ball screw and a lead screw for a robot's Z-axis linear lift actuator. Computes thrust force from mass, gravity, and acceleration, converts to drive torque for both screw types via the standard T = F*L/(2*pi*eta) relation with real efficiency values, then explains why the self-locking/backdrive distinction (checked via the lead angle vs thread friction angle) usually decides the choice more than the torque gap does for lightly loaded axes. Includes a comparison table and a step-by-step selection procedure. |
 | 41 | 2026-07-21 | tool-center-point-calibration-robot-arm-pivot-method | Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example | TCP calibration robot arm, tool center point calibration, pivot calibration robot arm, TCP offset least squares | Control Systems | Explains TCP (tool center point) calibration for robot arms via the pivot calibration method: the p_tip = p_flange + R_flange * t relationship, the least-squares setup for solving the unknown offset vector t and fixed pivot point from multiple recorded flange poses, and a worked planar numeric example (true offset tx=50mm, ty=0mm, fixed point at 400,150mm) using 4 poses 90 degrees apart including a 0.4mm teach error, showing the opposite-pose-averaging shortcut and how to read the residual to catch a bad pose or loose tool mount. Notes the 'tool tip swings in a cone during pure reorientation' symptom of a wrong TCP offset. |
 | 40 | 2026-07-20 | rs485-modbus-robot-joint-network-wiring-polling-budget | RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget | RS-485 Modbus robot joint network, Modbus RTU polling rate calculation, RS-485 wiring robot arm, Modbus robot joint addressing | Hardware | Explains RS-485/Modbus RTU wiring for daisy-chained robot joint drivers (twisted pair, 120-ohm termination, bias resistors, addressing) and works through the frame-time math (11 bits/char, baud rate, turnaround delay) to compute achievable polling rate for a 6-joint arm at 115200 and 460800 baud, comparing scaling limits against the site's existing CAN bus and EtherCAT articles. |
@@ -220,3 +221,7 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 42)
 - ball-screw-vs-lead-screw-robot-linear-actuator-sizing -> robot-arm-joint-motor-gearbox-torque-sizing (linked as the analogous worst-case-load-first sizing approach applied to a rotary joint instead of a linear axis)
 - ball-screw-vs-lead-screw-robot-linear-actuator-sizing -> robot-arm-joint-friction-compensation-coulomb-viscous (linked for the safety-factor/margin discipline referenced when adding margin to the theoretical torque number)
+
+## Internal links (article 43)
+- sliding-mode-control-robot-arm-joint-worked-example -> computed-torque-control-robot-arm-worked-example (both use a model-based feedforward plus correction term structure)
+- sliding-mode-control-robot-arm-joint-worked-example -> robot-arm-joint-friction-compensation-coulomb-viscous (SMC's robustness margin absorbs the friction uncertainty discussed there)
