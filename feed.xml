@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 Jul 2026 16:46:45 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 21 Jul 2026 00:51:17 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example</title>
+      <link>https://arcbotix.com/blog/posts/tool-center-point-calibration-robot-arm-pivot-method.html</link>
+      <guid>https://arcbotix.com/blog/posts/tool-center-point-calibration-robot-arm-pivot-method.html</guid>
+      <pubDate>Tue, 21 Jul 2026 00:50:01 +0000</pubDate>
+      <description>TCP calibration for robot arms explained with an actual worked pivot-calibration example: the least-squares math behind the offset, not just the procedure.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget</title>
       <link>https://arcbotix.com/blog/posts/rs485-modbus-robot-joint-network-wiring-polling-budget.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/ekf-slam-explained-worked-example.html</guid>
       <pubDate>Mon, 13 Jul 2026 22:29:46 +0000</pubDate>
       <description>EKF-SLAM explained with a full worked numeric example: state vector, covariance, Jacobians, and Kalman gain computed by hand for a robot observing two landmarks.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Field-Oriented Control (FOC) for BLDC Motors Explained: A Worked Clarke/Park Example</title>
-      <link>https://arcbotix.com/blog/posts/field-oriented-control-foc-bldc-motors-explained.html</link>
-      <guid>https://arcbotix.com/blog/posts/field-oriented-control-foc-bldc-motors-explained.html</guid>
-      <pubDate>Mon, 13 Jul 2026 10:24:59 +0000</pubDate>
-      <description>Field-oriented control for BLDC motors explained with real numbers: Clarke and Park transforms, Id/Iq current control, and why FOC beats six-step commutation.</description>
       <category>Control Systems</category>
     </item>
   </channel>
