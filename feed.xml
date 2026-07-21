@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 21 Jul 2026 00:51:17 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 21 Jul 2026 08:54:25 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Ball Screw vs Lead Screw for a Robot Linear Actuator: A Worked Torque Sizing Example</title>
+      <link>https://arcbotix.com/blog/posts/ball-screw-vs-lead-screw-robot-linear-actuator-sizing.html</link>
+      <guid>https://arcbotix.com/blog/posts/ball-screw-vs-lead-screw-robot-linear-actuator-sizing.html</guid>
+      <pubDate>Tue, 21 Jul 2026 08:54:12 +0000</pubDate>
+      <description>Ball screw vs lead screw for a robot linear actuator, with a full worked torque sizing example for a SCARA Z-axis lift, including holding torque and backdrive behavior.</description>
+      <category>Build Guides</category>
+    </item>
     <item>
       <title>Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example</title>
       <link>https://arcbotix.com/blog/posts/tool-center-point-calibration-robot-arm-pivot-method.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/robot-arm-gravity-compensation-worked-example.html</guid>
       <pubDate>Tue, 14 Jul 2026 10:32:49 +0000</pubDate>
       <description>Robot arm gravity compensation explained with a real formula: computing joint torque from mass, link length, and angle, then adding it as a PD feedforward term.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Extended Kalman Filter SLAM (EKF-SLAM) Explained: A Worked Numeric Example</title>
-      <link>https://arcbotix.com/blog/posts/ekf-slam-explained-worked-example.html</link>
-      <guid>https://arcbotix.com/blog/posts/ekf-slam-explained-worked-example.html</guid>
-      <pubDate>Mon, 13 Jul 2026 22:29:46 +0000</pubDate>
-      <description>EKF-SLAM explained with a full worked numeric example: state vector, covariance, Jacobians, and Kalman gain computed by hand for a robot observing two landmarks.</description>
       <category>Control Systems</category>
     </item>
   </channel>
