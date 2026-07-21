@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Ball Screw vs Lead Screw for a Robot Linear Actuator: A Worked Torque Sizing Example – Arcbotix</title>
+  <meta name="description" content="Ball screw vs lead screw for a robot linear actuator, with a full worked torque sizing example for a SCARA Z-axis lift, including holding torque and backdrive behavior.">
+  <meta name="keywords" content="ball screw vs lead screw, robot linear actuator sizing, lead screw torque calculation, ball screw backdrive robot arm">
+  <meta property="og:title" content="Ball Screw vs Lead Screw for a Robot Linear Actuator: A Worked Torque Sizing Example">
+  <meta property="og:description" content="Ball screw vs lead screw for a robot linear actuator, with a full worked torque sizing example for a SCARA Z-axis lift, including holding torque and backdrive behavior.">
+  <meta property="og:image" content="/blog/posts/img/ball-screw-vs-lead-screw-robot-linear-actuator-sizing.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/ball-screw-vs-lead-screw-robot-linear-actuator-sizing.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/ball-screw-vs-lead-screw-robot-linear-actuator-sizing.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Build Guides</span>
+      <time datetime="2026-07-21">July 21, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Ball Screw vs Lead Screw for a Robot Linear Actuator: A Worked Torque Sizing Example</h1>
+    <p class="blog-post-subtitle">Turning a lift mass and lead into an actual motor torque number, and why the self-locking question decides more than the efficiency number does</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/ball-screw-vs-lead-screw-robot-linear-actuator-sizing.webp" alt="Isometric technical illustration of a robot linear actuator Z-axis lift mechanism with a screw shaft and nut carriage" loading="lazy">
+    </div>
+
+    <p>Most guides on <strong>ball screw vs lead screw</strong> selection stop at a spec-sheet comparison: ball screws are more efficient, lead screws are cheaper and self-locking. That is true, but it skips the part a robot builder actually needs, which is a number. If you are building a Z-axis lift for a SCARA arm, a linear rail feeder, or a gripper closing mechanism, you need to know the actual drive torque your motor has to produce for each screw type, and whether the difference changes what motor you buy. This article works through that calculation for a concrete lift mechanism and shows why the self-locking question often matters more than the efficiency number.</p>
+
+<h2>The mechanism: a SCARA Z-axis lift</h2>
+<p>Take a SCARA arm's Z-axis: a carriage of mass <code>m = 4 kg</code> (arm assembly plus payload) rides on a vertical screw with lead <code>L = 5 mm</code> (0.005 m per revolution). The lift needs to accelerate the carriage upward at <code>a = 0.3 m/s^2</code> during a fast move, on top of holding it against gravity. This is the same style of worst-case-load-first approach used when <a href="/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html">sizing a rotary motor and gearbox for a robot arm joint</a>, just applied to a linear axis instead of a rotary one.</p>
+
+<h3>Step 1: total thrust force</h3>
+<p>The screw has to supply enough axial thrust to overcome gravity and provide the acceleration force:</p>
+<blockquote>F = m * (g + a) = 4 kg * (9.81 + 0.3) m/s^2 = 40.4 N</blockquote>
+<p>Round up to <code>F = 41 N</code> for margin. This is the thrust number both screw types have to deliver; what differs is how much motor torque it takes to produce it.</p>
+
+<h3>Step 2: drive torque from thrust</h3>
+<p>The standard screw torque relation is:</p>
+<blockquote>T = (F * L) / (2 * pi * eta)</blockquote>
+<p>where <code>L</code> is the lead in meters and <code>eta</code> is the drive efficiency. A precision ball screw typically runs <code>eta = 0.90</code>; a plain (non-ball) lead screw with an Acme thread commonly runs <code>eta = 0.35 to 0.45</code> depending on thread angle, material, and lubrication. Using <code>eta = 0.40</code> for the lead screw:</p>
+<ul>
+<li>Ball screw: T = (41 * 0.005) / (2 * pi * 0.90) = 0.0363 N*m</li>
+<li>Lead screw: T = (41 * 0.005) / (2 * pi * 0.40) = 0.0816 N*m</li>
+</ul>
+<p>The lead screw needs about 2.25 times more torque for the same thrust, purely from the efficiency loss in the sliding thread contact versus the ball screw's rolling contact. In practice you would also add a safety factor of 1.3 to 1.5 on top of this before picking a motor, the same margin discipline used in <a href="/blog/posts/robot-arm-joint-friction-compensation-coulomb-viscous.html">friction compensation work</a>, since static friction and thread wear both eat into the theoretical number over the life of the mechanism.</p>
+
+<h2>Why the torque gap rarely decides the motor choice</h2>
+<p>Here is the part the generic screw-selection guides skip: a factor of 2.25 in required torque sounds decisive, but at these load levels it usually is not the deciding factor. NEMA 17 or NEMA 23 stepper motors and small BLDC gearmotors commonly deliver 0.4 to 1.5 N*m of continuous torque, so both the 0.036 N*m and 0.082 N*m numbers above sit comfortably inside a single motor's rating once you add reduction or a slightly larger frame size. For a lightly loaded axis like this, either screw type will work with an off-the-shelf motor. The efficiency gap matters much more once the thrust load or the lead gets larger, for example a heavier payload lift or a coarser lead used for speed, where the torque difference can push you from a small motor into a noticeably larger and more expensive one.</p>
+
+<h2>The tradeoff that actually decides it: backdrive vs self-locking</h2>
+<p>The number that usually settles <strong>ball screw vs lead screw</strong> for a robot lift is not torque, it is what happens when power is removed.</p>
+<ul>
+<li><strong>Ball screws backdrive.</strong> Their high efficiency runs both directions: an external axial load (gravity, in this case) can drive the nut and turn the screw. On a vertical axis, that means the carriage will fall the instant motor holding torque disappears, whether from a power cut, an e-stop, or a fault.</li>
+<li><strong>Lead screws are typically self-locking.</strong> A screw is self-locking when its thread lead angle is smaller than the friction angle of the thread contact. Most Acme lead screws satisfy this by design, so the carriage stays in place under gravity with zero motor torque applied.</li>
+</ul>
+<p>You can check self-locking with the lead angle:</p>
+<blockquote>lambda = atan(L / (pi * d_m))</blockquote>
+<p>where <code>d_m</code> is the screw's mean thread diameter. For a common 8 mm lead screw with <code>d_m = 7.5 mm</code> and lead <code>L = 2 mm</code>, <code>lambda = atan(2 / (pi * 7.5)) = 4.85 degrees</code>. Typical steel-on-brass or steel-on-bronze thread friction angles run 8 to 11 degrees (friction coefficient roughly 0.15 to 0.20), well above 4.85 degrees, so the screw self-locks. A ball screw's rolling-element friction angle is much smaller, which is exactly why it does not self-lock at comparable leads.</p>
+<p>For a vertical Z-axis this is not a minor detail, it is a safety requirement. A ball screw lift needs a brake, whether a motor-integrated holding brake or a mechanical fail-safe, to keep the carriage from dropping on power loss. A self-locking lead screw needs neither, at the cost of that lower drive efficiency you paid for in Step 2.</p>
+
+<h2>Putting the numbers together</h2>
+<table>
+<tr><th>Property</th><th>Ball screw</th><th>Lead screw</th></tr>
+<tr><td>Efficiency (eta)</td><td>~0.90</td><td>~0.35-0.45</td></tr>
+<tr><td>Drive torque for 41 N thrust, 5 mm lead</td><td>0.036 N*m</td><td>0.082 N*m</td></tr>
+<tr><td>Backdrives under gravity load</td><td>Yes, needs a brake</td><td>No, typically self-locking</td></tr>
+<tr><td>Positioning repeatability</td><td>High (rolling contact, low backlash)</td><td>Lower unless preloaded</td></tr>
+<tr><td>Relative cost</td><td>Higher</td><td>Lower</td></tr>
+</table>
+
+<h2>Choosing between them</h2>
+<ol>
+<li>Compute the thrust load with gravity and acceleration terms, as in Step 1.</li>
+<li>Convert to drive torque for both screw types using the efficiency values in Step 2, and check both against your candidate motor's continuous torque rating with a safety factor applied.</li>
+<li>If the axis is vertical or otherwise gravity-loaded and unbraked motor torque is not guaranteed at all times, check the self-locking condition. If it holds, a lead screw removes the need for a separate brake. If you need a ball screw's precision or speed anyway, budget for a holding brake or a mechanically retained fail-safe instead of relying on motor torque.</li>
+<li>For a horizontal axis with no gravity holding requirement, the decision usually comes down to efficiency, backlash, and cost, in which case a ball screw is the better default when the budget allows it, since the torque savings help more once loads scale up.</li>
+</ol>
+<p>Run the actual numbers for your mechanism before choosing. A 2 to 2.5x difference in required torque frequently costs nothing at the small end, and the self-locking question, not the efficiency spec, is what usually decides whether you need a brake circuit at all.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
