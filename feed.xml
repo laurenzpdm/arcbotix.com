@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 21 Jul 2026 08:54:25 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 21 Jul 2026 16:57:05 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Sliding Mode Control for Robot Arm Joints: A Worked Numeric Example</title>
+      <link>https://arcbotix.com/blog/posts/sliding-mode-control-robot-arm-joint-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/sliding-mode-control-robot-arm-joint-worked-example.html</guid>
+      <pubDate>Tue, 21 Jul 2026 16:56:54 +0000</pubDate>
+      <description>Sliding mode control for a robot arm joint explained with real numbers: sizing the sliding surface, the switching gain, and the boundary layer that kills chattering.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Ball Screw vs Lead Screw for a Robot Linear Actuator: A Worked Torque Sizing Example</title>
       <link>https://arcbotix.com/blog/posts/ball-screw-vs-lead-screw-robot-linear-actuator-sizing.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html</guid>
       <pubDate>Wed, 15 Jul 2026 15:54:36 +0000</pubDate>
       <description>Real-time considerations in robot control loops explained with a jitter budget formula, timer code, and the gain margin math that connects timing to stability.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Robot Arm Gravity Compensation: A Worked Torque Calculation Example</title>
-      <link>https://arcbotix.com/blog/posts/robot-arm-gravity-compensation-worked-example.html</link>
-      <guid>https://arcbotix.com/blog/posts/robot-arm-gravity-compensation-worked-example.html</guid>
-      <pubDate>Tue, 14 Jul 2026 10:32:49 +0000</pubDate>
-      <description>Robot arm gravity compensation explained with a real formula: computing joint torque from mass, link length, and angle, then adding it as a PD feedforward term.</description>
       <category>Control Systems</category>
     </item>
   </channel>

@@ -247,6 +247,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/sliding-mode-control-robot-arm-joint-worked-example.html</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/stepper-motor-microstepping-explained.html</loc>
     <lastmod>2026-07-11</lastmod>
     <changefreq>monthly</changefreq>
