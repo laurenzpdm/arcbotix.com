@@ -6,6 +6,11 @@ only the most recent entries, so older ones matter less over time - that's fine.
 
 ## Research Entries
 
+### 2026-07-21
+- Candidates checked: sliding mode control for robot arms (backup candidate, only academic papers and IEEE/ScienceDirect abstracts, no accessible hobbyist worked example, gap still confirmed but scoping the chattering/boundary-layer math tightly enough for 800-1300 words is risky this cycle), cycloidal drive gearboxes (Firgelli and patsnap already give the L/(P-L) ratio formula and a general explanation, moderate overlap risk with the published harmonic-drive-vs-planetary-gearbox article), ball screw vs lead screw actuator sizing (still generic industrial-catalog level, confirmed again as backup only), NVIDIA Isaac Sim getting started (official NVIDIA docs and DLI course already cover a full step-by-step first-robot tutorial thoroughly, saturated for the generic angle), robot arm TCP (tool center point) pivot calibration.
+- Chose "Tool Center Point (TCP) Pivot Calibration: A Worked Least-Squares Example": PickNik MoveIt Pro docs, control.com, and Hirebotics all describe the standard "teach 3-4 poses around a fixed point" procedure conceptually and say software "calculates" the offset, but none show the actual linear algebra.
+- Weakness in current top pages: no page walks through setting up the least-squares system from multiple recorded end-effector poses (rotation matrices plus translation vectors) and solving for the actual TCP offset vector, or explains the common failure symptom (tool tip appears to swing in a cone during pure reorientation moves) that tells a builder their TCP offset is wrong.
+
 ### 2026-07-20 (2)
 - Candidates checked: Denavit-Hartenberg parameters worked example (still saturated per repeated prior entries, confirmed again), PID anti-windup/actuator saturation for robot arms (arXiv papers and a Simulink/Medium writeup already explain clamping vs back-calculation clearly at a generic-control-theory level), ball screw vs lead screw actuator sizing (still generic industrial-catalog level per 2026-07-20 strategy note, viable backup), RS-485/Modbus wiring for robot joint networks.
 - Chose "RS-485/Modbus for robot joint networks: wiring, addressing, and polling-rate budget": top pages (Schneider Electric, Ozeki, Measurlogic, electrical-engineering-portal) cover generic RS-485 cabling rules (twisted pair, 120-ohm termination, A/B polarity, 32-device limit) for building-automation contexts, not robot joints.
@@ -125,6 +130,20 @@ the current top-ranking pages for that query.)
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Strategy Adjustments
+
+### 2026-07-21
+- Deprioritized the "joint network protocol" angle within cluster 2 in
+  blog/_BLOG_STRATEGY.md Topic Priority. Reviewed the last 10 published
+  articles (31-40): three of them in a row picked a joint network protocol
+  (CAN bus 2026-07-16, EtherCAT 2026-07-20, RS-485/Modbus 2026-07-20(2)),
+  covering the three fieldbuses actually used in robot joint networks -
+  further picks in this specific angle now risk self-saturation rather than
+  finding a real external gap. The same 10-article window also showed
+  cluster 2/Hardware at 5 of 10 and cluster 1/Control Systems at only 1 of
+  10 (ZMP), a reversal from the 2026-07-19 audit's balance (5 Control, 4
+  Hardware). Rebalanced the priority list to favor cluster 1 for the next
+  several cycles, with sliding mode control noted as the current backup
+  candidate (2026-07-21 research entry).
 
 ### 2026-07-19
 - No change - reviewed the last 10 published articles (26-35) and all research

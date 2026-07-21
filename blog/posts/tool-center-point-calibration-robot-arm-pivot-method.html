@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example – Arcbotix</title>
+  <meta name="description" content="TCP calibration for robot arms explained with an actual worked pivot-calibration example: the least-squares math behind the offset, not just the procedure.">
+  <meta name="keywords" content="TCP calibration robot arm, tool center point calibration, pivot calibration robot arm, TCP offset least squares">
+  <meta property="og:title" content="Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example">
+  <meta property="og:description" content="TCP calibration for robot arms explained with an actual worked pivot-calibration example: the least-squares math behind the offset, not just the procedure.">
+  <meta property="og:image" content="/blog/posts/img/tool-center-point-calibration-robot-arm-pivot-method.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/tool-center-point-calibration-robot-arm-pivot-method.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/tool-center-point-calibration-robot-arm-pivot-method.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-21">July 21, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example</h1>
+    <p class="blog-post-subtitle">The pivot-point teaching procedure everyone describes, and the least-squares math nobody shows.</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/tool-center-point-calibration-robot-arm-pivot-method.webp" alt="Isometric illustration of a robot arm tool tip touching a fixed reference pin from several rotated orientations, showing pivot calibration" loading="lazy">
+    </div>
+
+    <p>Every motion command a robot controller executes internally targets the flange, the mounting plate at the end of the last joint. But you almost never care where the flange is. You care where the tool tip is: the welding electrode, the gripper fingertip, the router bit. TCP calibration is the step that tells the controller the fixed offset between those two points, so that every jog, waypoint, and path you teach actually happens where the tool touches the work, not where the flange happens to be.</p>
+<p>Get this offset wrong and the symptom is distinctive: command a pure reorientation move, rotating the wrist in place with no translation, and instead of staying still the tool tip swings through a small cone or arc. That happens because the controller is rotating the flange correctly, but it is rotating around the wrong point, since it does not know where the real tip is relative to the flange.</p>
+<h2>What TCP Calibration Actually Solves For</h2>
+<p>Let <code>p_flange</code> be the flange position in the robot's base frame and <code>R_flange</code> be the 3x3 rotation matrix describing the flange orientation, both of which the controller always knows from forward kinematics. The tool tip position in the base frame is:</p>
+<blockquote>p_tip = p_flange + R_flange * t</blockquote>
+<p>where <code>t</code> is the unknown offset vector, expressed in the flange's own coordinate frame, from the flange origin to the tool tip. TCP calibration is nothing more than solving for <code>t</code>. Once you have it, the controller can add <code>R_flange * t</code> to every planned flange pose and command paths in tool-tip coordinates instead of flange coordinates.</p>
+<h2>The Pivot Calibration Procedure</h2>
+<p>The standard approach, sometimes called the four-point or pivot method, is simple to describe: pick any fixed point in space, a pin tip, a scribed mark, the corner of a jig, and jog the robot so the tool tip touches that exact point. Record the flange pose. Then rotate the wrist to a substantially different orientation, jog again until the tip touches the same fixed point, and record that pose too. Repeat for three or four total poses, spanning as much orientation diversity as the wrist allows.</p>
+<p>Every vendor's documentation stops there and says the software calculates the offset. It does, but the calculation is a small least-squares problem you can set up yourself, which is useful both for understanding why four poses beat two and for sanity-checking a calibration that looks suspicious.</p>
+<h2>Setting Up the Least-Squares System</h2>
+<p>Since the tool tip touches the same physical point <code>p_fixed</code> in every pose, each recorded pose <code>i</code> gives:</p>
+<blockquote>p_flange_i + R_i * t = p_fixed</blockquote>
+<p>Both <code>t</code> and <code>p_fixed</code> are unknown, six unknowns total in 3D. Rearranged into standard linear form:</p>
+<blockquote>R_i * t - p_fixed = -p_flange_i</blockquote>
+<p>Stack this for N poses into a big matrix equation <code>A x = b</code>, where <code>x = [t; p_fixed]</code>, and solve with the normal equations <code>x = (A^T A)^-1 A^T b</code>. Two poses give six equations for six unknowns, technically solvable, but in practice unreliable because measurement noise has nowhere to average out. Three or four poses with the wrist rotated through clearly different, non-parallel axes is the practical minimum for a repeatable calibration.</p>
+<h2>A Worked Numeric Example</h2>
+<p>To keep the arithmetic checkable by hand, work the planar case: a wrist that only rotates about one axis, with the tool offset and fixed point both in that plane. The 3D case is the same idea with a full rotation matrix instead of a 2D one.</p>
+<p>Suppose the true (unknown to us, known to the simulation) tool offset is <code>tx = 50 mm</code>, <code>ty = 0 mm</code> in the flange frame, and the fixed pin is at <code>p_fixed = (400, 150) mm</code>. Teaching four poses 90 degrees apart gives these recorded flange positions:</p>
+<ul>
+<li>theta = 0 deg: flange at (350.0, 150.0) mm</li>
+<li>theta = 90 deg: flange at (400.0, 100.0) mm</li>
+<li>theta = 180 deg: flange at (450.4, 149.6) mm (0.4 mm off due to teach-pendant jog resolution)</li>
+<li>theta = 270 deg: flange at (400.0, 200.0) mm</li>
+</ul>
+<p>Poses 180 degrees apart give a shortcut worth knowing: since <code>R(theta+180) * t = -R(theta) * t</code>, the offset term cancels when you average opposite poses, leaving <code>p_fixed</code> directly.</p>
+<ol>
+<li>Average pose 1 and pose 3: ((350.0+450.4)/2, (150.0+149.6)/2) = (400.2, 149.8) mm</li>
+<li>Average pose 2 and pose 4: ((400.0+400.0)/2, (100.0+200.0)/2) = (400.0, 150.0) mm</li>
+<li>Average both estimates: p_fixed = (400.1, 149.9) mm</li>
+</ol>
+<p>The true fixed point was (400, 150) mm, so this estimate is off by about 0.14 mm, entirely attributable to the 0.4 mm jog error in pose 3. Now solve for <code>t</code> using pose 1: <code>t = p_fixed - p_flange_1 = (400.1 - 350.0, 149.9 - 150.0) = (50.1, -0.1) mm</code>, close to the true (50, 0) mm. A full least-squares solve using all four poses together, rather than just averaging opposite pairs, would spread that 0.4 mm error across all four residuals instead of concentrating it in one pair, which is the real reason four-plus poses outperform the minimum.</p>
+<h3>Reading the Residual</h3>
+<p>After solving, plug your estimated <code>t</code> and <code>p_fixed</code> back into the original equations for every pose and check the residual, the leftover error at each pose. A residual under roughly 0.2 to 0.5 mm across all poses is typical for a rigid tool mount and a careful jog. If one pose has a residual several times larger than the others, that pose was probably mistaught, or the tool is not actually rigid, a loose collet or a bent probe will produce exactly this kind of outlier.</p>
+<blockquote>If the residual is small for three poses but large for a fourth, re-teach that one pose before trusting the calibration. Averaging a bad pose into a least-squares fit hides the error instead of fixing it.</blockquote>
+<p>This TCP offset feeds directly into whatever inverse kinematics solver plans your paths, since path waypoints are specified at the tool tip and must be converted back to a flange target before the solver runs. It is a similar layered-calibration idea to <a href="/blog/posts/robot-arm-homing-limit-switches-encoder-offset.html">homing a joint's encoder offset</a>: one calibration establishes where zero is at the joint level, this one establishes where the working point is at the tool level, and both have to be right before any taught path means what you think it means.</p>
+<h2>Practical Notes</h2>
+<ul>
+<li>Use as much orientation spread as the wrist allows. Poses that only differ by a small rotation angle make the rotation matrices nearly identical, which makes the least-squares system poorly conditioned and amplifies noise into the solution.</li>
+<li>Re-run the calibration whenever the tool is removed and reinstalled, even onto the same mount. A collet or quick-change coupler rarely returns to the exact same seated position twice.</li>
+<li>For tools with a meaningful orientation component (a spray nozzle, a laser), pivot calibration alone only gives you the translational offset. A second step, aligning a reference axis of the tool to a known direction, is needed to fix the rotational part of the tool frame.</li>
+</ul>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

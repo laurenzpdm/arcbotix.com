@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 40
-- Last published: 2026-07-20
+- Total articles: 41
+- Last published: 2026-07-21
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 41 | 2026-07-21 | tool-center-point-calibration-robot-arm-pivot-method | Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example | TCP calibration robot arm, tool center point calibration, pivot calibration robot arm, TCP offset least squares | Control Systems | Explains TCP (tool center point) calibration for robot arms via the pivot calibration method: the p_tip = p_flange + R_flange * t relationship, the least-squares setup for solving the unknown offset vector t and fixed pivot point from multiple recorded flange poses, and a worked planar numeric example (true offset tx=50mm, ty=0mm, fixed point at 400,150mm) using 4 poses 90 degrees apart including a 0.4mm teach error, showing the opposite-pose-averaging shortcut and how to read the residual to catch a bad pose or loose tool mount. Notes the 'tool tip swings in a cone during pure reorientation' symptom of a wrong TCP offset. |
 | 40 | 2026-07-20 | rs485-modbus-robot-joint-network-wiring-polling-budget | RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget | RS-485 Modbus robot joint network, Modbus RTU polling rate calculation, RS-485 wiring robot arm, Modbus robot joint addressing | Hardware | Explains RS-485/Modbus RTU wiring for daisy-chained robot joint drivers (twisted pair, 120-ohm termination, bias resistors, addressing) and works through the frame-time math (11 bits/char, baud rate, turnaround delay) to compute achievable polling rate for a 6-joint arm at 115200 and 460800 baud, comparing scaling limits against the site's existing CAN bus and EtherCAT articles. |
 | 39 | 2026-07-20 | ethercat-robot-joint-network-cycle-time-budget | EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works | EtherCAT for robot joint networks, EtherCAT cycle time calculation, EtherCAT vs CANopen robotics, EtherCAT robot arm axis count | Hardware | Worked-example article explaining EtherCAT for multi-joint robot arm networks: why EtherCAT processes frames on the fly instead of arbitrating like CAN, the four components of a cycle-time budget (frame transmission time at 100 Mbit/s, per-slave forwarding delay, cable propagation delay, master/application processing time), and a full worked calculation for a 6-DOF arm with 6 joint drives showing roughly 20.4 microseconds of wire time against a 1 kHz (1000 microsecond) cycle. Covers where the budget actually breaks in practice: faster cycle rates (4 kHz), larger PDO payloads per slave, and non-real-time master jitter as the real limiting factors rather than axis count alone. Links to the CAN bus joint network article for a contrasting protocol and to the real-time control loop article for how to budget the remaining cycle time. |
 | 38 | 2026-07-20 | zero-moment-point-legged-robot-balance-worked-example | Zero Moment Point for Legged Robot Balance: A Worked Numeric Example | zero moment point legged robot, ZMP stability criterion, ZMP worked example, legged robot balance control | Control Systems | Explains the zero moment point (ZMP) stability criterion for legged robots. Derives the linear inverted pendulum ZMP formula (x_zmp = x_com - (z_com/g)*x_com_ddot), works a numeric example for a quadruped in single-support trot stance (z_com=0.18m, x_com=0.02m, x_com_ddot=0.6 m/s^2, giving x_zmp=0.009m), shows how to check the result against the support polygon with a safety margin, and covers where the linear ZMP approximation breaks down (large CoM height changes, soft terrain, airborne gaits). Links to the LQR control article as the regulator that would track ZMP to the support polygon center. |
@@ -211,3 +212,6 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 40)
 - rs485-modbus-robot-joint-network-wiring-polling-budget -> can-bus-robot-joint-network-wiring-bit-timing (compares Modbus RTU's poll-and-wait model to CAN's arbitration-based broadcast timing)
 - rs485-modbus-robot-joint-network-wiring-polling-budget -> ethercat-robot-joint-network-cycle-time-budget (compares Modbus RTU scaling limits to EtherCAT's on-the-fly frame processing)
+
+## Internal links (article 41)
+- tool-center-point-calibration-robot-arm-pivot-method -> robot-arm-homing-limit-switches-encoder-offset (both are layered calibration steps (joint-level home offset vs tool-level TCP offset) needed before a taught path means what you think it means)

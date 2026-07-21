@@ -86,6 +86,17 @@ research log entry; no rationale, no edit.
   worked-numeric hardware/sizing angle instead - series elastic actuators
   is a noted backup candidate (2026-07-17b) once a concrete spring-stiffness
   example can be scoped tightly.
+- Within cluster 2, the "joint network protocol" angle (CAN bus - chosen
+  2026-07-16, EtherCAT - chosen 2026-07-20, RS-485/Modbus - chosen
+  2026-07-20(2)) has now covered the three major fieldbuses used in robot
+  joint networks back to back. Deprioritize further network-protocol picks
+  for a few cycles - further picks here risk self-saturation from our own
+  coverage rather than a real external gap. Articles 31-40 also skewed
+  heavily to cluster 2/Hardware (5 of 10) with cluster 1/Control Systems
+  underrepresented (1 of 10) - favor cluster 1 worked-numeric angles for the
+  next several cycles (sliding mode control remains the noted backup per the
+  2026-07-21 entry) and non-networking cluster 2 angles (actuators, sensors)
+  over another protocol piece.
 
 ## Image Prompt Style
 Cover images should look like clean technical illustrations, not stock-photo
