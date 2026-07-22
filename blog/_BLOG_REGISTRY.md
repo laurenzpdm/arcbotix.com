@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 43
-- Last published: 2026-07-21
+- Total articles: 44
+- Last published: 2026-07-22
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 44 | 2026-07-22 | robot-joint-velocity-estimation-encoder-counts | Robot Joint Velocity Estimation from Encoder Counts: Why Finite Differences Get Noisy | robot joint velocity estimation, encoder velocity estimation, finite difference encoder noise, velocity tracking loop observer | Control Systems | Practical guide to estimating robot joint velocity from incremental encoder counts. Works the quantization arithmetic for a 2048-line quadrature encoder at 1 kHz (one-count step = 0.767 rad/s = 44 deg/s) and shows why a joint moving at 10 deg/s produces a raw finite difference toggling between 0 and 44 deg/s. Compares four estimators with numbers: N-sample windowed difference (N=16: 2.7 deg/s resolution, 7.5 ms delay), first-order low-pass filtered dirty derivative (25 Hz cutoff, a=0.855), 1/T edge timing (0.02% error at 10 deg/s with 1 us capture, fails at high count rates), and a PLL-style tracking loop observer (Kp=2*zeta*wn, Ki=wn^2, worked gains for wn=2*pi*25, zero steady-state lag at constant velocity). Ends with a selection guide by speed range and loop bandwidth. |
 | 43 | 2026-07-21 | sliding-mode-control-robot-arm-joint-worked-example | Sliding Mode Control for Robot Arm Joints: A Worked Numeric Example | sliding mode control robot arm, sliding mode control worked example, chattering sliding mode control, boundary layer sliding mode robotics | Control Systems | Worked numeric example of sliding mode control for a single robot arm joint: models the joint as a second-order system with inertia/friction mismatch and a bounded disturbance torque, derives the sliding surface s = e_dot + lambda*e, sizes lambda from a settling-time target, derives the equivalent-control-plus-switching-term control law, sizes the switching gain K from worst-case disturbance and model mismatch using real numbers, and sizes a boundary layer phi (saturation function replacing sign(s)) to eliminate chattering while bounding steady-state error to encoder resolution. Ends with a comparison of when to use SMC vs PID vs computed torque control. |
 | 42 | 2026-07-21 | ball-screw-vs-lead-screw-robot-linear-actuator-sizing | Ball Screw vs Lead Screw for a Robot Linear Actuator: A Worked Torque Sizing Example | ball screw vs lead screw, robot linear actuator sizing, lead screw torque calculation, ball screw backdrive robot arm | Build Guides | Worked torque sizing example comparing a ball screw and a lead screw for a robot's Z-axis linear lift actuator. Computes thrust force from mass, gravity, and acceleration, converts to drive torque for both screw types via the standard T = F*L/(2*pi*eta) relation with real efficiency values, then explains why the self-locking/backdrive distinction (checked via the lead angle vs thread friction angle) usually decides the choice more than the torque gap does for lightly loaded axes. Includes a comparison table and a step-by-step selection procedure. |
 | 41 | 2026-07-21 | tool-center-point-calibration-robot-arm-pivot-method | Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example | TCP calibration robot arm, tool center point calibration, pivot calibration robot arm, TCP offset least squares | Control Systems | Explains TCP (tool center point) calibration for robot arms via the pivot calibration method: the p_tip = p_flange + R_flange * t relationship, the least-squares setup for solving the unknown offset vector t and fixed pivot point from multiple recorded flange poses, and a worked planar numeric example (true offset tx=50mm, ty=0mm, fixed point at 400,150mm) using 4 poses 90 degrees apart including a 0.4mm teach error, showing the opposite-pose-averaging shortcut and how to read the residual to catch a bad pose or loose tool mount. Notes the 'tool tip swings in a cone during pure reorientation' symptom of a wrong TCP offset. |
@@ -225,3 +226,8 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 43)
 - sliding-mode-control-robot-arm-joint-worked-example -> computed-torque-control-robot-arm-worked-example (both use a model-based feedforward plus correction term structure)
 - sliding-mode-control-robot-arm-joint-worked-example -> robot-arm-joint-friction-compensation-coulomb-viscous (SMC's robustness margin absorbs the friction uncertainty discussed there)
+
+## Internal links (article 44)
+- robot-joint-velocity-estimation-encoder-counts -> quadrature-encoder-wiring-6dof-robot-arm (electrical noise on A/B lines creates false counts no estimator can fix; wiring guide covers signal integrity)
+- robot-joint-velocity-estimation-encoder-counts -> absolute-vs-incremental-encoder-robot-joint-resolution (encoder resolution sizing determines the one-count velocity step; natural companion article)
+- absolute-vs-incremental-encoder-robot-joint-resolution -> robot-joint-velocity-estimation-encoder-counts (backlink added in the velocity-estimation constraint paragraph)
