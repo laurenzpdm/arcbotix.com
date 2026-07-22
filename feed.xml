@@ -5,8 +5,24 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 21 Jul 2026 16:57:05 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 22 Jul 2026 01:01:44 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Robot Joint Velocity Estimation from Encoder Counts: Why Finite Differences Get Noisy</title>
+      <link>https://arcbotix.com/blog/posts/robot-joint-velocity-estimation-encoder-counts.html</link>
+      <guid>https://arcbotix.com/blog/posts/robot-joint-velocity-estimation-encoder-counts.html</guid>
+      <pubDate>Wed, 22 Jul 2026 01:01:18 +0000</pubDate>
+      <description>Robot joint velocity estimation from encoder counts: worked quantization noise math, windowed differences, 1/T timing, and a tracking loop observer.</description>
+      <category>Control Systems</category>
+    </item>
+    <item>
+      <title>Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need</title>
+      <link>https://arcbotix.com/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html</link>
+      <guid>https://arcbotix.com/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html</guid>
+      <pubDate>Wed, 22 Jul 2026 01:01:07 +0000</pubDate>
+      <description>Absolute vs incremental encoder for robot joints, explained with a worked example: converting a target joint accuracy into encoder bits, PPR, and gear ratio.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>Sliding Mode Control for Robot Arm Joints: A Worked Numeric Example</title>
       <link>https://arcbotix.com/blog/posts/sliding-mode-control-robot-arm-joint-worked-example.html</link>
@@ -128,14 +144,6 @@
       <category>Control Systems</category>
     </item>
     <item>
-      <title>Absolute vs Incremental Encoders for Robot Joints: How to Size the Resolution You Actually Need</title>
-      <link>https://arcbotix.com/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html</link>
-      <guid>https://arcbotix.com/blog/posts/absolute-vs-incremental-encoder-robot-joint-resolution.html</guid>
-      <pubDate>Fri, 17 Jul 2026 00:09:25 +0000</pubDate>
-      <description>Absolute vs incremental encoder for robot joints, explained with a worked example: converting a target joint accuracy into encoder bits, PPR, and gear ratio.</description>
-      <category>Hardware</category>
-    </item>
-    <item>
       <title>Impedance Control vs Admittance Control for Robot Arms: A Worked Numeric Example</title>
       <link>https://arcbotix.com/blog/posts/impedance-vs-admittance-control-robot-arm.html</link>
       <guid>https://arcbotix.com/blog/posts/impedance-vs-admittance-control-robot-arm.html</guid>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/computed-torque-control-robot-arm-worked-example.html</guid>
       <pubDate>Wed, 15 Jul 2026 23:57:48 +0000</pubDate>
       <description>Computed torque control explained with real numbers: canceling a two-link arm's nonlinear dynamics and reducing tracking error to a simple double integrator.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>Real-Time Considerations in Robot Control Loops: Budgeting Jitter and Choosing Your Loop Rate</title>
-      <link>https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html</link>
-      <guid>https://arcbotix.com/blog/posts/real-time-considerations-robot-control-loops.html</guid>
-      <pubDate>Wed, 15 Jul 2026 15:54:36 +0000</pubDate>
-      <description>Real-time considerations in robot control loops explained with a jitter budget formula, timer code, and the gain margin math that connects timing to stability.</description>
       <category>Control Systems</category>
     </item>
   </channel>
