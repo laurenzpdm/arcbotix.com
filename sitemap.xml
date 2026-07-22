@@ -62,7 +62,7 @@
   </url>
   <url>
     <loc>https://arcbotix.com/blog/posts/differential-drive-robot-kinematics-odometry.html</loc>
-    <lastmod>2026-07-11</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -123,6 +123,12 @@
   <url>
     <loc>https://arcbotix.com/blog/posts/lqr-control-robot-arm-practical-introduction.html</loc>
     <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://arcbotix.com/blog/posts/mecanum-wheel-robot-kinematics-worked-example.html</loc>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

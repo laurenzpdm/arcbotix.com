@@ -5,8 +5,24 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 22 Jul 2026 01:01:44 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 22 Jul 2026 09:06:54 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Mecanum Wheel Kinematics: A Worked Example from Velocity Command to Wheel Speeds</title>
+      <link>https://arcbotix.com/blog/posts/mecanum-wheel-robot-kinematics-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/mecanum-wheel-robot-kinematics-worked-example.html</guid>
+      <pubDate>Wed, 22 Jul 2026 09:06:22 +0000</pubDate>
+      <description>Mecanum wheel kinematics with real numbers: the inverse kinematics equations, wheel speeds in rad/s and RPM, normalization, and why strafing drifts.</description>
+      <category>Control Systems</category>
+    </item>
+    <item>
+      <title>Differential Drive Robot Kinematics and Wheel Odometry: A Worked Example</title>
+      <link>https://arcbotix.com/blog/posts/differential-drive-robot-kinematics-odometry.html</link>
+      <guid>https://arcbotix.com/blog/posts/differential-drive-robot-kinematics-odometry.html</guid>
+      <pubDate>Wed, 22 Jul 2026 09:06:17 +0000</pubDate>
+      <description>Differential drive robot kinematics explained with the full odometry derivation, real encoder numbers, and a worked example showing how drift accumulates.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Robot Joint Velocity Estimation from Encoder Counts: Why Finite Differences Get Noisy</title>
       <link>https://arcbotix.com/blog/posts/robot-joint-velocity-estimation-encoder-counts.html</link>
@@ -149,22 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/impedance-vs-admittance-control-robot-arm.html</guid>
       <pubDate>Thu, 16 Jul 2026 16:06:49 +0000</pubDate>
       <description>Impedance control vs admittance control explained with a worked one-DOF mass-spring-damper example, real numbers, and which one fits your robot arm hardware.</description>
-      <category>Control Systems</category>
-    </item>
-    <item>
-      <title>CAN Bus for Robot Joint Networks: Wiring, Bit Timing, and Bus Load Explained</title>
-      <link>https://arcbotix.com/blog/posts/can-bus-robot-joint-network-wiring-bit-timing.html</link>
-      <guid>https://arcbotix.com/blog/posts/can-bus-robot-joint-network-wiring-bit-timing.html</guid>
-      <pubDate>Thu, 16 Jul 2026 08:02:13 +0000</pubDate>
-      <description>A worked example of CAN bus for robot joint networks: termination placement, bit-timing calculation for cable length, and bus-load arithmetic for a 6-joint arm.</description>
-      <category>Hardware</category>
-    </item>
-    <item>
-      <title>Computed Torque Control for Robot Arms: A Worked Numeric Example</title>
-      <link>https://arcbotix.com/blog/posts/computed-torque-control-robot-arm-worked-example.html</link>
-      <guid>https://arcbotix.com/blog/posts/computed-torque-control-robot-arm-worked-example.html</guid>
-      <pubDate>Wed, 15 Jul 2026 23:57:48 +0000</pubDate>
-      <description>Computed torque control explained with real numbers: canceling a two-link arm's nonlinear dynamics and reducing tracking error to a simple double integrator.</description>
       <category>Control Systems</category>
     </item>
   </channel>
