@@ -131,6 +131,18 @@ the current top-ranking pages for that query.)
 
 ## Strategy Adjustments
 
+### 2026-07-22
+- Rebalanced back after the cluster-1 push: added one line to
+  blog/_BLOG_STRATEGY.md Topic Priority deprioritizing further cluster 1
+  picks for a few cycles. Basis: the 2026-07-21 audit favored cluster 1, and
+  articles 41-46 then came out 5 of 6 Control Systems (TCP calibration,
+  sliding mode, encoder velocity estimation, mecanum kinematics, PID
+  anti-windup), inverting the imbalance the 2026-07-21 audit was correcting.
+  Meanwhile research entries kept confirming hardware-side gaps that were
+  never picked: DC motor parameter identification (2026-07-22b, 2026-07-22c)
+  and H-bridge deadtime (2026-07-18, 2026-07-18b, 2026-07-19). Favor
+  non-networking cluster 2 and cluster 4 worked-numeric angles next.
+
 ### 2026-07-21
 - Deprioritized the "joint network protocol" angle within cluster 2 in
   blog/_BLOG_STRATEGY.md Topic Priority. Reviewed the last 10 published

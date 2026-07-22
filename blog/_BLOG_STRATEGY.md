@@ -97,6 +97,15 @@ research log entry; no rationale, no edit.
   next several cycles (sliding mode control remains the noted backup per the
   2026-07-21 entry) and non-networking cluster 2 angles (actuators, sensors)
   over another protocol piece.
+- The 2026-07-21 cluster-1 push is complete - articles 41-46 came out 5 of 6
+  Control Systems (TCP calibration, sliding mode, velocity estimation,
+  mecanum kinematics, PID anti-windup), inverting the earlier imbalance.
+  Deprioritize further cluster 1 picks for a few cycles and favor
+  non-networking cluster 2 and cluster 4 worked-numeric angles instead.
+  Confirmed-but-never-picked backups to draw from: DC motor parameter
+  identification via Kt/Ke/R/J bench tests (2026-07-22b, 2026-07-22c) and
+  H-bridge deadtime/shoot-through sizing (2026-07-18, 2026-07-18b,
+  2026-07-19). (added 2026-07-22 audit at article 45/46)
 
 ## Image Prompt Style
 Cover images should look like clean technical illustrations, not stock-photo
