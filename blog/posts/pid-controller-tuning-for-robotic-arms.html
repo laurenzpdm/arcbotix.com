@@ -142,7 +142,7 @@ last_error = error
 <p>The joint settles just short of or past the target when holding a static load. This is the textbook symptom of insufficient Ki. Add a small amount of integral gain, and consider a feedforward gravity compensation term if the payload varies significantly, since a large Ki to fight a large, predictable disturbance also makes the loop more prone to windup.</p>
 
 <h3>Integral Windup</h3>
-<p>If the joint is mechanically blocked or the error stays large for a long period, the integral term can accumulate an enormous value, causing a large overshoot once the obstruction clears. Clamp the integral term to a maximum value (anti-windup clamping), or freeze integration whenever the output is saturated.</p>
+<p>If the joint is mechanically blocked or the error stays large for a long period, the integral term can accumulate an enormous value, causing a large overshoot once the obstruction clears. Clamp the integral term to a maximum value (anti-windup clamping), or freeze integration whenever the output is saturated. For a worked numeric example of how much torque a wound-up integrator can store and the standard clamping and back-calculation fixes in code, see our guide to <a href="/blog/posts/pid-anti-windup-robot-joint-worked-example.html">PID anti-windup for robot joints</a>.</p>
 
 <h3>High-Frequency Jitter</h3>
 <p>A buzzing or vibrating joint at standstill usually means Kd is amplifying encoder quantization noise. Lowering Kd, or low-pass filtering the derivative term before applying the gain, usually resolves this without sacrificing much damping.</p>

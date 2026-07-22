@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>PID Anti-Windup for Robot Joints: A Worked Integrator Windup Example – Arcbotix</title>
+  <meta name="description" content="A worked PID anti-windup example for robot joints: how integrator windup causes overshoot at the torque limit, with clamping and back-calculation code.">
+  <meta name="keywords" content="PID anti-windup robot joint, integrator windup PID, back-calculation anti-windup, PID clamping conditional integration">
+  <meta property="og:title" content="PID Anti-Windup for Robot Joints: A Worked Integrator Windup Example">
+  <meta property="og:description" content="A worked PID anti-windup example for robot joints: how integrator windup causes overshoot at the torque limit, with clamping and back-calculation code.">
+  <meta property="og:image" content="/blog/posts/img/pid-anti-windup-robot-joint-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/pid-anti-windup-robot-joint-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/pid-anti-windup-robot-joint-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-22">July 22, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">PID Anti-Windup for Robot Joints: A Worked Integrator Windup Example</h1>
+    <p class="blog-post-subtitle">Why a saturated joint overshoots long after the error is gone, computed with real numbers, and the two standard fixes in drop-in code</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/pid-anti-windup-robot-joint-worked-example.webp" alt="Isometric 3D illustration of a robotic arm joint pressed against a glowing limit stop with an overfilled integrator node in a feedback loop behind it" loading="lazy">
+    </div>
+
+    <p>Every real robot joint has a torque limit. The motor driver clamps current, the bus voltage caps speed, and the gearbox has a rated torque you should not exceed. Your PID controller, however, knows nothing about any of that. Command a large step and the controller happily asks for ten times what the actuator can deliver, the output clamps, and the integral term keeps accumulating error the whole time. That stored integral is called windup, and it is why a saturated joint blows past its target and takes ages to settle. This article works through the arithmetic on a concrete joint, then adds the two standard fixes, clamping and back-calculation, as code you can drop into a 1 kHz loop.</p><h2>What PID Anti-Windup Fixes: The Integrator at the Torque Limit</h2><p>PID anti-windup addresses one specific failure: the integrator integrating error while the actuator is saturated and physically cannot respond to it. During saturation the feedback loop is effectively broken. The plant gets a constant maximum torque no matter what the controller computes, so the extra integral action does nothing useful now, but it is stored. The moment the error finally shrinks or changes sign, that stored command is still there, pushing the joint past the target until enough negative error has accumulated to drain it back out.</p><p>The symptom on a bench is distinctive: the joint launches toward the setpoint at full torque, sails through it, parks noticeably past the target, and then creeps back over several hundred milliseconds. If you have tuned gains using our guide to <a href="/blog/posts/pid-controller-tuning-for-robotic-arms.html">PID controller tuning for robotic arms</a> and still see this behavior on large steps but not small ones, windup is the first thing to check, because small steps never saturate the actuator.</p><h2>A Worked Example: A 1.0 rad Step into a 4 N m Torque Limit</h2><p>Take a single joint with these numbers:</p><ul><li>Reflected inertia about the joint axis: J = 0.05 kg m<sup>2</sup></li><li>Actuator torque limit: 4 N m (whichever binds first: driver current limit times torque constant times gear ratio, or the gearbox rating)</li><li>Gains: Kp = 60 N m/rad, Ki = 100 N m/(rad s), Kd = 2 N m s/rad, running at 1 kHz</li><li>Setpoint step: 1.0 rad, about 57 degrees</li></ul><p>At t = 0 the proportional term alone asks for 60 x 1.0 = 60 N m, fifteen times the limit. The driver clamps at 4 N m and the joint accelerates at 4 / 0.05 = 80 rad/s<sup>2</sup>. Starting from rest, position follows q(t) = 40 t<sup>2</sup> and the error is e(t) = 1 - 40 t<sup>2</sup>.</p><p>Now watch the integrator. The controller stays saturated until the unsaturated PID output falls back below 4 N m, which for these numbers happens at roughly t = 0.14 s. At that moment:</p><ul><li>The error is still about 0.25 rad, so the joint has not arrived yet.</li><li>The joint is moving at about 11 rad/s.</li><li>The integral of error so far is about 0.10 rad s, so the integral term holds Ki x 0.10 = 10 N m.</li></ul><p>Read that last number again: the integrator alone is commanding two and a half times the actuator's entire capability, at a moment when the joint is already flying toward the target at 11 rad/s. To discharge those 10 N m, the integrator needs to accumulate about 0.10 rad s of error on the other side of the target. If the overshoot averages 0.2 rad, that is roughly half a second spent parked on the wrong side while the integral drains. That is the slow, ugly crawl back you see on the bench.</p><blockquote><p>The stored integral is not a tuning problem. No choice of Kp, Ki, Kd fixes it, because the accumulation happens while the loop is broken by saturation. You have to tell the integrator about the limit.</p></blockquote><h2>Fix 1: Clamping (Conditional Integration)</h2><p>The simplest fix is to stop integrating whenever integration would push the output deeper into saturation:</p><pre><code># 1 kHz loop, dt = 0.001, i_state is the integral of error
+e = q_ref - q
+u_unsat = kp * e + ki * i_state + kd * (0.0 - qdot)  # D on measurement
+u = max(-u_max, min(u_max, u_unsat))
+saturated = (u != u_unsat)
+if not (saturated and e * u &gt; 0):
+    i_state += e * dt
+tau_cmd = u</code></pre><p>The condition reads: if the output is clamped and the error has the same sign as the output, freezing the integrator is the only sane option, because integrating would just demand more of what the actuator cannot give. In the worked example above, clamping keeps the integral near zero during the whole 0.14 s launch, so the controller exits saturation with essentially no stored torque and the overshoot is set by the velocity and the damping term instead of by a 10 N m surprise.</p><p>Note the derivative is computed on the measured velocity, not on the error. That avoids the derivative kick on setpoint steps, which would otherwise add its own spike into the saturation.</p><h2>Fix 2: Back-Calculation and the Tracking Time Constant</h2><p>Back-calculation is the standard scheme in industrial drives. Instead of freezing the integrator, you feed the difference between the saturated and unsaturated outputs back into it, so the integrator actively unwinds toward a value consistent with the limit:</p><pre><code>u_unsat = kp * e + ki * i_state + kd * (0.0 - qdot)
+u = max(-u_max, min(u_max, u_unsat))
+i_state += (e + (u - u_unsat) / (ki * tt)) * dt
+tau_cmd = u</code></pre><p>While unsaturated, u equals u_unsat and the extra term vanishes, so behavior is a normal PID. While saturated, (u - u_unsat) is large and negative for a positive step, and it pulls the integral state down with time constant tt.</p><p>How do you pick tt? A widely used rule of thumb takes the geometric mean of the integral and derivative times. For our gains, Ti = Kp / Ki = 0.6 s and Td = Kd / Kp = 0.033 s, so tt = sqrt(Ti x Td) is about 0.14 s. Smaller tt unwinds faster but reacts aggressively to brief saturation blips, such as a one-cycle current limit during a load spike. Larger tt drifts back toward plain windup. Anywhere between Td and Ti works; start at the geometric mean and adjust on the bench.</p><p>Compared with clamping, back-calculation is smooth, tunable, and degrades gracefully when the saturation is marginal. Clamping is simpler and has no extra parameter. Either one beats doing nothing by a wide margin.</p><h2>Robot-Specific Details: Gravity Loads and Cascaded Loops</h2><p>Two things make robot joints different from the textbook process-control setting.</p><h3>Gravity needs standing torque</h3><p>A joint holding a horizontal link needs a constant torque just to stay put, and if you provide no feedforward, the integrator is what supplies it. That is legitimate integral action, and neither fix above interferes with it, since both only act during saturation. But a joint whose integrator already carries a large gravity torque sits closer to the limit and winds up faster on top of it. The cleaner architecture is to compute the gravity term explicitly and add it outside the PID, as covered in our worked example on <a href="/blog/posts/robot-arm-gravity-compensation-worked-example.html">robot arm gravity compensation</a>. With gravity handled by feedforward, the integrator only has to cover friction and model error, and its normal operating value stays small.</p><h3>Cascaded loops saturate at every level</h3><p>Most joint controllers are cascaded: a position loop commands velocity, a velocity loop commands torque, and a current loop delivers it. Each stage has its own limit and each integrator can wind up against it. Apply anti-windup at every level, and clamp each loop's output to the same limit the next stage actually enforces, so the outer loop never believes in torque that the inner loop cannot deliver.</p><h2>Takeaways</h2><ul><li>Windup happens whenever the actuator saturates. For a joint with a 4 N m limit and ordinary gains, a 1 rad step stores an integral command of about 10 N m, and the joint pays for it in overshoot and a slow crawl back.</li><li>Clamping is three lines of code and no tuning: freeze the integrator when saturated and the error would push deeper.</li><li>Back-calculation unwinds the integrator with a tracking time constant; sqrt(Ti x Td), about 0.14 s here, is a solid starting point.</li><li>Put gravity in a feedforward term so the integrator does not carry it, and add anti-windup to every loop in a cascade.</li><li>Anti-windup does not replace trajectory planning. A ramped or planned setpoint that respects the actuator's limits avoids deep saturation in the first place, and the anti-windup then only catches disturbances.</li></ul>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
