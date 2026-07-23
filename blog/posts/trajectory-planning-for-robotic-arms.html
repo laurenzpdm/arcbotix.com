@@ -139,7 +139,7 @@
 
 <h3>S-Curve Velocity Profile</h3>
 
-<p>An S-curve profile adds a jerk-limited ramp to both the acceleration and deceleration phases, so acceleration itself changes smoothly instead of jumping. Instead of three phases, there are seven: jerk up, constant acceleration, jerk down, cruise, jerk down (into deceleration), constant deceleration, jerk up (back to zero).</p>
+<p>An S-curve profile adds a jerk-limited ramp to both the acceleration and deceleration phases, so acceleration itself changes smoothly instead of jumping. Instead of three phases, there are seven: jerk up, constant acceleration, jerk down, cruise, jerk down (into deceleration), constant deceleration, jerk up (back to zero). For the full phase-by-phase arithmetic with real numbers, see the <a href="/blog/posts/s-curve-trajectory-jerk-limited-robot-joint-worked-example.html">worked S-curve trajectory example for a robot joint</a>.</p>
 
 <p>The tradeoff is straightforward: S-curves take slightly longer to execute the same move because ramping acceleration smoothly costs time, but they produce noticeably smoother motion, less mechanical wear, and lower peak torque demand on the motor. For arms handling fragile payloads, or with backlash-prone gearboxes such as those discussed when <a href="/blog/posts/harmonic-drive-vs-planetary-gearbox.html">comparing harmonic drives to planetary gearboxes</a>, the reduction in jerk is often worth the small time penalty.</p>
 

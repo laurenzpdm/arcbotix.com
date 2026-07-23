@@ -208,8 +208,16 @@ run_blog_cycle() {
     # full registry and strategy on every cycle.
     python3 blog/_prepare_blog_context.py 2>&1 | tee -a "$LOG_FILE"
 
-    # Run Claude Code with the blog prompt
-    claude --dangerously-skip-permissions -p "$BLOG_PROMPT" 2>&1 | tee -a "$LOG_FILE"
+    # Run Claude Code with the blog prompt.
+    # --strict-mcp-config: keine MCP-Connectoren laden (Canva/Gmail/Slack/… braucht der
+    #   Blog-Cycle nie; sparte in Messungen die 43k-Prefix-Ausreisser).
+    # --tools <whitelist>: nur die Tools laden, die der Cycle tatsaechlich nutzt. Das
+    #   senkt den Prompt-Prefix, der bei JEDEM Turn erneut gelesen wird, von ~27k auf
+    #   ~8k Tokens (verifiziert 2026-07-23) — ~70% weniger statischer Overhead pro Turn,
+    #   ohne jede Verhaltensaenderung.
+    claude --dangerously-skip-permissions --strict-mcp-config \
+        --tools Bash Read Write Edit Grep Glob WebSearch WebFetch TodoWrite \
+        -p "$BLOG_PROMPT" 2>&1 | tee -a "$LOG_FILE"
 
     local exit_code=$?
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')

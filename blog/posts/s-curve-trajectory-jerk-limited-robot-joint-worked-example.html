@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>S-Curve Trajectory for a Robot Joint: A Worked Jerk-Limited Motion Profile – Arcbotix</title>
+  <meta name="description" content="Compute a jerk-limited S-curve trajectory for a robot joint step by step: the seven phases, real J/A/V numbers, phase durations, and the short-move check.">
+  <meta name="keywords" content="S-curve trajectory robot joint, jerk limited motion profile, S-curve trajectory worked example, seven phase S-curve velocity profile">
+  <meta property="og:title" content="S-Curve Trajectory for a Robot Joint: A Worked Jerk-Limited Motion Profile">
+  <meta property="og:description" content="Compute a jerk-limited S-curve trajectory for a robot joint step by step: the seven phases, real J/A/V numbers, phase durations, and the short-move check.">
+  <meta property="og:image" content="/blog/posts/img/s-curve-trajectory-jerk-limited-robot-joint-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/s-curve-trajectory-jerk-limited-robot-joint-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/s-curve-trajectory-jerk-limited-robot-joint-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-23">July 23, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">S-Curve Trajectory for a Robot Joint: A Worked Jerk-Limited Motion Profile</h1>
+    <p class="blog-post-subtitle">From jerk and acceleration limits to the seven phase durations of a real move</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/s-curve-trajectory-jerk-limited-robot-joint-worked-example.webp" alt="Technical render of a robot joint following a smooth motion path with glowing S-shaped velocity and bell-shaped acceleration curves" loading="lazy">
+    </div>
+
+    <p>A trapezoidal velocity profile is the first motion profile most builders reach for, and for good reason: it is easy to compute and it gets a joint from rest to rest in near-minimum time. But it has a hidden cost. At the corners of the trapezoid, acceleration jumps instantaneously from zero to its maximum and back. That step in acceleration is infinite jerk, and your joint feels it as a sharp jolt at the start and end of every move. The gearbox rattles, the arm tip rings, and over time the mechanical play gets worse.</p>
+<p>The fix is an <strong>S-curve trajectory</strong>: a jerk-limited motion profile that ramps the acceleration up and down smoothly instead of switching it on and off. This article works through the full seven-phase computation for a single robot joint with real numbers, then shows the check you need for short moves where the profile never reaches its limits.</p>
+<h2>What a jerk-limited S-curve trajectory actually is</h2>
+<p>The name comes from the shape of the velocity curve: instead of straight ramps, the velocity follows an S at each end. That S shape is what you get when acceleration itself ramps linearly instead of stepping. The quantity you are limiting is jerk, the derivative of acceleration.</p>
+<p>A full rest-to-rest S-curve move has seven phases:</p>
+<ol>
+<li><strong>Jerk up</strong>: acceleration rises from 0 to +A at constant jerk +J.</li>
+<li><strong>Constant acceleration</strong>: acceleration held at +A.</li>
+<li><strong>Jerk down</strong>: acceleration falls from +A to 0 at jerk -J, and velocity reaches its peak V.</li>
+<li><strong>Constant velocity (cruise)</strong>: acceleration is 0, velocity held at V.</li>
+<li><strong>Jerk down</strong>: acceleration falls from 0 to -A.</li>
+<li><strong>Constant deceleration</strong>: acceleration held at -A.</li>
+<li><strong>Jerk up</strong>: acceleration rises from -A back to 0, velocity returns to rest.</li>
+</ol>
+<p>You feed the planner three limits: the maximum jerk J, the maximum acceleration A, and the maximum velocity V. The job is to find the duration of each phase so the joint travels exactly the commanded distance L.</p>
+<h2>The worked example: a 90 degree joint move</h2>
+<p>Take one joint of a robot arm and command it to slew 90 degrees, so the target displacement is L = 1.5708 rad. Pick these limits:</p>
+<ul>
+<li>Maximum velocity V = 2.0 rad/s</li>
+<li>Maximum acceleration A = 8.0 rad/s^2</li>
+<li>Maximum jerk J = 80 rad/s^3</li>
+</ul>
+<h3>Step 1: does the profile reach maximum acceleration?</h3>
+<p>The acceleration ramp needs enough velocity room to actually reach A. The condition is V >= A^2 / J. Here A^2 / J = 64 / 80 = 0.8 rad/s, and V = 2.0 rad/s is comfortably larger, so yes, the joint reaches full acceleration A.</p>
+<h3>Step 2: the jerk phase duration</h3>
+<p>Each jerk phase ramps acceleration between 0 and A at rate J, so its duration is</p>
+<blockquote>T_j = A / J = 8.0 / 80 = 0.1 s</blockquote>
+<p>During a single jerk phase the velocity gained is 0.5 * J * T_j^2 = 0.5 * 80 * 0.01 = 0.4 rad/s. The two jerk phases of the acceleration segment (phases 1 and 3) together add A * T_j = 8.0 * 0.1 = 0.8 rad/s.</p>
+<h3>Step 3: the constant-acceleration phase duration</h3>
+<p>The joint still needs to gain V minus 0.8 = 1.2 rad/s at constant acceleration A:</p>
+<blockquote>T_a = (V - A * T_j) / A = 1.2 / 8.0 = 0.15 s</blockquote>
+<p>So the full acceleration segment takes T_acc = 2 * T_j + T_a = 0.2 + 0.15 = 0.35 s. By symmetry the deceleration segment takes the same 0.35 s.</p>
+<h3>Step 4: distance used by accelerating and decelerating</h3>
+<p>An S-curve velocity segment that runs from 0 to V is antisymmetric about its midpoint, so its average velocity is exactly V/2. The distance to accelerate up to V is therefore</p>
+<blockquote>d_acc = (V / 2) * T_acc = 1.0 * 0.35 = 0.35 rad</blockquote>
+<p>Decelerating from V back to rest uses another 0.35 rad, so the two ends consume 0.70 rad.</p>
+<h3>Step 5: is there a cruise phase?</h3>
+<p>The accel and decel segments together need 0.70 rad. The commanded move is 1.5708 rad, which is larger, so a constant-velocity phase exists. Its length is</p>
+<blockquote>d_cruise = L - 2 * d_acc = 1.5708 - 0.70 = 0.8708 rad</blockquote>
+<blockquote>T_v = d_cruise / V = 0.8708 / 2.0 = 0.4354 s</blockquote>
+<h3>Step 6: total move time</h3>
+<p>Add it up:</p>
+<blockquote>T_total = T_acc + T_v + T_dec = 0.35 + 0.4354 + 0.35 = 1.1354 s</blockquote>
+<p>That is the full jerk-limited trajectory. Compared with a trapezoidal profile using the same V and A, the S-curve costs a little extra time (the rounded corners) but keeps jerk bounded at 80 rad/s^3 everywhere instead of spiking to infinity.</p>
+<h2>The short-move check</h2>
+<p>The computation above assumed the move was long enough to reach cruise velocity V. For short moves that assumption breaks, and this is where a lot of naive planners produce garbage. There are two escalating cases:</p>
+<ul>
+<li><strong>V is never reached.</strong> If L is smaller than 2 * d_acc, the joint starts decelerating before it hits V. You must solve for a reduced peak velocity V'.</li>
+<li><strong>A is never reached either.</strong> For an even shorter move, the acceleration ramp does not have time to reach A, and the profile collapses to just the four jerk phases.</li>
+</ul>
+<p>Take the same limits but command only L = 0.5 rad. The accel plus decel distance to reach V is 0.70 rad, which is larger than 0.5, so V is not reached. Assuming A is still reached, the peak velocity V' solves a quadratic that comes from L = V' * T_j + V'^2 / A:</p>
+<blockquote>V'^2 + A * T_j * V' - A * L = 0</blockquote>
+<p>With A = 8, T_j = 0.1, L = 0.5 this gives V' = (-0.8 + sqrt(0.64 + 16)) / 2 = (-0.8 + 4.079) / 2 = 1.64 rad/s. Since 1.64 is still above A^2/J = 0.8, full acceleration is reached, so the profile has six phases (no cruise) and the total time is 2 * (T_j + V'/A) = 2 * (0.1 + 0.205) = 0.61 s. Always run this check before trusting the seven-phase result.</p>
+<h2>A compact planner in Python</h2>
+<pre><code>import math
+
+def s_curve_time(L, V, A, J):
+    Tj = A / J                      # jerk phase duration
+    if V &lt; A * A / J:               # A is never reached
+        Tj = math.sqrt(V / J)
+        A = J * Tj
+    Ta = (V - A * Tj) / A           # constant-accel duration
+    d_acc = (V / 2.0) * (2 * Tj + Ta)
+    if 2 * d_acc &gt; L:               # V is never reached, reduce peak
+        Vp = (-A * Tj + math.sqrt((A * Tj) ** 2 + 4 * A * L)) / 2.0
+        return 2 * (Tj + Vp / A), Vp
+    d_cruise = L - 2 * d_acc
+    Tv = d_cruise / V
+    return 2 * (2 * Tj + Ta) + Tv, V
+
+print(s_curve_time(1.5708, 2.0, 8.0, 80.0))  # ~ (1.135, 2.0)
+print(s_curve_time(0.5, 2.0, 8.0, 80.0))      # ~ (0.610, 1.64)
+</code></pre>
+<p>Once you have the phase durations you integrate jerk to get acceleration, velocity, and position at your control-loop rate, then feed the position setpoints to the joint controller. If you are still choosing that loop rate and its actuator torque headroom, the jerk you pick here directly sets the peak torque demand, which ties straight into <a href="robot-arm-joint-motor-gearbox-torque-sizing.html">motor and gearbox sizing for a robot arm joint</a>.</p>
+<h2>Why bother over a trapezoid</h2>
+<p>The trapezoidal profile in our <a href="trajectory-planning-for-robotic-arms.html">trajectory planning walkthrough</a> is fine for slow, stiff, lightly loaded joints. But as soon as you have a long arm, a flexible transmission, or a payload that must not slosh or wobble, bounding jerk pays off: less structural ringing, gentler gear loading, and smoother tracking. The extra few tens of milliseconds per move is almost always worth it.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

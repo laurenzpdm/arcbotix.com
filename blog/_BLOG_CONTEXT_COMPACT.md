@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 46
-- Last published: 2026-07-22
-- Known slugs: 46
+- Total articles: 47
+- Last published: 2026-07-23
+- Known slugs: 47
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 47 | 2026-07-23 | robot-arm-joint-bearing-selection-moment-load | Bearing Selection for Robot Arm Joints: A Worked Moment Load Example | bearing selection for robot arm joints, robot arm joint bearing, crossed roller bearing robot joint, moment load bearing calculation | Hardware  |
 | 46 | 2026-07-22 | pid-anti-windup-robot-joint-worked-example | PID Anti-Windup for Robot Joints: A Worked Integrator Windup Example | PID anti-windup robot joint, integrator windup PID, back-calculation anti-windup, PID clamping conditional integration | Control Systems  |
 | 45 | 2026-07-22 | mecanum-wheel-robot-kinematics-worked-example | Mecanum Wheel Kinematics: A Worked Example from Velocity Command to Wheel Speeds | mecanum wheel kinematics, mecanum wheel inverse kinematics, mecanum robot wheel speed calculation, omnidirectional robot kinematics | Control Systems  |
 | 44 | 2026-07-22 | robot-joint-velocity-estimation-encoder-counts | Robot Joint Velocity Estimation from Encoder Counts: Why Finite Differences Get Noisy | robot joint velocity estimation, encoder velocity estimation, finite difference encoder noise, velocity tracking loop observer | Control Systems  |
@@ -101,7 +102,6 @@ already covered - check the slugs and titles list before choosing.
 | 5 | 2026-07-03 | ros2-nodes-and-topics-explained | ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself | ROS2 nodes and topics explained, ROS2 topics, ROS2 nodes, ROS2 publisher subscriber | Software  |
 | 4 | 2026-07-03 | servo-vs-stepper-vs-bldc-motor-robotics | Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator | servo vs stepper vs BLDC motor for robotics, robot actuator selection, stepper motor robotics, BLDC motor robot arm | Hardware  |
 | 3 | 2026-07-03 | kalman-filter-robot-state-estimation | Kalman Filter for Robot State Estimation: A Practical Introduction | Kalman filter for robot state estimation, Kalman filter robotics, sensor fusion robot, state estimation robotics | Control Systems  |
-| 2 | 2026-07-03 | inverse-kinematics-explained | Inverse Kinematics Explained: How Robotic Arms Solve for Joint Angles | inverse kinematics explained, inverse kinematics robotic arm, IK solver robotics, forward vs inverse kinematics | Control Systems  |
 
 ## Keyword Pool
 ## Keyword Pool (not yet used)
@@ -122,7 +122,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-pid-anti-windup-robot-joint-worked-example, mecanum-wheel-robot-kinematics-worked-example, robot-joint-velocity-estimation-encoder-counts, sliding-mode-control-robot-arm-joint-worked-example, ball-screw-vs-lead-screw-robot-linear-actuator-sizing, tool-center-point-calibration-robot-arm-pivot-method, rs485-modbus-robot-joint-network-wiring-polling-budget, ethercat-robot-joint-network-cycle-time-budget, zero-moment-point-legged-robot-balance-worked-example, series-elastic-actuator-robot-joint-stiffness-sizing, robot-arm-homing-limit-switches-encoder-offset, sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+robot-arm-joint-bearing-selection-moment-load, pid-anti-windup-robot-joint-worked-example, mecanum-wheel-robot-kinematics-worked-example, robot-joint-velocity-estimation-encoder-counts, sliding-mode-control-robot-arm-joint-worked-example, ball-screw-vs-lead-screw-robot-linear-actuator-sizing, tool-center-point-calibration-robot-arm-pivot-method, rs485-modbus-robot-joint-network-wiring-polling-budget, ethercat-robot-joint-network-cycle-time-budget, zero-moment-point-legged-robot-balance-worked-example, series-elastic-actuator-robot-joint-stiffness-sizing, robot-arm-homing-limit-switches-encoder-offset, sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style
@@ -141,6 +141,6 @@ as a scene). Keep prompts specific to the article's actual subject matter.
 - Weakness in current top pages: none walk through computing the actual gravity torque (tau = m * g * l * cos(theta)) for a simple one- or two-link arm with real mass/length numbers, layered under a PD position loop, and none mention the common symptom (arm sags or oscillates without gravity feedforward) that tells a builder they're missing this term.
 
 ## Recent Strategy Adjustments (last 3 entries)
-- Chose "PID anti-windup for robot joints: worked example": top pages are MATLAB/Simulink block docs, Scilab scheme overviews, a drilling-industry blog (Erdos Miller) and an arXiv review - all either toolbox-specific or generic process control, none robot-joint-specific.
-- Demand signal: windup is a routine failure mode for saturated joint actuators (large setpoint steps, gravity loads); forum/Q&A discussions on PID overshoot after saturation are constant, and the topic directly extends the existing PID tuning article (internal link fit).
-- Weakness in current top pages: none walk through the arithmetic - a joint motor hitting its torque/voltage limit on a big step, the integrator accumulating during saturation with real numbers, the resulting overshoot, then clamping vs back-calculation (choosing the tracking time constant Tt ~ sqrt(Ti*Td) or Ti/2) in discrete-time code a builder can drop into a 1 kHz loop.
+- Timing belt drive sizing: top results are generic calculators, profile comparisons (HTD vs GT2) and vendor PDFs, no robot-joint worked example - viable backup for a future cycle.
+- Chose "bearing selection for robot arm joints: worked moment load example": top-ranking pages are almost entirely bearing-vendor marketing (PIB Sales, HGT, Jiayi, Bearings Direct) that assert crossed rollers handle moment loads but show zero arithmetic; constant hobbyist question is whether two spaced ball bearings can replace an expensive crossed roller in a joint.
+- Weakness in current top pages: none compute the actual tilting moment from payload and arm mass, the equivalent load on a crossed roller (P = X*(Fr + 2M/dp) + Y*Fa), the static safety factor against C0, or the force-pair math (F = M/L) showing how bearing spacing tames the same moment with ordinary deep groove bearings - and none translate bearing tilt stiffness into millimeters of sag at the tool tip.
