@@ -5,8 +5,24 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 22 Jul 2026 17:12:41 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jul 2026 01:17:49 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Bearing Selection for Robot Arm Joints: A Worked Moment Load Example</title>
+      <link>https://arcbotix.com/blog/posts/robot-arm-joint-bearing-selection-moment-load.html</link>
+      <guid>https://arcbotix.com/blog/posts/robot-arm-joint-bearing-selection-moment-load.html</guid>
+      <pubDate>Thu, 23 Jul 2026 01:17:19 +0000</pubDate>
+      <description>Worked example of bearing selection for robot arm joints: compute the moment load, equivalent load on a crossed roller, and when two ball bearings suffice.</description>
+      <category>Hardware</category>
+    </item>
+    <item>
+      <title>Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation</title>
+      <link>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</link>
+      <guid>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</guid>
+      <pubDate>Thu, 23 Jul 2026 01:17:07 +0000</pubDate>
+      <description>Motor and gearbox sizing for a robot arm joint explained with a full worked example: load torque, safety factor, gear ratio choice, and a continuous-torque check.</description>
+      <category>Build Guides</category>
+    </item>
     <item>
       <title>PID Anti-Windup for Robot Joints: A Worked Integrator Windup Example</title>
       <link>https://arcbotix.com/blog/posts/pid-anti-windup-robot-joint-worked-example.html</link>
@@ -150,22 +166,6 @@
       <pubDate>Sat, 18 Jul 2026 08:22:05 +0000</pubDate>
       <description>A worked Category 3 e-stop circuit design example for a robot arm: dual-channel wiring, cross-fault detection, and a stop-response time budget with real numbers.</description>
       <category>Hardware</category>
-    </item>
-    <item>
-      <title>Force Sensing in Robot Grippers: A Worked Load Cell Calibration and PID Force Control Example</title>
-      <link>https://arcbotix.com/blog/posts/robot-gripper-force-sensing-load-cell-calibration.html</link>
-      <guid>https://arcbotix.com/blog/posts/robot-gripper-force-sensing-load-cell-calibration.html</guid>
-      <pubDate>Sat, 18 Jul 2026 00:18:57 +0000</pubDate>
-      <description>Load cell force sensing for robot grippers explained: bridge output to amplifier gain to ADC counts to grams, then a worked PID force control example.</description>
-      <category>Build Guides</category>
-    </item>
-    <item>
-      <title>Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation</title>
-      <link>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</link>
-      <guid>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</guid>
-      <pubDate>Fri, 17 Jul 2026 16:15:52 +0000</pubDate>
-      <description>Motor and gearbox sizing for a robot arm joint explained with a full worked example: load torque, safety factor, gear ratio choice, and a continuous-torque check.</description>
-      <category>Build Guides</category>
     </item>
   </channel>
 </rss>
