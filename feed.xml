@@ -5,8 +5,24 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Jul 2026 07:36:04 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jul 2026 15:39:54 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque</title>
+      <link>https://arcbotix.com/blog/posts/torque-control-robot-arm-joints-current-sensing.html</link>
+      <guid>https://arcbotix.com/blog/posts/torque-control-robot-arm-joints-current-sensing.html</guid>
+      <pubDate>Thu, 23 Jul 2026 15:39:33 +0000</pubDate>
+      <description>Learn robot joint torque control from current sensing: the Kt torque constant, a cascaded current/velocity/position loop, and a worked PI current-loop tuning example.</description>
+      <category>Control Systems</category>
+    </item>
+    <item>
+      <title>Cascaded PID Control for Robot Joints: A Worked Bandwidth-Separation Example</title>
+      <link>https://arcbotix.com/blog/posts/cascaded-pid-control-robot-joint-bandwidth-separation.html</link>
+      <guid>https://arcbotix.com/blog/posts/cascaded-pid-control-robot-joint-bandwidth-separation.html</guid>
+      <pubDate>Thu, 23 Jul 2026 15:38:51 +0000</pubDate>
+      <description>How to tune a cascaded PID control loop (current, velocity, position) for a robot joint with a worked bandwidth-separation example and real PI gain numbers.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>S-Curve Trajectory for a Robot Joint: A Worked Jerk-Limited Motion Profile</title>
       <link>https://arcbotix.com/blog/posts/s-curve-trajectory-jerk-limited-robot-joint-worked-example.html</link>
@@ -150,22 +166,6 @@
       <pubDate>Sun, 19 Jul 2026 08:33:03 +0000</pubDate>
       <description>How to home a robot arm joint with a limit switch: mounting, the approach/back-off sequence, and a worked encoder-offset calculation with real numbers.</description>
       <category>Build Guides</category>
-    </item>
-    <item>
-      <title>Sensorless BLDC Motor Commutation: A Worked Back-EMF Zero-Crossing Timing Example</title>
-      <link>https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html</link>
-      <guid>https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html</guid>
-      <pubDate>Sun, 19 Jul 2026 00:29:40 +0000</pubDate>
-      <description>Sensorless BLDC motor commutation explained with real numbers: the electrical period, the 30-degree phase-lag delay in microseconds, and the low-speed blanking-time failure mode.</description>
-      <category>Hardware</category>
-    </item>
-    <item>
-      <title>BLDC Hall Sensor Commutation Explained: Building the Six-Step Table from Scratch</title>
-      <link>https://arcbotix.com/blog/posts/bldc-hall-sensor-commutation-six-step.html</link>
-      <guid>https://arcbotix.com/blog/posts/bldc-hall-sensor-commutation-six-step.html</guid>
-      <pubDate>Sun, 19 Jul 2026 00:29:37 +0000</pubDate>
-      <description>BLDC hall sensor commutation explained from first principles: the six hall states, the electrical-angle math behind the switching table, and portable C code.</description>
-      <category>Hardware</category>
     </item>
   </channel>
 </rss>

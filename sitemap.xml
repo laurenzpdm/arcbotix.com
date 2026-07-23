@@ -49,6 +49,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/cascaded-pid-control-robot-joint-bandwidth-separation.html</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/choosing-a-battery-for-a-quadruped-robot.html</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
@@ -296,7 +302,7 @@
   </url>
   <url>
     <loc>https://arcbotix.com/blog/posts/torque-control-robot-arm-joints-current-sensing.html</loc>
-    <lastmod>2026-07-10</lastmod>
+    <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
