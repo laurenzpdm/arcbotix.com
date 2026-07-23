@@ -379,3 +379,14 @@ section still reflects reality. Log either the change made and why, or
 - Content edge: I can walk the full 7-phase timing computation (jerk J, accel A, velocity V, displacement) with real numbers for one joint, then show how to detect the "short move" case where the profile never reaches max accel or max velocity.
 - Weakness in top-ranking pages: they are either abstract research papers (asymmetric/optimal-jerk schemes, minimum-jerk polynomials) too heavy for a builder, or motion-control-tips explainers that describe the S-shape qualitatively but never compute the seven phase durations for a concrete move with real J/A/V limits.
 - Deprioritized ROS2 lifecycle nodes: official ROS2 docs, Foxglove and learnros2 already cover the state machine well - gap too thin this cycle.
+
+### 2026-07-23b
+- Candidates checked: Denavit-Hartenberg forward kinematics worked example, servo vs stepper vs BLDC motor comparison, Kalman filter for robot state estimation, Monte Carlo localization (particle filter) worked example.
+- DH parameters: reconfirmed gap too thin (Robotiq blog, Clemson open textbook already cover it well) - skipped again. Servo vs stepper vs BLDC and Kalman filter for robot state estimation: both already published on Arcbotix under these exact slugs - skipped as duplicates.
+- Chose "Monte Carlo localization (particle filter) for mobile robots: a worked numeric example" - top pages are either academic slide decks (MIT, Berkeley), abstract Medium walkthroughs with code but no concrete numbers, or Wikipedia's conceptual summary; complements the existing EKF-SLAM and SLAM-basics articles by covering the non-Gaussian localization case.
+- Weakness in current top pages: none carry a small particle set (e.g. 5-8 particles) through one full prediction-weight-resample cycle with actual pose numbers, a real landmark-range likelihood computation, and low-variance resampling arithmetic a builder can check by hand before trusting a library implementation.
+
+## Strategy Adjustments
+
+### 2026-07-23 audit (article 50)
+- Dropped the blanket "deprioritize cluster 1" guidance from the 2026-07-22 audit: articles 47-50 (S-curve, bearing selection, cascaded PID, Monte Carlo localization) still found strong gaps in cluster 1 twice despite that guidance, while cluster 2/3 candidates like DH parameters, ROS2 lifecycle nodes, and cycloidal drive kept hitting repeat saturation. Let step-2 research pick the biggest gap per cycle instead of a fixed cluster rotation.

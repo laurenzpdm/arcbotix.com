@@ -3,9 +3,9 @@
 This file is auto-generated. Read this instead of the full registry/strategy.
 
 ## Stats
-- Total articles: 48
+- Total articles: 49
 - Last published: 2026-07-23
-- Known slugs: 48
+- Known slugs: 49
 
 ## Current Strategy
 Arcbotix is an English-language robotics blog. It targets people who actually
@@ -57,6 +57,7 @@ already covered - check the slugs and titles list before choosing.
 ## Recent Articles
 | # | Date | Slug | Title | Keywords | Tag |
 |---|------|------|-------|----------|-----|
+| 49 | 2026-07-23 | cascaded-pid-control-robot-joint-bandwidth-separation | Cascaded PID Control for Robot Joints: A Worked Bandwidth-Separation Example | cascaded PID control robot joint, cascade control loop tuning robotics, bandwidth separation PID loops, position velocity current control loop | Control Systems  |
 | 48 | 2026-07-23 | s-curve-trajectory-jerk-limited-robot-joint-worked-example | S-Curve Trajectory for a Robot Joint: A Worked Jerk-Limited Motion Profile | S-curve trajectory robot joint, jerk limited motion profile, S-curve trajectory worked example, seven phase S-curve velocity profile | Control Systems  |
 | 47 | 2026-07-23 | robot-arm-joint-bearing-selection-moment-load | Bearing Selection for Robot Arm Joints: A Worked Moment Load Example | bearing selection for robot arm joints, robot arm joint bearing, crossed roller bearing robot joint, moment load bearing calculation | Hardware  |
 | 46 | 2026-07-22 | pid-anti-windup-robot-joint-worked-example | PID Anti-Windup for Robot Joints: A Worked Integrator Windup Example | PID anti-windup robot joint, integrator windup PID, back-calculation anti-windup, PID clamping conditional integration | Control Systems  |
@@ -101,7 +102,6 @@ already covered - check the slugs and titles list before choosing.
 | 7 | 2026-07-03 | harmonic-drive-vs-planetary-gearbox | Harmonic Drive vs Planetary Gearbox: Choosing the Right Reduction for a Robot Joint | harmonic drive vs planetary gearbox, harmonic drive robotics, planetary gearbox robot arm, strain wave gear | Hardware  |
 | 6 | 2026-07-03 | slam-basics-for-mobile-robots | SLAM Basics for Mobile Robots: How Robots Map and Localize at the Same Time | SLAM basics for mobile robots, SLAM robotics, simultaneous localization and mapping, SLAM algorithm explained | Software  |
 | 5 | 2026-07-03 | ros2-nodes-and-topics-explained | ROS2 Nodes and Topics Explained: How Robot Software Talks to Itself | ROS2 nodes and topics explained, ROS2 topics, ROS2 nodes, ROS2 publisher subscriber | Software  |
-| 4 | 2026-07-03 | servo-vs-stepper-vs-bldc-motor-robotics | Servo vs Stepper vs BLDC Motor for Robotics: Choosing the Right Actuator | servo vs stepper vs BLDC motor for robotics, robot actuator selection, stepper motor robotics, BLDC motor robot arm | Hardware  |
 
 ## Keyword Pool
 ## Keyword Pool (not yet used)
@@ -122,7 +122,7 @@ already covered - check the slugs and titles list before choosing.
 - power budgeting for mobile robots
 
 ## Slugs Already Used
-s-curve-trajectory-jerk-limited-robot-joint-worked-example, robot-arm-joint-bearing-selection-moment-load, pid-anti-windup-robot-joint-worked-example, mecanum-wheel-robot-kinematics-worked-example, robot-joint-velocity-estimation-encoder-counts, sliding-mode-control-robot-arm-joint-worked-example, ball-screw-vs-lead-screw-robot-linear-actuator-sizing, tool-center-point-calibration-robot-arm-pivot-method, rs485-modbus-robot-joint-network-wiring-polling-budget, ethercat-robot-joint-network-cycle-time-budget, zero-moment-point-legged-robot-balance-worked-example, series-elastic-actuator-robot-joint-stiffness-sizing, robot-arm-homing-limit-switches-encoder-offset, sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
+cascaded-pid-control-robot-joint-bandwidth-separation, s-curve-trajectory-jerk-limited-robot-joint-worked-example, robot-arm-joint-bearing-selection-moment-load, pid-anti-windup-robot-joint-worked-example, mecanum-wheel-robot-kinematics-worked-example, robot-joint-velocity-estimation-encoder-counts, sliding-mode-control-robot-arm-joint-worked-example, ball-screw-vs-lead-screw-robot-linear-actuator-sizing, tool-center-point-calibration-robot-arm-pivot-method, rs485-modbus-robot-joint-network-wiring-polling-budget, ethercat-robot-joint-network-cycle-time-budget, zero-moment-point-legged-robot-balance-worked-example, series-elastic-actuator-robot-joint-stiffness-sizing, robot-arm-homing-limit-switches-encoder-offset, sensorless-bldc-motor-commutation-back-emf-timing, ros2-tf2-transforms-explained-worked-example, robot-arm-e-stop-circuit-design-category-3, robot-gripper-force-sensing-load-cell-calibration, robot-arm-joint-motor-gearbox-torque-sizing, robot-arm-joint-friction-compensation-coulomb-viscous, absolute-vs-incremental-encoder-robot-joint-resolution, impedance-vs-admittance-control-robot-arm, can-bus-robot-joint-network-wiring-bit-timing, computed-torque-control-robot-arm-worked-example, real-time-considerations-robot-control-loops, robot-arm-gravity-compensation-worked-example, ekf-slam-explained-worked-example, field-oriented-control-foc-bldc-motors-explained, bldc-hall-sensor-commutation-six-step, ros2-qos-settings-explained, stepper-motor-microstepping-explained, differential-drive-robot-kinematics-odometry, ros2-executors-callback-groups-explained, torque-control-robot-arm-joints-current-sensing, robot-arm-singularity-avoidance-jacobian, gearbox-backlash-compensation-robot-arm, lqr-control-robot-arm-practical-introduction, power-budgeting-for-mobile-robots, quadrature-encoder-wiring-6dof-robot-arm, imu-sensor-fusion-basics, choosing-a-battery-for-a-quadruped-robot, trajectory-planning-for-robotic-arms, harmonic-drive-vs-planetary-gearbox, slam-basics-for-mobile-robots, ros2-nodes-and-topics-explained, servo-vs-stepper-vs-bldc-motor-robotics, kalman-filter-robot-state-estimation, inverse-kinematics-explained, pid-controller-tuning-for-robotic-arms
 
 ## Image Prompt Style
 ## Image Prompt Style

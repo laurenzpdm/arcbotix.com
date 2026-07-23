@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Monte Carlo Localization (Particle Filter) for Mobile Robots: A Worked Numeric Example – Arcbotix</title>
+  <meta name="description" content="Monte Carlo localization explained with real numbers: a small particle set carried through motion prediction, landmark-range weighting, and low-variance resampling.">
+  <meta name="keywords" content="Monte Carlo localization, particle filter robot localization, Monte Carlo localization worked example, low variance resampling">
+  <meta property="og:title" content="Monte Carlo Localization (Particle Filter) for Mobile Robots: A Worked Numeric Example">
+  <meta property="og:description" content="Monte Carlo localization explained with real numbers: a small particle set carried through motion prediction, landmark-range weighting, and low-variance resampling.">
+  <meta property="og:image" content="/blog/posts/img/monte-carlo-localization-particle-filter-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/monte-carlo-localization-particle-filter-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/monte-carlo-localization-particle-filter-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-23">July 23, 2026</time>
+      <span>8 min read</span>
+    </div>
+    <h1 class="blog-post-title">Monte Carlo Localization (Particle Filter) for Mobile Robots: A Worked Numeric Example</h1>
+    <p class="blog-post-subtitle">A small particle set carried by hand through prediction, weighting, and resampling for a robot localizing against one landmark</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/monte-carlo-localization-particle-filter-worked-example.webp" alt="Isometric technical illustration of a mobile robot surrounded by a cloud of glowing particles representing a probability distribution over its position" loading="lazy">
+    </div>
+
+    <p>Monte Carlo localization (MCL) shows up in every SLAM course as a bullet list: sample particles, move them, weight them, resample. That summary is correct but it skips the part that actually builds intuition: what the numbers do to eight or so particles across one real cycle. This article carries a small particle set by hand through prediction, a landmark-range measurement, weight normalization, and low-variance resampling, so the algorithm stops being a black box.</p>
+
+<h2>Why Monte Carlo Localization Instead of a Kalman Filter</h2>
+<p>A Kalman filter represents the robot's belief about its own pose as a single Gaussian: one mean, one covariance. That works well once the robot roughly knows where it is. It breaks down for the <strong>global localization</strong> problem, where the robot starts with no idea of its pose and the true belief is multimodal (the robot could be in a corridor on either the north or south side of the building, for example, before it gets a distinguishing measurement). Monte Carlo localization represents the belief as a set of discrete samples, or particles, each one a full pose hypothesis <code>(x, y, theta)</code> with an associated weight. Because the samples do not assume any particular distribution shape, MCL handles multimodal beliefs that a single Gaussian cannot.</p>
+<p>The tradeoff is compute: you are running the motion and sensor model once per particle, per step, and you typically need hundreds to thousands of particles for a real 2D localization problem. The worked example below uses eight particles purely so the arithmetic stays checkable by hand; a real implementation would use far more.</p>
+
+<h2>Setup: Eight Particles and One Landmark</h2>
+<p>The robot has an odometry-based rough position estimate near <code>(2.0, 1.0)</code> meters with heading 0 radians, but with real uncertainty, so the particle set is spread around that estimate. One known landmark sits at <code>(5.0, 1.0)</code> meters. Our eight particles, each <code>(x, y, theta)</code> with an initial uniform weight of <code>1/8 = 0.125</code>, are:</p>
+<pre><code>P1: (1.8, 0.9, 0.00)   P5: (2.3, 0.8, -0.05)
+P2: (2.1, 1.1, 0.02)   P6: (1.7, 1.2, 0.03)
+P3: (2.0, 1.0, 0.00)   P7: (2.4, 1.1, -0.02)
+P4: (1.9, 1.3, -0.01)  P8: (2.0, 0.7, 0.01)</code></pre>
+
+<h2>Step 1: Motion Update (Prediction)</h2>
+<p>The robot commands a forward move of 0.50 m. A real motion model adds noise per particle (drawn from a distribution shaped by the wheel odometry error, the same source of drift discussed in our <a href="/blog/posts/robot-joint-velocity-estimation-encoder-counts.html">encoder velocity estimation article</a>), so each particle moves by a slightly different amount. Applying the sampled motion <code>delta_x = 0.50 + noise</code> to each particle (noise values below are the ones drawn for this example) gives:</p>
+<pre><code>Particle   noise   x_new = x + (0.50+noise)*cos(theta)
+P1  +0.01   1.8 + 0.51*1.000 = 2.31
+P2  -0.02   2.1 + 0.48*1.000 = 2.58
+P3  +0.00   2.0 + 0.50*1.000 = 2.50
+P4  +0.02   1.9 + 0.52*1.000 = 2.42
+P5  -0.01   2.3 + 0.49*1.000 = 2.79
+P6  +0.03   1.7 + 0.53*1.000 = 2.23
+P7  -0.03   2.4 + 0.47*1.000 = 2.87
+P8  +0.00   2.0 + 0.50*1.000 = 2.50</code></pre>
+<p>(theta is small enough here that cos(theta) rounds to 1.000 for this step; y is left unchanged since the commanded motion is a pure forward step with no turn.) Notice the particles are no longer identical after the same commanded motion: this per-particle noise injection is what lets the filter represent uncertainty growth, the same role process noise Q plays in a Kalman filter.</p>
+
+<h2>Step 2: Weighting Against a Landmark Measurement</h2>
+<p>The robot's range sensor measures a distance of <strong>2.55 m</strong> to the known landmark at <code>(5.0, 1.0)</code>. For each particle, compute the expected range (distance from that particle's predicted position to the landmark), then weight the particle by how well the expected range matches the actual measurement using a Gaussian likelihood:</p>
+<pre><code>w_i = exp( -(r_expected - r_measured)^2 / (2 * sigma^2) )</code></pre>
+<p>with a sensor standard deviation sigma = 0.15 m. Using y = 1.0 for all particles (unchanged this step) so the expected range is just <code>5.0 - x_new</code>:</p>
+<pre><code>Particle  x_new  r_expected  error   raw weight
+P1        2.31   2.69        0.14   exp(-0.14^2/0.045)=exp(-0.435)=0.647
+P2        2.58   2.42       -0.13   exp(-0.13^2/0.045)=exp(-0.376)=0.687
+P3        2.50   2.50       -0.05   exp(-0.05^2/0.045)=exp(-0.056)=0.946
+P4        2.42   2.58        0.03   exp(-0.03^2/0.045)=exp(-0.020)=0.980
+P5        2.79   2.21       -0.34   exp(-0.34^2/0.045)=exp(-2.569)=0.077
+P6        2.23   2.77        0.22   exp(-0.22^2/0.045)=exp(-1.076)=0.341
+P7        2.87   2.13       -0.42   exp(-0.42^2/0.045)=exp(-3.920)=0.020
+P8        2.50   2.50       -0.05   exp(-0.05^2/0.045)=exp(-0.056)=0.946</code></pre>
+<p>P4 and P3/P8 have the smallest range error and get the highest raw weights; P7 predicted a range far from the measurement and is nearly killed off. Normalize by dividing each raw weight by the sum (0.647+0.687+0.946+0.980+0.077+0.341+0.020+0.946 = 4.644):</p>
+<pre><code>w1=0.139  w2=0.148  w3=0.204  w4=0.211
+w5=0.017  w6=0.073  w7=0.004  w8=0.204</code></pre>
+<p>P4 now carries roughly 21% of the total belief while P7 carries under half a percent, purely from one range measurement.</p>
+
+<h2>Step 3: Low-Variance Resampling</h2>
+<p>Resampling draws a new set of 8 particles, with replacement, where each particle's chance of being copied is proportional to its weight. A naive approach (roulette-wheel sampling with independent random draws) is easy to code but adds unnecessary sampling variance. The standard fix is <strong>low-variance resampling</strong>: pick one random start point and step through the cumulative weight distribution at fixed intervals.</p>
+<pre><code>M = 8 particles
+r = random number in [0, 1/M) -> say r = 0.03
+cumulative weights: c1=0.139, c2=0.287, c3=0.491, c4=0.702,
+                     c5=0.719, c6=0.792, c7=0.796, c8=1.000
+
+for i in 0..M-1:
+    u = r + i * (1/M) = 0.03 + i * 0.125
+    advance through cumulative weights until c >= u, select that particle</code></pre>
+<p>Walking the eight draw points <code>u = 0.030, 0.155, 0.280, 0.405, 0.530, 0.655, 0.780, 0.905</code> against the cumulative weights above selects, in order: <strong>P1, P2, P3, P4, P4, P4, P6, P8</strong>. P4 gets copied three times because it occupies a wide slice of the cumulative range (0.491 to 0.702), P3 and P8 each survive once despite tying on weight because the fixed-interval draw points happened to land once in each of their slices, and P5 and P7 are dropped entirely, their low-probability hypotheses discarded. This single random offset <code>r</code>, reused for every draw, is what makes the sampling variance lower than independent draws: the selected count for each particle differs from its expected count (weight times M) by less than one, which is provably impossible with naive resampling.</p>
+
+<h2>Reading the Result</h2>
+<p>After resampling, the particle cloud has visibly contracted around <code>x ~= 2.4-2.5</code>, which is consistent with the true landmark-range measurement, and the duplicate copies of P4 now carry the process noise forward independently on the next motion update, so they will not stay identical. This contraction-then-respread cycle, run continuously, is exactly how MCL converges from a wide, possibly multimodal initial spread down to a tight cluster around the true pose as more measurements arrive, and how it can re-diverge and recover if the robot gets kidnapped or badly delocalized (a scenario handled by injecting a small fraction of random particles each cycle, often called the augmented MCL or KLD-sampling variant).</p>
+
+<h2>Practical Implementation Notes</h2>
+<ul>
+<li><strong>Particle count matters more than most tutorials admit.</strong> Eight particles is illustrative only; real 2D indoor localization typically needs several hundred to a few thousand particles to reliably cover ambiguous regions like symmetric corridors. Too few particles and the filter converges confidently to the wrong pose because the correct hypothesis simply was not sampled.</li>
+<li><strong>Resample only when needed.</strong> Resampling every single cycle throws away diversity faster than necessary. A common guard is the effective sample size, <code>N_eff = 1 / sum(w_i^2)</code>; only resample when N_eff drops below roughly half the particle count.</li>
+<li><strong>Compare against EKF-SLAM when the map is also unknown.</strong> This article assumes a known landmark map (pure localization). If you also need to build the map, particle filters extend naturally to FastSLAM, which was one of the scaling alternatives mentioned in our <a href="/blog/posts/ekf-slam-explained-worked-example.html">EKF-SLAM worked example</a> as an alternative to the O(N^2) covariance growth of EKF-SLAM.</li>
+<li><strong>Sensor noise sigma sets how aggressively weights spread out.</strong> A smaller sigma than the sensor actually has makes the filter overconfident and prone to discarding the correct hypothesis on a single noisy reading; a larger sigma than reality makes convergence unnecessarily slow.</li>
+</ul>
+
+<blockquote>The entire algorithm is three steps repeated forever: move every particle by the commanded motion plus noise, reweight every particle by how well it predicts the actual sensor reading, and resample toward the high-weight particles. Nothing in that loop assumes a single Gaussian belief, which is exactly why particle filters handle the ambiguous, multimodal localization problems that break a Kalman filter.</blockquote>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
