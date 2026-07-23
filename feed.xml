@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Jul 2026 15:39:54 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jul 2026 23:44:20 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Monte Carlo Localization (Particle Filter) for Mobile Robots: A Worked Numeric Example</title>
+      <link>https://arcbotix.com/blog/posts/monte-carlo-localization-particle-filter-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/monte-carlo-localization-particle-filter-worked-example.html</guid>
+      <pubDate>Thu, 23 Jul 2026 23:43:20 +0000</pubDate>
+      <description>Monte Carlo localization explained with real numbers: a small particle set carried through motion prediction, landmark-range weighting, and low-variance resampling.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Torque Control for Robot Arm Joints: From Motor Current to Commanded Torque</title>
       <link>https://arcbotix.com/blog/posts/torque-control-robot-arm-joints-current-sensing.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Sun, 19 Jul 2026 16:36:12 +0000</pubDate>
       <description>A worked example for sizing series elastic actuator spring stiffness: bandwidth, peak torque, and deflection-to-torque calibration for a robot joint.</description>
       <category>Hardware</category>
-    </item>
-    <item>
-      <title>Homing a Robot Arm Joint with a Limit Switch: The Encoder-Offset Math</title>
-      <link>https://arcbotix.com/blog/posts/robot-arm-homing-limit-switches-encoder-offset.html</link>
-      <guid>https://arcbotix.com/blog/posts/robot-arm-homing-limit-switches-encoder-offset.html</guid>
-      <pubDate>Sun, 19 Jul 2026 08:33:03 +0000</pubDate>
-      <description>How to home a robot arm joint with a limit switch: mounting, the approach/back-off sequence, and a worked encoder-offset calculation with real numbers.</description>
-      <category>Build Guides</category>
     </item>
   </channel>
 </rss>

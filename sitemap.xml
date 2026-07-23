@@ -139,6 +139,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/monte-carlo-localization-particle-filter-worked-example.html</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/pid-anti-windup-robot-joint-worked-example.html</loc>
     <lastmod>2026-07-22</lastmod>
     <changefreq>monthly</changefreq>
