@@ -135,7 +135,7 @@ tau_worst_case = tau_static + tau_dynamic
 <li>Multiply the motor's continuous torque by the chosen ratio and the gearbox's rated efficiency to verify the delivered torque still clears the design target.</li>
 <li>Confirm whether the joint's actual duty cycle is continuous or intermittent, and size against the matching torque rating rather than the largest number on the datasheet.</li>
 </ul>
-<p>Skipping any one of these steps, especially the efficiency check and the continuous-vs-peak distinction, is why a motor that looked adequate on paper ends up stalling or overheating in a real arm. Running the full chain with your own link masses, lengths, and target accelerations before ordering hardware is cheaper than discovering the gap after the joint is already wired up.</p>
+<p>Skipping any one of these steps, especially the efficiency check and the continuous-vs-peak distinction, is why a motor that looked adequate on paper ends up stalling or overheating in a real arm. Running the full chain with your own link masses, lengths, and target accelerations before ordering hardware is cheaper than discovering the gap after the joint is already wired up. The same worst-case moment the motor has to overcome also loads the joint's bearings; see the <a href="/blog/posts/robot-arm-joint-bearing-selection-moment-load.html">bearing selection worked moment load example</a> for that half of the sizing.</p>
 
     <div class="blog-cta">
       <h3>Building or studying robotics?</h3>

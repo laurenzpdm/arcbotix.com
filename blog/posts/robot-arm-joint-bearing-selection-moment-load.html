@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Bearing Selection for Robot Arm Joints: A Worked Moment Load Example – Arcbotix</title>
+  <meta name="description" content="Worked example of bearing selection for robot arm joints: compute the moment load, equivalent load on a crossed roller, and when two ball bearings suffice.">
+  <meta name="keywords" content="bearing selection for robot arm joints, robot arm joint bearing, crossed roller bearing robot joint, moment load bearing calculation">
+  <meta property="og:title" content="Bearing Selection for Robot Arm Joints: A Worked Moment Load Example">
+  <meta property="og:description" content="Worked example of bearing selection for robot arm joints: compute the moment load, equivalent load on a crossed roller, and when two ball bearings suffice.">
+  <meta property="og:image" content="/blog/posts/img/robot-arm-joint-bearing-selection-moment-load.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/robot-arm-joint-bearing-selection-moment-load.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/robot-arm-joint-bearing-selection-moment-load.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-23">July 23, 2026</time>
+      <span>7 min read</span>
+    </div>
+    <h1 class="blog-post-title">Bearing Selection for Robot Arm Joints: A Worked Moment Load Example</h1>
+    <p class="blog-post-subtitle">Compute the tilting moment, check a crossed roller against it, and see when two cheap deep groove bearings do the same job</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/robot-arm-joint-bearing-selection-moment-load.webp" alt="Cutaway technical render of a crossed roller bearing at a robot arm base joint showing alternating cylindrical rollers" loading="lazy">
+    </div>
+
+    <p>You sized the motor, the gearbox holds the load, the controller is tuned, and the tool tip still wobbles. Push sideways on the end effector of many hobby arms and you can feel a millimeter or two of give that has nothing to do with control gains. Very often the culprit is the joint bearing: either it was chosen for radial load when the real load is a tilting moment, or it is fine on load rating but far too soft in tilt. This article works the actual numbers for one joint, because almost every page on this topic asserts that crossed roller bearings solve the problem without ever computing anything.</p>
+
+<h2>Bearing Selection for Robot Arm Joints Starts with the Moment Load</h2>
+<p>Take the base joint of a desktop 6-DOF arm with a vertical rotation axis. The numbers:</p>
+<ul>
+<li>Payload: 2.0 kg carried at full reach, 500 mm from the joint axis</li>
+<li>Arm structure: 3.0 kg with its center of gravity 250 mm out</li>
+<li>Joint speed is low, so dynamic loads are mild; we will fold them into a safety factor</li>
+</ul>
+<p>With the arm stretched out horizontally, gravity produces an overturning moment on the base bearing:</p>
+<blockquote><p>M = 2.0 kg x 9.81 m/s&sup2; x 0.50 m + 3.0 kg x 9.81 m/s&sup2; x 0.25 m = 9.8 + 7.4 = 17.2 Nm</p></blockquote>
+<p>The same weights press straight down along the axis, giving an axial load Fa = 5.0 kg x 9.81 m/s&sup2; = 49 N. Radial load Fr is small for a vertical axis, mostly side forces from acceleration; call it 30 N. Notice the imbalance: the moment term dominates everything. This is the defining feature of bearing selection for robot arm joints. A payload that is trivial as a force becomes a serious load once it acts at the end of a 500 mm lever, and the bearing arrangement has to react that moment across its own small diameter.</p>
+
+<h2>Option 1: A Single Crossed Roller Bearing</h2>
+<p>A crossed roller bearing packs cylindrical rollers alternately tilted 90 degrees to each other in a V-groove raceway, so one thin ring reacts radial, axial, and moment loads at once. Manufacturers give an equivalent load formula of this shape (symbols vary slightly by catalog):</p>
+<blockquote><p>P = X (Fr + 2M / dp) + Y Fa</p></blockquote>
+<p>where dp is the roller pitch diameter. The 2M/dp term is the key move: it converts the moment into an equivalent radial force acting at the roller circle. Take a thin-section crossed roller ring with a 50 mm bore, dp = 65 mm, and a static load rating C0 of 20 kN (representative values; pull the real row from your manufacturer's table). For the static case with X0 = 1 and Y0 = 0.44:</p>
+<blockquote><p>2M / dp = 2 x 17.2 Nm / 0.065 m = 529 N<br>P0 = 30 N + 529 N + 0.44 x 49 N = 581 N<br>fs = C0 / P0 = 20000 / 581 = 34</p></blockquote>
+<p>Catalogs ask for a static safety factor fs of about 2 to 3 for smooth motion and 3 to 4 with shocks and vibration. We have 34. That is the first honest conclusion: at hobby arm scale, a crossed roller is nowhere near its load limit. You are not paying for load capacity. You are paying for rigidity, zero play, and the packaging convenience of one flat ring that bolts between two plates.</p>
+
+<h2>Option 2: Two Deep Groove Bearings, Spaced Apart</h2>
+<p>The alternative every builder asks about: put two ordinary deep groove ball bearings on a shaft or tube, separated by a distance L. A bearing pair converts the moment into a force couple:</p>
+<blockquote><p>F = M / L</p></blockquote>
+<p>With two 40 mm bore bearings (6808 size, C0 around 4 kN) spaced L = 40 mm apart:</p>
+<blockquote><p>F = 17.2 Nm / 0.040 m = 430 N radial on each bearing, in opposite directions</p></blockquote>
+<p>Each bearing sees 430 N plus its share of the 49 N axial load, against a 4 kN static rating: a safety factor around 9. Perfectly fine. Now shrink the spacing to 10 mm, which is what happens when you stack two bearings almost touching to save height:</p>
+<blockquote><p>F = 17.2 / 0.010 = 1720 N per bearing</p></blockquote>
+<p>Same joint, same load, four times the bearing force, and the safety factor drops near 2 before any impact factor. Spacing is the free variable in this design: doubling L halves the bearing load and, as we will see, quadruples the tilt stiffness. If the mechanism allows a longer bearing tube, use it.</p>
+<p>Two practical notes for the paired arrangement. First, deep groove bearings have internal radial clearance, so an unpreloaded pair will always have a little tilt play; preload the pair axially with a shim or wave spring, or step up to a back-to-back angular contact pair, which spreads the effective load centers even further apart than the physical spacing. Second, do not substitute a stamped lazy susan turntable bearing here. Those have large clearance and flexible races, and they are the single most common source of visible backlash in first-build arm bases.</p>
+
+<h2>Stiffness Decides, Not Load Rating</h2>
+<p>Since both options pass the load check easily, the real comparison is tilt stiffness, because bearing tilt multiplies into tool tip sag by the arm length. Suppose you want no more than 0.1 mm of sag at 500 mm reach from the base bearing alone:</p>
+<blockquote><p>allowed tilt = 0.1 mm / 500 mm = 0.0002 rad (about 0.7 arcmin)<br>required moment stiffness k = M / tilt = 17.2 Nm / 0.0002 rad = 86 kNm/rad</p></blockquote>
+<p>Small crossed roller rings publish moment rigidity in exactly this range, which is why they show up in harmonic drive output stages. For the bearing pair, each bearing deflects radially by tilt x L/2, so the pair's moment stiffness is approximately:</p>
+<blockquote><p>k = kr x L&sup2; / 2</p></blockquote>
+<p>With a preloaded radial stiffness kr of 80 N/&micro;m (8 x 10&#8310; N/m, a reasonable order of magnitude for a preloaded ball bearing of this size) and L = 40 mm, k = 8 x 10&#8310; x 0.0016 / 2 = 64 kNm/rad, just short of the target. Stretch the spacing to 60 mm and k = 144 kNm/rad, comfortably past it. The L squared scaling is the whole story: a widely spaced pair of cheap bearings can out-stiffen a compact crossed roller, and the crossed roller wins only when the joint must stay axially thin.</p>
+<p>A short script to play with your own numbers:</p>
+<pre><code>g = 9.81
+M = 2.0*g*0.50 + 3.0*g*0.25      # tilting moment, Nm
+Fa = 5.0*g                        # axial load, N
+Fr = 30.0                         # radial load, N
+
+# crossed roller equivalent static load
+dp = 0.065
+P0 = (Fr + 2*M/dp) + 0.44*Fa
+print("P0 =", round(P0), "N, fs =", round(20000/P0, 1))
+
+# spaced pair: load and tilt stiffness vs spacing
+kr = 8e7                          # N/m per bearing, preloaded
+for L in (0.010, 0.040, 0.060):
+    print(L, "m:", round(M/L), "N per bearing,",
+          round(kr*L**2/2/1000), "kNm/rad")</code></pre>
+
+<h2>How to Choose in Practice</h2>
+<ul>
+<li>Compute the moment first: payload and link weights times their lever arms, at the worst pose. Add a load factor of 1.5 to 2 for accelerations and bumps before comparing against ratings.</li>
+<li>If the joint can be long (a base column, a shoulder tube), use two preloaded bearings spaced as far apart as the structure allows. It is the cheapest stiffness you can buy, and F = M/L tells you exactly what each bearing carries.</li>
+<li>If the joint must be flat (a pancake joint behind a gearbox, a wrist), a crossed roller ring earns its price through moment capacity per millimeter of height. Check P = X(Fr + 2M/dp) + Y Fa against the catalog, but expect stiffness and preload, not load rating, to be the binding constraint.</li>
+<li>Work backwards from tip accuracy: allowed tilt is tip tolerance divided by reach, and required moment stiffness is M divided by that tilt. This one line tells you whether a bearing choice is even in the running.</li>
+</ul>
+<p>The bearing does not act alone, of course. The motor and reducer have to hold the same moment through the gear train, which is its own sizing exercise; we walk that calculation in the <a href="/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html">motor and gearbox torque sizing worked example</a>. And if you end up at a harmonic drive for the reduction, note that many units ship with a crossed roller output bearing already integrated, which can delete this whole problem from your parts list; see the <a href="/blog/posts/harmonic-drive-vs-planetary-gearbox.html">harmonic drive vs planetary gearbox comparison</a> for that tradeoff. Either way, run the moment arithmetic before you buy: it takes five minutes and it is the difference between a joint that feels like a machine tool and one that feels like a shopping cart wheel.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
