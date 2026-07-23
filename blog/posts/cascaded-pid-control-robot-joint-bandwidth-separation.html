@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Cascaded PID Control for Robot Joints: A Worked Bandwidth-Separation Example – Arcbotix</title>
+  <meta name="description" content="How to tune a cascaded PID control loop (current, velocity, position) for a robot joint with a worked bandwidth-separation example and real PI gain numbers.">
+  <meta name="keywords" content="cascaded PID control robot joint, cascade control loop tuning robotics, bandwidth separation PID loops, position velocity current control loop">
+  <meta property="og:title" content="Cascaded PID Control for Robot Joints: A Worked Bandwidth-Separation Example">
+  <meta property="og:description" content="How to tune a cascaded PID control loop (current, velocity, position) for a robot joint with a worked bandwidth-separation example and real PI gain numbers.">
+  <meta property="og:image" content="/blog/posts/img/cascaded-pid-control-robot-joint-bandwidth-separation.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/cascaded-pid-control-robot-joint-bandwidth-separation.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/cascaded-pid-control-robot-joint-bandwidth-separation.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-23">July 23, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Cascaded PID Control for Robot Joints: A Worked Bandwidth-Separation Example</h1>
+    <p class="blog-post-subtitle">Deriving PI gains for three nested loops from real motor numbers, not just 'tune the inner loop first'</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/cascaded-pid-control-robot-joint-bandwidth-separation.webp" alt="Isometric illustration of three nested control loops as concentric glowing rings around a robot joint motor" loading="lazy">
+    </div>
+
+    <p>Almost every commercial servo drive controls a robot joint with three nested PID loops: an inner current (torque) loop, a middle velocity loop, and an outer position loop. Vendor manuals tell you to "tune the inner loop first" and keep each loop "5 to 10 times slower" than the one inside it, but they rarely show why, or what numbers actually come out of that rule for a real joint. This article walks through a cascaded PID control loop design from scratch, using real motor and mechanical parameters, so you end up with concrete gains instead of a vague heuristic.</p>
+
+<h2>Why cascade three loops instead of one</h2>
+<p>A single position PID acting directly on motor voltage has to fight everything at once: electrical dynamics, mechanical inertia, friction, and any load disturbance, all through one set of gains. Splitting the problem into nested loops lets each loop handle one physical time constant:</p>
+<ul>
+<li><strong>Current loop</strong> - controls coil current, which is proportional to torque. Fights the fast electrical time constant of the winding.</li>
+<li><strong>Velocity loop</strong> - commands a current setpoint to track a desired joint speed. Fights the mechanical time constant (inertia and friction).</li>
+<li><strong>Position loop</strong> - commands a velocity setpoint to track a desired angle. Usually just a P or PI term on position error.</li>
+</ul>
+<p>Each outer loop treats the loop inside it as an ideal, instantaneous actuator. That assumption only holds if the inner loop is meaningfully faster than the outer one. This is the bandwidth-separation rule, and it is the actual reason cascaded PID control loop tuning works at all.</p>
+
+<h2>Step 1: size the current loop</h2>
+<p>Take a small brushed DC joint motor with winding resistance R = 1.2 Ω and inductance L = 0.8 mH. The electrical time constant is:</p>
+<blockquote>tau_e = L / R = 0.0008 / 1.2 = 0.667 ms</blockquote>
+<p>For a PI current controller with gains Kp_i and Ki_i driving a first-order R-L plant, pole-zero cancellation gives a clean design rule: set Ki_i / Kp_i = R / L (cancels the plant pole), then pick Kp_i to place the closed-loop bandwidth where you want it. For a target current-loop bandwidth of f_i = 2 kHz (omega_i = 2*pi*2000 = 12566 rad/s):</p>
+<blockquote>Kp_i = omega_i * L = 12566 * 0.0008 = 10.05 V/A<br>Ki_i = Kp_i * (R / L) = 10.05 * 1500 = 15075 V/(A*s)</blockquote>
+<p>This loop needs to run at least 5-10x faster than its own bandwidth to behave like a continuous controller, so a 10-20 kHz sample rate is appropriate here. This is the same current-loop structure covered in more depth, including PWM duty cycle conversion, in the <a href="/blog/posts/torque-control-robot-arm-joints-current-sensing.html">torque control article</a> - this piece focuses on what sits on top of it.</p>
+
+<h2>Step 2: size the velocity loop at 1/10 the current-loop bandwidth</h2>
+<p>Take the joint's reflected inertia (motor plus gearbox plus link, referred to the motor shaft) as J = 0.00045 kg*m^2, with viscous friction b = 0.002 N*m*s/rad. The mechanical plant from commanded current to velocity, assuming the current loop is fast enough to be treated as ideal, is:</p><blockquote>J * domega/dt + b * omega = Kt * i_cmd</blockquote><p>with a torque constant Kt = 0.06 N*m/A. Set the velocity-loop bandwidth at 1/10 of the current loop: f_v = 200 Hz, omega_v = 1257 rad/s. Using the same pole-cancellation approach (cancel the mechanical pole b/J, then set the proportional term for the target bandwidth):</p><blockquote>Kp_v = omega_v * J / Kt = 1257 * 0.00045 / 0.06 = 9.43 (A per rad/s)<br>Ki_v = Kp_v * (b / J) = 9.43 * 4.44 = 41.9 (A per rad, per second)</blockquote><p>Run this loop at roughly 2-5 kHz, comfortably inside the current loop's 10-20 kHz but well above its own 200 Hz bandwidth.</p>
+
+<h2>Step 3: size the position loop at 1/10 the velocity-loop bandwidth</h2>
+<p>The position loop treats the velocity loop as an ideal integrator: commanded velocity becomes actual velocity almost instantly relative to position-loop dynamics, and velocity integrates directly to position. That makes the position plant a bare integrator, 1/s, which a proportional-only (or PI) controller handles cleanly. Set the position-loop bandwidth at 1/10 of the velocity loop: f_p = 20 Hz, omega_p = 125.7 rad/s.</p><blockquote>Kp_p = omega_p = 125.7 (rad/s per rad of error)</blockquote><p>In practice this comes out as a commanded velocity of 125.7 rad/s for every radian of position error, saturated by the joint's actual max velocity. Most implementations skip an integral term here, or use a very small one, because integral windup on the position loop compounds badly with the loops underneath it - see the <a href="/blog/posts/pid-anti-windup-robot-joint-worked-example.html">anti-windup article</a> for why. Run the position loop at 200-500 Hz, again a decade below the velocity loop's own bandwidth.</p>
+
+<h2>Why the bandwidth ratio matters</h2>
+<p>If you skip the separation and set, say, the velocity loop to 800 Hz bandwidth (only 2.5x below the current loop instead of 10x), the current loop's own phase lag starts eating into the velocity loop's phase margin. The velocity loop's assumption that current tracks instantly breaks down, and you get overshoot or ringing that looks like a badly tuned velocity PID but is actually a bandwidth-separation violation. The fix is not more derivative gain - it is slowing the outer loop down or speeding the inner loop up.</p>
+<p>Conversely, if the position loop is set too conservatively (say 2 Hz when the velocity loop supports 20 Hz), the joint feels sluggish: it takes visibly longer than necessary to settle onto a new target even though the actuator has plenty of headroom left.</p>
+
+<h2>A quick numeric sanity table</h2>
+<table>
+<tr><th>Loop</th><th>Bandwidth</th><th>Sample rate</th><th>Kp</th><th>Ki</th></tr>
+<tr><td>Current</td><td>2000 Hz</td><td>10-20 kHz</td><td>10.05 V/A</td><td>15075 V/(A*s)</td></tr>
+<tr><td>Velocity</td><td>200 Hz</td><td>2-5 kHz</td><td>9.43 A/(rad/s)</td><td>41.9 A/(rad*s)</td></tr>
+<tr><td>Position</td><td>20 Hz</td><td>200-500 Hz</td><td>125.7 (rad/s)/rad</td><td>0 or small</td></tr>
+</table>
+<p>The pattern to notice: each loop's bandwidth is a decade below the one feeding it, and each loop's sample rate is comfortably above its own bandwidth (roughly 10x). That combination is what makes the "treat the inner loop as ideal" assumption hold well enough in practice.</p>
+
+<h2>Practical tuning order</h2>
+<ol>
+<li>Tune the current loop first, in isolation if your driver allows it (command a current step, verify the response settles in a few electrical time constants with minimal overshoot).</li>
+<li>Tune the velocity loop next, with the current loop active underneath it. Command a velocity step and check for overshoot; back off Kp_v if the response rings.</li>
+<li>Tune the position loop last. Command a position step and watch for overshoot or a sluggish approach; adjust Kp_p while keeping Ki_p small or zero.</li>
+<li>If any outer loop misbehaves, first check whether the bandwidth ratio to its inner loop is still close to 10x before adding more gain.</li>
+</ol>
+<p>These formulas assume linear, well-behaved plant dynamics; real joints add gear backlash, stiction, and sensor noise that will pull the achievable bandwidths down from the ideal numbers above. Treat the pole-cancellation gains as a starting point, then back off Kp on each loop until step responses are clean with 10-20% headroom before the next stability boundary.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

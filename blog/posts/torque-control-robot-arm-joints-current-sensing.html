@@ -132,7 +132,7 @@ I_command = clamp(I_command_raw, -I_max, I_max)</code></pre>
 </ul>
 
 <h2>Conclusion</h2>
-<p>Torque control for robot arm joints is not a separate control paradigm from position or velocity control, it is what sits underneath both once you close a current loop around the motor and use the Kt relationship to translate between amps and newton-meters. The practical payoff is a clean, physically meaningful torque limit you can enforce in software, which is the basis for safe contact tasks and collision response on a real arm.</p>
+<p>Torque control for robot arm joints is not a separate control paradigm from position or velocity control, it is what sits underneath both once you close a current loop around the motor and use the Kt relationship to translate between amps and newton-meters. The practical payoff is a clean, physically meaningful torque limit you can enforce in software, which is the basis for safe contact tasks and collision response on a real arm. For the full nested structure, including how to size the velocity and position loop gains on top of this current loop with a bandwidth-separation rule, see the <a href="/blog/posts/cascaded-pid-control-robot-joint-bandwidth-separation.html">cascaded PID control article</a>.</p>
 
     <div class="blog-cta">
       <h3>Building or studying robotics?</h3>
