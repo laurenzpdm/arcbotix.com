@@ -247,6 +247,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/s-curve-trajectory-jerk-limited-robot-joint-worked-example.html</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/sensorless-bldc-motor-commutation-back-emf-timing.html</loc>
     <lastmod>2026-07-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -296,7 +302,7 @@
   </url>
   <url>
     <loc>https://arcbotix.com/blog/posts/trajectory-planning-for-robotic-arms.html</loc>
-    <lastmod>2026-07-07</lastmod>
+    <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
