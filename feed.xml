@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 24 Jul 2026 07:48:42 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2026 15:52:29 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example</title>
+      <link>https://arcbotix.com/blog/posts/holding-brake-sizing-robot-arm-joint-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/holding-brake-sizing-robot-arm-joint-worked-example.html</guid>
+      <pubDate>Fri, 24 Jul 2026 15:52:12 +0000</pubDate>
+      <description>How to size a spring-applied holding brake for a robot arm joint: gravity torque, gear ratio reflection, safety factor, and free-fall during release time.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>Motor and Gearbox Sizing for a Robot Arm Joint: A Worked Torque Calculation</title>
       <link>https://arcbotix.com/blog/posts/robot-arm-joint-motor-gearbox-torque-sizing.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Mon, 20 Jul 2026 08:42:56 +0000</pubDate>
       <description>EtherCAT for robot joint networks explained with a worked cycle-time budget: frame transmission time, per-slave forwarding delay, and cable propagation.</description>
       <category>Hardware</category>
-    </item>
-    <item>
-      <title>Zero Moment Point for Legged Robot Balance: A Worked Numeric Example</title>
-      <link>https://arcbotix.com/blog/posts/zero-moment-point-legged-robot-balance-worked-example.html</link>
-      <guid>https://arcbotix.com/blog/posts/zero-moment-point-legged-robot-balance-worked-example.html</guid>
-      <pubDate>Mon, 20 Jul 2026 00:39:32 +0000</pubDate>
-      <description>Learn the zero moment point (ZMP) stability criterion for legged robots with a worked numeric example: computing ZMP location and checking it against the support polygon.</description>
-      <category>Control Systems</category>
     </item>
   </channel>
 </rss>
