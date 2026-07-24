@@ -4,7 +4,7 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 51
+- Total articles: 52
 - Last published: 2026-07-24
 
 ## Keyword Pool (not yet used)
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 52 | 2026-07-24 | holding-brake-sizing-robot-arm-joint-worked-example | Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example | holding brake sizing robot arm joint, servo brake torque calculation, fail safe brake robot joint, spring applied brake gear ratio | Hardware | Worked example for sizing a spring-applied fail-safe holding brake on a robot arm joint: computing gravity torque at the output, deciding motor-side vs output-side placement, reflecting torque through the gear ratio, applying a safety factor to pick a catalog brake, and checking free-fall angle during the brake's release time. |
 | 51 | 2026-07-24 | motor-thermal-duty-cycle-sizing-robot-joint-worked-example | Motor Thermal Duty Cycle Sizing for a Robot Joint: A Worked RMS Current Example | motor thermal duty cycle sizing, RMS current motor sizing robot joint, motor thermal time constant robot, continuous vs peak current motor duty cycle | Hardware | Explains motor thermal duty cycle sizing for a robot joint with a full worked numeric example: breaking a repeating pick-and-place motion cycle into current segments, computing RMS current via I_RMS = sqrt(sum(I_k^2 * t_k) / T), comparing it against the motor's continuous current rating, and showing two fixes (extending idle time, offloading holding torque). Also explains when the RMS shortcut is valid versus when to use the full exponential thermal time constant check (T_rise = I^2*R_winding*R_th*(1-e^(-t/tau))) for slow, infrequent, high-duty cycles. |
 | 50 | 2026-07-23 | monte-carlo-localization-particle-filter-worked-example | Monte Carlo Localization (Particle Filter) for Mobile Robots: A Worked Numeric Example | Monte Carlo localization, particle filter robot localization, Monte Carlo localization worked example, low variance resampling | Control Systems | Explains Monte Carlo localization (particle filter localization) by carrying a small set of eight particles through one full prediction-weighting-resampling cycle with real numbers instead of staying in symbolic notation. Covers why MCL is used instead of a Kalman filter for global/multimodal localization, a motion update with per-particle noise sampling, a landmark-range Gaussian likelihood weighting computation with normalized weights, and a full low-variance resampling walkthrough (cumulative weights, fixed-interval draw points, resulting particle selection). Also covers effective sample size as a resampling trigger, particle count practicalities, and the relationship to EKF-SLAM/FastSLAM when the map is also unknown. |
 | 49 | 2026-07-23 | cascaded-pid-control-robot-joint-bandwidth-separation | Cascaded PID Control for Robot Joints: A Worked Bandwidth-Separation Example | cascaded PID control robot joint, cascade control loop tuning robotics, bandwidth separation PID loops, position velocity current control loop | Control Systems | Worked example deriving PI gains for a three-loop cascaded PID control structure (current, velocity, position) on a robot joint, starting from real motor R/L/J/b numbers and a 10x bandwidth-separation rule between loops, with a tuning order and a sanity table of resulting gains and sample rates. |
@@ -270,3 +271,7 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 51)
 - motor-thermal-duty-cycle-sizing-robot-joint-worked-example -> robot-arm-joint-motor-gearbox-torque-sizing (peak-torque motor/gearbox sizing is the prerequisite step before this thermal duty-cycle check)
 - motor-thermal-duty-cycle-sizing-robot-joint-worked-example -> torque-control-robot-arm-joints-current-sensing (thermal sizing feeds into the current control loop that regulates the same motor current this article analyzes)
+
+## Internal links (article 52)
+- holding-brake-sizing-robot-arm-joint-worked-example -> robot-arm-gravity-compensation-worked-example (reuses the same gravity torque formula, contrasts feedforward compensation with a mechanical fail-safe)
+- holding-brake-sizing-robot-arm-joint-worked-example -> robot-arm-e-stop-circuit-design-category-3 (positions the brake as a complementary layer to the e-stop stop-response budget)

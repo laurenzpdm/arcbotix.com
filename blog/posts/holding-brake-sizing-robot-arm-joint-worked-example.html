@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example – Arcbotix</title>
+  <meta name="description" content="How to size a spring-applied holding brake for a robot arm joint: gravity torque, gear ratio reflection, safety factor, and free-fall during release time.">
+  <meta name="keywords" content="holding brake sizing robot arm joint, servo brake torque calculation, fail safe brake robot joint, spring applied brake gear ratio">
+  <meta property="og:title" content="Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example">
+  <meta property="og:description" content="How to size a spring-applied holding brake for a robot arm joint: gravity torque, gear ratio reflection, safety factor, and free-fall during release time.">
+  <meta property="og:image" content="/blog/posts/img/holding-brake-sizing-robot-arm-joint-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/holding-brake-sizing-robot-arm-joint-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/holding-brake-sizing-robot-arm-joint-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-24">July 24, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example</h1>
+    <p class="blog-post-subtitle">A worked calculation for picking a spring-applied brake that actually holds a vertical joint when power drops</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/holding-brake-sizing-robot-arm-joint-worked-example.webp" alt="Isometric technical illustration of a spring-applied holding brake clamped onto a robot arm joint motor shaft" loading="lazy">
+    </div>
+
+    <p>A robot arm joint that fights gravity needs a holding brake, not just a motor that goes limp when the drive disables. If axis 2 or axis 3 of your arm carries a load above the horizontal, cutting power to the motor lets the joint free-fall until something else stops it: a hard stop, the floor, or a person's hand. Holding brake sizing for a robot arm joint means answering one specific question with real numbers: how much static torque does the brake need to hold, and how far does the joint move before the brake actually clamps down.</p>
+
+<h2>What a holding brake actually does</h2>
+<p>A servo holding brake is a small spring-applied, electromagnetically-released disc brake mounted on the back of a motor. Under normal operation the coil is energized, an electromagnet pulls back an armature plate against the spring, and the shaft spins free. Cut the coil voltage (intentionally, or because of an e-stop or power loss) and the spring re-engages the friction disc in tens of milliseconds. This is the opposite failure direction from a normal friction clutch: no power means clamped, not free.</p>
+<p>This is not a dynamic brake. It is not rated to dissipate the kinetic energy of a joint decelerating from speed, and running it that way repeatedly will glaze the friction lining and shorten its life fast. Its job is purely static: hold a stationary shaft against a constant load once the joint has already stopped.</p>
+
+<h3>Where it fits with other safety hardware</h3>
+<p>A holding brake is not a substitute for a proper stop circuit. It is a complementary layer: the <a href="/blog/posts/robot-arm-e-stop-circuit-design-category-3.html">Category 3 dual-channel e-stop circuit</a> cuts drive enable and removes power fast, and the brake is what keeps a vertical axis from sagging afterward while the arm sits disabled. If your arm only moves in the horizontal plane, or every load-bearing axis is naturally balanced (counterweighted or below a strong enough gearbox worm stage that it cannot back-drive), you may not need one at all. Check backdrivability before assuming a brake is required.</p>
+
+<h2>Step 1: Find the gravity torque at the joint</h2>
+<p>Start at the output shaft, where the physical load actually acts. Take a simple example: axis 2 of a small arm carries a forearm and gripper assembly with a combined mass of 4.0 kg, whose center of mass sits 0.28 m from the joint axis when the arm is extended horizontally, the worst case for gravity torque.</p>
+<pre><code>tau_gravity = m * g * l
+tau_gravity = 4.0 kg * 9.81 m/s^2 * 0.28 m
+tau_gravity = 10.99 N*m</code></pre>
+<p>This is the same gravity torque term used in a <a href="/blog/posts/robot-arm-gravity-compensation-worked-example.html">gravity feedforward calculation for a PD position loop</a>, but here you are not feeding it forward, you are sizing a mechanical part to resist it with zero electronics involved.</p>
+
+<h2>Step 2: Decide where the brake sits, output side or motor side</h2>
+<p>This is the design decision that changes your torque number by orders of magnitude. Most robot arm brakes mount on the back of the motor, before the gearbox, not on the output shaft. That means the required brake torque is the output torque divided by the gear ratio.</p>
+<p>Say this joint uses a 50:1 harmonic drive with 85% efficiency. Reflecting the load back to the motor side:</p>
+<pre><code>tau_brake,motor = tau_gravity / (N * eta)
+tau_brake,motor = 10.99 / (50 * 0.85)
+tau_brake,motor = 0.258 N*m</code></pre>
+<p>A quarter of a newton-meter is a small, cheap, low-inertia brake instead of an 11 N*m output-side unit. This is why motor-side placement is the default choice on most small and mid-size arms. The tradeoff is that the brake now trusts the gearbox and its coupling to hold too; if a tooth strips or a coupling slips, the brake holds the motor shaft while the joint itself is free. Output-side brakes avoid that failure mode but cost more, add mass at the worst possible location (far from the base), and rarely fit inside a compact joint housing. For most builds, motor-side placement with a gearbox you trust is the right call; only go output-side on safety-critical high-payload axes where gearbox failure has to be tolerated.</p>
+
+<h2>Step 3: Apply a safety factor</h2>
+<p>Never size a brake to its bare calculated torque. Friction linings wear, air gaps grow, coil voltage sags under a shared 24V bus, and your gravity torque estimate itself has some error in the mass and center-of-mass numbers. A safety factor of 2 to 3 on holding torque is standard practice for fail-safe brakes, mirroring the same margin philosophy used when sizing an e-stop's stop-response time budget rather than trusting the nominal spec.</p>
+<pre><code>tau_brake,required = 0.258 * 2.5
+tau_brake,required = 0.645 N*m</code></pre>
+<p>Now you pick the next catalog size at or above 0.645 N*m from a supplier like Mayr, Kendrion, or Miki Pulley. A typical small servo brake line jumps from 0.32 N*m to 0.8 N*m to 2.0 N*m, so you would select the 0.8 N*m unit.</p>
+
+<h2>Step 4: Check the free-fall during release time</h2>
+<p>Sizing the torque only answers whether the brake can hold once engaged. The other question is how far the joint moves before it engages. A spring-applied brake needs 20 to 80 ms to fully re-clamp after the coil de-energizes, and during that window the joint is still being decelerated only by friction and the motor's own detent torque, both small.</p>
+<p>Approximate the joint's angular acceleration under gravity torque alone, ignoring friction as a worst case:</p>
+<pre><code>alpha = tau_gravity / J_joint</code></pre>
+<p>For this arm, if the reflected inertia at the joint (link plus reflected motor/gearbox inertia) is roughly 0.15 kg*m^2, and using an 80 ms worst-case release time:</p>
+<pre><code>alpha = 10.99 / 0.15 = 73.3 rad/s^2
+delta_theta = 0.5 * alpha * t^2
+delta_theta = 0.5 * 73.3 * (0.08)^2
+delta_theta = 0.234 rad = 13.4 degrees</code></pre>
+<p>Thirteen degrees of drop in the worst case before the brake catches is significant for a joint working near a fixture or a person. If that is not acceptable, the fix is not a bigger brake, it is a faster one: look for a brake spec with a shorter release time, or add mechanical damping (a friction disc, a small dashpot) that limits fall speed independent of the brake.</p>
+
+<h2>Practical checklist</h2>
+<ul>
+<li>Compute worst-case gravity torque at the output, using the arm pose that maximizes moment arm.</li>
+<li>Decide motor-side vs output-side placement based on how much you trust the gearbox and coupling.</li>
+<li>Reflect torque through gear ratio and efficiency if motor-side.</li>
+<li>Apply a 2 to 3x safety factor before picking a catalog size.</li>
+<li>Check free-fall angle during the brake's rated release time at your worst-case reflected inertia.</li>
+<li>Confirm the brake coil is wired to fail engaged on power loss, not just on a commanded disable.</li>
+</ul>
+
+<blockquote>A brake sized only for static holding torque and never checked against release-time free-fall will pass a bench test and still let a joint drop noticeably in the field, because the bench test rarely reproduces the worst-case pose and reflected inertia together.</blockquote>
+
+<p>Holding brake sizing for a robot arm joint is a short calculation, but skipping the release-time check is the most common mistake: a correctly sized brake can still let a joint swing through a dangerous arc before it actually stops anything.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
