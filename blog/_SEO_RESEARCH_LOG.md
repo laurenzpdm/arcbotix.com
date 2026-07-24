@@ -386,6 +386,12 @@ section still reflects reality. Log either the change made and why, or
 - Chose "Monte Carlo localization (particle filter) for mobile robots: a worked numeric example" - top pages are either academic slide decks (MIT, Berkeley), abstract Medium walkthroughs with code but no concrete numbers, or Wikipedia's conceptual summary; complements the existing EKF-SLAM and SLAM-basics articles by covering the non-Gaussian localization case.
 - Weakness in current top pages: none carry a small particle set (e.g. 5-8 particles) through one full prediction-weight-resample cycle with actual pose numbers, a real landmark-range likelihood computation, and low-variance resampling arithmetic a builder can check by hand before trusting a library implementation.
 
+### 2026-07-24
+- Candidates checked: ROS2 lifecycle nodes, cycloidal vs harmonic drive gearboxes, voice coil actuator sizing for robot joints, Isaac Sim vs Gazebo comparison, motor thermal duty-cycle sizing for robot joints.
+- ROS2 lifecycle nodes: reconfirmed thoroughly covered by official docs, Foxglove, and Medium walkthroughs - skipped again. Cycloidal vs harmonic: a substack piece and several vendor comparison pages (Cone Drive, PlaPivot, howtomechatronics with test data) already cover it well - skipped. Voice coil actuators: real coverage gap but the use case is niche (linear/haptic stages, rarely a robot joint) - deferred as a backup. Isaac Sim vs Gazebo: existing comparison blogs (Trossen, VnRobo, BlackCoffee) already give a fair qualitative rundown - too thin a gap for a worked-numeric piece.
+- Chose "motor thermal duty-cycle sizing for a robot joint: a worked RMS current example" - top pages are either vendor generic explainers (The Robot Report), a forum thread with no math, or academic thermal-model papers (MDPI, Stanford climbing-robot PDF) too heavy for a builder.
+- Weakness in current top pages: none walk through computing the actual RMS current over a real move-and-hold duty cycle, comparing it against a motor's continuous current rating, and showing the thermal time constant math that tells a builder how long they can run at peak current before the winding overheats - despite this being one of the most common motor-sizing follow-up questions after continuous-vs-peak torque selection.
+
 ## Strategy Adjustments
 
 ### 2026-07-23 audit (article 50)

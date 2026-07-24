@@ -125,7 +125,7 @@ tau_worst_case = tau_static + tau_dynamic
 
 <h2>Step 5: Continuous vs Peak Torque, and Duty Cycle</h2>
 <p>Motor datasheets list both a peak (or stall) torque and a continuous torque, sometimes buried in a thermal curve rather than a single number. Peak torque is only available briefly before winding temperature rises past the motor's insulation rating. A joint that has to hold a fixed pose against gravity for extended periods, like a shoulder joint supporting an outstretched arm, is a continuous-duty load and must be sized against the continuous rating, not the peak one, even though the peak number looks far more attractive on a spec sheet.</p>
-<p>A joint that only sees torque briefly during a fast move and then relaxes, like a gripper actuator that closes and releases, can be sized closer to the peak rating with a shorter duty cycle, since the winding has time to cool between actuations. Check the motor's thermal time constant against your actual hold times before assuming a peak-rated sizing is safe.</p>
+<p>A joint that only sees torque briefly during a fast move and then relaxes, like a gripper actuator that closes and releases, can be sized closer to the peak rating with a shorter duty cycle, since the winding has time to cool between actuations. Check the motor's thermal time constant against your actual hold times before assuming a peak-rated sizing is safe, and see <a href="/blog/posts/motor-thermal-duty-cycle-sizing-robot-joint-worked-example.html">motor thermal duty cycle sizing</a> for a worked RMS current example of this check.</p>
 
 <h2>Putting the Chain Together</h2>
 <ul>
