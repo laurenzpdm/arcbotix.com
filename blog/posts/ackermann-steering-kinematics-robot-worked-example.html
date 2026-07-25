@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Ackermann Steering Kinematics for Robots: A Worked Example – Arcbotix</title>
+  <meta name="description" content="Ackermann steering kinematics explained with a worked example: turning radius, inner/outer wheel angles, and why one steering angle causes tire scrub.">
+  <meta name="keywords" content="Ackermann steering kinematics, Ackermann steering robot, Ackermann steering angle calculation, car-like robot kinematics">
+  <meta property="og:title" content="Ackermann Steering Kinematics for Robots: A Worked Example">
+  <meta property="og:description" content="Ackermann steering kinematics explained with a worked example: turning radius, inner/outer wheel angles, and why one steering angle causes tire scrub.">
+  <meta property="og:image" content="/blog/posts/img/ackermann-steering-kinematics-robot-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/ackermann-steering-kinematics-robot-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/ackermann-steering-kinematics-robot-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-25">July 25, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Ackermann Steering Kinematics for Robots: A Worked Example</h1>
+    <p class="blog-post-subtitle">Turning a wheelbase, track width, and desired turn radius into two different front wheel angles</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/ackermann-steering-kinematics-robot-worked-example.webp" alt="Isometric technical illustration of a four-wheeled robot chassis with front wheels turned at Ackermann steering angles toward a common turn center" loading="lazy">
+    </div>
+
+    <p>Any robot that steers with two front wheels on a common axle, like an RC car chassis, a warehouse tugger, or an outdoor rover with a car-like drivetrain, runs into the same problem the moment you turn: the inner and outer front wheels do not travel on circles of the same radius. If you steer both wheels to the same angle, at least one of them scrubs sideways against the ground every time you turn. Ackermann steering kinematics is the geometry that fixes this by giving each front wheel a slightly different angle. This article works through the actual numbers for a real chassis.</p>
+
+<h2>The Ackermann steering geometry</h2>
+<p>A car-like robot has a fixed wheelbase <code>L</code> (distance from front axle to rear axle) and a fixed track width <code>W</code> (distance between the left and right wheels). The rear wheels do not steer; only the front wheels turn, and they rotate about a common steering axis roughly above the rear axle's centerline extended forward.</p>
+<p>The key geometric fact is this: for the robot to turn without any wheel scrubbing, every wheel's velocity vector must be perpendicular to a line drawn from that wheel to a single common point, called the instantaneous center of rotation (ICR). For a two-wheel-steer chassis, the ICR sits on the extended line of the rear axle. Because the two front wheels are different distances from that ICR, they must point at different angles.</p>
+<p>Define the desired turning radius <code>R</code> as the distance from the ICR to the centerline of the vehicle (measured at the rear axle). The ideal Ackermann angles for the inner and outer front wheels are:</p>
+<blockquote>
+delta_inner = atan( L / (R - W/2) )<br>
+delta_outer = atan( L / (R + W/2) )
+</blockquote>
+<p>The inner wheel (the one closer to the turn center) always gets the larger steering angle. A simplified "bicycle model" angle, treating the vehicle as a single wheel at the centerline, is <code>delta_bicycle = atan(L / R)</code>, and it always falls between the inner and outer angles.</p>
+
+<h2>Worked example: sizing the steering angles</h2>
+<p>Take a small outdoor rover with a car-like front axle:</p>
+<ul>
+<li>Wheelbase L = 0.40 m</li>
+<li>Track width W = 0.30 m</li>
+<li>Desired turning radius R = 1.20 m (measured to the vehicle centerline at the rear axle)</li>
+</ul>
+<p>First, the bicycle-model reference angle:</p>
+<blockquote>delta_bicycle = atan(0.40 / 1.20) = atan(0.3333) = 18.43 deg</blockquote>
+<p>Now the two real front wheel angles. For the inner wheel (turning left, so the left wheel is inner):</p>
+<blockquote>delta_inner = atan( 0.40 / (1.20 - 0.15) ) = atan(0.40 / 1.05) = atan(0.3810) = 20.86 deg</blockquote>
+<p>For the outer wheel:</p>
+<blockquote>delta_outer = atan( 0.40 / (1.20 + 0.15) ) = atan(0.40 / 1.35) = atan(0.2963) = 16.50 deg</blockquote>
+<p>So for this rover, a 1.20 m turn radius means the inner wheel should point 20.86 degrees while the outer wheel points 16.50 degrees, a 4.36 degree spread. If a hobby steering linkage instead sends both wheels to the bicycle-model angle of 18.43 degrees, the outer wheel is off by about 1.9 degrees and the inner wheel by about 2.4 degrees relative to their true Ackermann angles.</p>
+
+<h3>Why the error matters more at tight radii</h3>
+<p>The angle spread between inner and outer wheels grows as the turn radius shrinks, because the <code>W/2</code> term becomes a bigger fraction of R. Repeat the same calculation at R = 0.60 m (a much tighter turn):</p>
+<blockquote>
+delta_inner = atan(0.40 / (0.60 - 0.15)) = atan(0.40/0.45) = 41.63 deg<br>
+delta_outer = atan(0.40 / (0.60 + 0.15)) = atan(0.40/0.75) = 28.07 deg
+</blockquote>
+<p>That is a 13.6 degree spread, roughly three times larger than at R = 1.20 m. This is why tire scrub, extra motor load, and accelerated tire wear from a non-Ackermann (parallel) steering linkage show up mainly during tight maneuvering, like parking or turning in an aisle, and barely matter at highway-radius turns. If your rover mostly drives large sweeping arcs, a simplified parallel-steering linkage may be an acceptable approximation; if it needs to turn sharply in a warehouse aisle, the geometry error becomes significant.</p>
+
+<h2>From body velocity command to wheel angle</h2>
+<p>In practice a robot's motion planner usually issues a body-frame command (v, omega) rather than a turning radius directly, the same v/omega convention used for <a href="differential-drive-robot-kinematics-odometry.html">differential drive kinematics</a>. The turning radius follows directly:</p>
+<blockquote>R = v / omega</blockquote>
+<p>with the sign of omega giving the turn direction (positive omega turns left, so the left wheel becomes the inner wheel). Given R, plug it into the two equations above to get delta_inner and delta_outer, then send those to the two steering servos or the steering rack actuator. A minimum viable control loop looks like this in pseudocode:</p>
+<pre><code>def ackermann_angles(v, omega, L, W):
+    if abs(omega) &lt; 1e-6:
+        return 0.0, 0.0  # straight line
+    R = v / omega
+    if R &gt;= 0:
+        left_is_inner = True
+    else:
+        left_is_inner = False
+    R_abs = abs(R)
+    d_inner = atan(L / (R_abs - W/2))
+    d_outer = atan(L / (R_abs + W/2))
+    if left_is_inner:
+        return d_inner, d_outer   # left, right
+    else:
+        return d_outer, d_inner
+</code></pre>
+<p>Note the equation breaks down (R - W/2 goes to zero or negative) if the requested turning radius is tighter than roughly W/2, which is a hard physical limit for any two-wheel-steer chassis, not a bug in the formula. Clamp the commanded omega so R never gets smaller than your linkage's mechanical minimum radius, which is usually set by the steering rack's travel limits rather than the Ackermann geometry itself.</p>
+
+<h2>Real linkages approximate, they do not solve, Ackermann geometry</h2>
+<p>Almost no physical steering linkage computes atan() in hardware. Traditional rack-and-pinion or four-bar Ackermann linkages are mechanically shaped (trapezoidal tie-rod geometry) to approximate the correct angle relationship across a limited range of steering travel, and only match the ideal curve exactly at a couple of design points; everywhere else there is a small residual error. A robot with two independent steering servos, one per front wheel, does not have this constraint: it can compute delta_inner and delta_outer directly from the formulas above and drive each servo to its exact target every control cycle, which is why independently-actuated steering axles are common on research rovers even though they cost two servos instead of one steering rack.</p>
+
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Using one steering angle for both wheels.</strong> This is the parallel-steering error shown above; it works fine for large radii but scrubs tires and adds drivetrain load on tight turns.</li>
+<li><strong>Measuring R from the wrong reference point.</strong> R must be measured to the centerline at the rear axle, not to the front axle or to one of the front wheels, or the inner/outer split will be wrong even if the bicycle-model angle looks reasonable.</li>
+<li><strong>Ignoring the minimum radius limit.</strong> If a commanded omega implies R smaller than W/2, the inner-wheel formula divides by a negative or near-zero number; clamp the input before it reaches the atan() call instead of letting it produce a nonsensical angle.</li>
+</ul>
+
+<p>Ackermann geometry only defines the kinematic steering angles; it says nothing about tire slip, weight transfer, or dynamic effects at speed. For a slow-moving indoor or outdoor rover this pure kinematic model is normally accurate enough, and it is the right starting point before adding any slip-angle correction.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

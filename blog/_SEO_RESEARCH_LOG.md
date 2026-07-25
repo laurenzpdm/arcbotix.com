@@ -405,6 +405,12 @@ section still reflects reality. Log either the change made and why, or
 - Chose "current sensing circuit design for robot motor drivers: a worked shunt resistor sizing example" - top pages are vendor app notes (Allegro, NXP), a TI datasheet, and a forum thread, none of which size a shunt value, amplifier gain, and ADC resolution together for a concrete robot joint current range, and this is distinct from the existing torque-control article which covers the current-loop control math, not the sensing hardware itself.
 - Weakness in current top pages: none walk through picking a shunt resistance from a target current range and power dissipation budget, then sizing the sense-amplifier gain and checking the resulting ADC resolution in amps per LSB for a specific robot joint's continuous/peak current numbers.
 
+### 2026-07-25
+- Candidates checked: Ackermann steering kinematics for robots (worked example), cycloidal drive gear ratio sizing (re-checked), Denavit-Hartenberg forward kinematics (re-checked), battery management system (BMS) design for mobile robots.
+- Cycloidal drive: reconfirmed saturated again, same conclusion as 2026-07-20, 2026-07-21, and 2026-07-23 - howtomechatronics, IMSystems and Firgelli already give thorough design/formula walkthroughs. DH parameters: reconfirmed saturated (automaticaddison.com, Robotiq, Clemson textbook). BMS design: real vendor coverage (NXP, Highleap, large-battery.com) already explains cell balancing and protection functions clearly at a usable level - gap thinner and more hardware-buying-guide shaped than formula driven.
+- Chose "Ackermann steering kinematics for robots: a worked example": top pages are MATLAB/MathWorks reference docs, the ROS2_control kinematics page, and a robotics textbook chapter that state the ẋ, ẏ, θ̇ equations and the inner/outer wheel steering-angle formulas correctly but never run them through a concrete wheelbase/track-width numeric example.
+- Weakness in current top pages: none compute an actual turning radius and the resulting inner/outer front wheel steering angles for a real car-like robot (wheelbase, track width, requested turn radius), and none show why a single ideal Ackermann angle applied to both front wheels causes tire scrub, or connect it back to differential-drive/mecanum kinematics already covered on the site for comparison.
+
 ## Strategy Adjustments
 
 ### 2026-07-23 audit (article 50)

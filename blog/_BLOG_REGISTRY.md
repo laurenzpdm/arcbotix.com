@@ -4,8 +4,8 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 53
-- Last published: 2026-07-24
+- Total articles: 54
+- Last published: 2026-07-25
 
 ## Keyword Pool (not yet used)
 - PID controller tuning for robotic arms
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 54 | 2026-07-25 | ackermann-steering-kinematics-robot-worked-example | Ackermann Steering Kinematics for Robots: A Worked Example | Ackermann steering kinematics, Ackermann steering robot, Ackermann steering angle calculation, car-like robot kinematics | Control Systems | Derives Ackermann steering kinematics for a car-like (two front wheel steer) robot: the geometric requirement that all wheels turn about a common instantaneous center of rotation, the inner/outer wheel steering angle formulas (delta = atan(L/(R -+ W/2))), a worked numeric example for a 0.40m wheelbase / 0.30m track width rover at R=1.20m (inner 20.86 deg, outer 16.50 deg) and again at a tighter R=0.60m to show the angle spread triples, a body-velocity-to-steering-angle pseudocode function, and why real trapezoidal steering linkages only approximate rather than exactly solve the Ackermann curve. |
 | 53 | 2026-07-24 | shunt-resistor-current-sensing-motor-driver-sizing-worked-example | Current Sensing Circuit Design for Robot Motor Drivers: A Worked Shunt Resistor Sizing Example | shunt resistor current sensing, current sensing circuit design robot motor driver, current sense amplifier gain sizing, ADC resolution current sensing robotics | Hardware | Worked numeric example of current sensing circuit design for a robot motor driver, covering the four linked sizing steps together: shunt resistor value selection from a target sense voltage and peak current (Rshunt = 5 mOhm for Ipeak=20A, Vsense_max=100mV), power dissipation check (2.0W peak, 0.32W continuous), sense-amplifier gain selection (20 V/V, giving 2.0V output at peak with headroom to the 3.3V ADC reference), and resulting ADC resolution (12-bit/3.3V ADC gives ~8.06 mA/LSB, full-scale current of 33A with peak at 61% of full scale). Also covers low-side vs high-side shunt placement tradeoffs and the importance of Kelvin-sensing PCB layout for the shunt connections. Distinct from the existing torque-control article, which covers current-loop control math rather than the sensing hardware itself. |
 | 52 | 2026-07-24 | holding-brake-sizing-robot-arm-joint-worked-example | Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example | holding brake sizing robot arm joint, servo brake torque calculation, fail safe brake robot joint, spring applied brake gear ratio | Hardware | Worked example for sizing a spring-applied fail-safe holding brake on a robot arm joint: computing gravity torque at the output, deciding motor-side vs output-side placement, reflecting torque through the gear ratio, applying a safety factor to pick a catalog brake, and checking free-fall angle during the brake's release time. |
 | 51 | 2026-07-24 | motor-thermal-duty-cycle-sizing-robot-joint-worked-example | Motor Thermal Duty Cycle Sizing for a Robot Joint: A Worked RMS Current Example | motor thermal duty cycle sizing, RMS current motor sizing robot joint, motor thermal time constant robot, continuous vs peak current motor duty cycle | Hardware | Explains motor thermal duty cycle sizing for a robot joint with a full worked numeric example: breaking a repeating pick-and-place motion cycle into current segments, computing RMS current via I_RMS = sqrt(sum(I_k^2 * t_k) / T), comparing it against the motor's continuous current rating, and showing two fixes (extending idle time, offloading holding torque). Also explains when the RMS shortcut is valid versus when to use the full exponential thermal time constant check (T_rise = I^2*R_winding*R_th*(1-e^(-t/tau))) for slow, infrequent, high-duty cycles. |
@@ -280,3 +281,6 @@ hand-edit the table below except to fix a clear data error.
 ## Internal links (article 53)
 - shunt-resistor-current-sensing-motor-driver-sizing-worked-example -> torque-control-robot-arm-joints-current-sensing (notes the sensed current feeds directly into the torque-control loop via the motor's torque constant)
 - shunt-resistor-current-sensing-motor-driver-sizing-worked-example -> motor-thermal-duty-cycle-sizing-robot-joint-worked-example (compares the shunt's pulse-power thermal check to the motor winding's duty-cycle thermal check)
+
+## Internal links (article 54)
+- ackermann-steering-kinematics-robot-worked-example -> differential-drive-robot-kinematics-odometry (links to the v/omega body velocity command convention shared with differential drive kinematics)
