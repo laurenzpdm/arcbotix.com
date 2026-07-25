@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 24 Jul 2026 15:52:29 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 25 Jul 2026 00:00:33 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Current Sensing Circuit Design for Robot Motor Drivers: A Worked Shunt Resistor Sizing Example</title>
+      <link>https://arcbotix.com/blog/posts/shunt-resistor-current-sensing-motor-driver-sizing-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/shunt-resistor-current-sensing-motor-driver-sizing-worked-example.html</guid>
+      <pubDate>Fri, 24 Jul 2026 23:59:40 +0000</pubDate>
+      <description>Shunt resistor current sensing for robot motor drivers: pick the resistor value, check power dissipation, size the amplifier gain, and check ADC resolution.</description>
+      <category>Hardware</category>
+    </item>
     <item>
       <title>Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example</title>
       <link>https://arcbotix.com/blog/posts/holding-brake-sizing-robot-arm-joint-worked-example.html</link>
@@ -157,14 +165,6 @@
       <guid>https://arcbotix.com/blog/posts/rs485-modbus-robot-joint-network-wiring-polling-budget.html</guid>
       <pubDate>Mon, 20 Jul 2026 16:46:12 +0000</pubDate>
       <description>RS-485/Modbus robot joint network wiring, addressing, and the frame-time math that determines how fast you can actually poll N daisy-chained joint drivers.</description>
-      <category>Hardware</category>
-    </item>
-    <item>
-      <title>EtherCAT for Robot Joint Networks: How the Cycle-Time Budget Actually Works</title>
-      <link>https://arcbotix.com/blog/posts/ethercat-robot-joint-network-cycle-time-budget.html</link>
-      <guid>https://arcbotix.com/blog/posts/ethercat-robot-joint-network-cycle-time-budget.html</guid>
-      <pubDate>Mon, 20 Jul 2026 08:42:56 +0000</pubDate>
-      <description>EtherCAT for robot joint networks explained with a worked cycle-time budget: frame transmission time, per-slave forwarding delay, and cable propagation.</description>
       <category>Hardware</category>
     </item>
   </channel>
