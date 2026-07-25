@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Current Sensing Circuit Design for Robot Motor Drivers: A Worked Shunt Resistor Sizing Example – Arcbotix</title>
+  <meta name="description" content="Shunt resistor current sensing for robot motor drivers: pick the resistor value, check power dissipation, size the amplifier gain, and check ADC resolution.">
+  <meta name="keywords" content="shunt resistor current sensing, current sensing circuit design robot motor driver, current sense amplifier gain sizing, ADC resolution current sensing robotics">
+  <meta property="og:title" content="Current Sensing Circuit Design for Robot Motor Drivers: A Worked Shunt Resistor Sizing Example">
+  <meta property="og:description" content="Shunt resistor current sensing for robot motor drivers: pick the resistor value, check power dissipation, size the amplifier gain, and check ADC resolution.">
+  <meta property="og:image" content="/blog/posts/img/shunt-resistor-current-sensing-motor-driver-sizing-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/shunt-resistor-current-sensing-motor-driver-sizing-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/shunt-resistor-current-sensing-motor-driver-sizing-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Hardware</span>
+      <time datetime="2026-07-24">July 24, 2026</time>
+      <span>5 min read</span>
+    </div>
+    <h1 class="blog-post-title">Current Sensing Circuit Design for Robot Motor Drivers: A Worked Shunt Resistor Sizing Example</h1>
+    <p class="blog-post-subtitle">Sizing the shunt value, the sense-amplifier gain, and the resulting amps-per-LSB for a real robot joint driver</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/shunt-resistor-current-sensing-motor-driver-sizing-worked-example.webp" alt="Isometric technical illustration of a motor driver PCB with a shunt resistor and current-sense amplifier near a robot joint connector, dark background with blue and cyan lighting" loading="lazy">
+    </div>
+
+    <p>Current sensing circuit design for a robot motor driver comes down to four linked numbers: the shunt resistor value, the power it has to dissipate, the sense-amplifier gain, and the resulting current resolution at the ADC. Most application notes explain each piece in isolation. This article works through all four together for a concrete robot joint driver, so you end with a shunt value and gain you can actually put in a bill of materials.</p>
+
+<h2>What the Current-Sense Chain Actually Has to Resolve</h2>
+<p>Take a joint driver with these requirements, typical of a mid-size arm joint on a 24 V bus:</p>
+<blockquote>Continuous current: 8 A<br>Peak current (short moves, direction changes): 20 A<br>ADC: 12-bit, 3.3 V reference</blockquote>
+<p>The sensing chain has to produce a voltage the microcontroller's ADC can read cleanly across that whole range, without wasting so much power in the shunt that it becomes a heat problem, and without pinning the amplifier output against the supply rail during a peak move.</p>
+
+<h2>Step 1: Pick the Shunt Resistor Value</h2>
+<p>Start from the sense-amplifier's usable input range. A common low-side current-sense amplifier accepts a shunt voltage up to roughly 100 mV before nonlinearity creeps in. Size the shunt so peak current lands at or just under that limit:</p>
+<blockquote>Rshunt = Vsense_max / Ipeak = 0.1 V / 20 A = 5 m&Omega;</blockquote>
+<p>5 m&Omega; is a standard current-sense resistor value, so no custom part is needed. At the two operating points:</p>
+<blockquote>Vsense at 20 A peak = 20 &times; 0.005 = 0.100 V<br>Vsense at 8 A continuous = 8 &times; 0.005 = 0.040 V</blockquote>
+
+<h2>Step 2: Check the Power Dissipation</h2>
+<p>Power in the shunt sets the resistor's physical size and package rating:</p>
+<blockquote>P_peak = I&sup2; &times; R = 20&sup2; &times; 0.005 = 2.0 W<br>P_continuous = 8&sup2; &times; 0.005 = 0.32 W</blockquote>
+<p>Peak current only lasts for short moves, so the resistor doesn't need to survive 2 W continuously, but it does need enough thermal mass and a low enough thermal resistance to shed that 2 W pulse without a large temperature spike, which would shift its resistance and add measurement error. A 1 W to 2 W surface-mount current-sense resistor with a low temperature coefficient, on a copper pour sized for the continuous 0.32 W, is the usual choice here. Skipping this check is a common way a current-sensing circuit works fine on the bench and then drifts once the joint runs a real duty cycle, similar to how a <a href="/blog/posts/motor-thermal-duty-cycle-sizing-robot-joint-worked-example.html">motor winding itself needs a duty-cycle-based thermal check</a> rather than just a continuous-rating check.</p>
+
+<h2>Step 3: Size the Sense-Amplifier Gain</h2>
+<p>With Rshunt fixed at 5 m&Omega;, pick an amplifier gain that uses as much of the ADC's input range as possible at peak current without clipping. Using a gain of 20 V/V, a common fixed-gain option in this class of part:</p>
+<blockquote>Vout at 20 A peak = 0.100 V &times; 20 = 2.0 V<br>Vout at 8 A continuous = 0.040 V &times; 20 = 0.8 V</blockquote>
+<p>Against a 3.3 V ADC reference, 2.0 V at peak current leaves about 1.3 V of headroom, which covers current overshoot during a hard direction reversal without saturating the amplifier output. A higher gain would use more of the ADC range at the cost of that headroom; a lower gain wastes resolution. 20 V/V is a reasonable middle point for this current range.</p>
+
+<h2>Step 4: Check the Resulting ADC Resolution</h2>
+<p>The whole point of the previous three steps is this number: how much current one ADC count actually represents. For a 12-bit ADC on a 3.3 V reference:</p>
+<blockquote>1 LSB = 3.3 V / 4096 &asymp; 0.8057 mV</blockquote>
+<p>Converting that voltage step back through the gain and shunt value gives the current resolution:</p>
+<blockquote>Amps per LSB = LSB / (Gain &times; Rshunt) = 0.0008057 / (20 &times; 0.005) &asymp; 8.06 mA/LSB</blockquote>
+<p>For a joint that needs to detect a stall or a light contact event in the tens-of-milliamps range, roughly 8 mA of resolution per count is enough margin. If a design instead needed to resolve single-digit milliamps, the fix is not a finer ADC alone; it's usually a smaller shunt paired with a higher gain, which keeps the same peak-current headroom while shrinking the volts-per-amp step at the low end. It's also worth checking the full-scale current implied by the chain, since that tells you how much margin exists above the expected peak:</p>
+<blockquote>Full-scale current = Vref / (Gain &times; Rshunt) = 3.3 / (20 &times; 0.005) = 33 A</blockquote>
+<p>The 20 A peak sits at about 61 percent of that 33 A full-scale value, which is the same headroom conclusion from the gain step, just expressed as a current instead of a voltage.</p>
+
+<h2>Step 5: Low-Side vs High-Side, and Kelvin Sensing</h2>
+<p>A low-side shunt, placed between the motor driver's low-side switches and ground, is simpler to interface because the amplifier's common-mode voltage stays near ground. Its downside is that it can't distinguish a motor short to ground from a normal high current event, and it sits in the return path shared with other circuitry, which can inject switching noise into other ground-referenced sensors. A high-side shunt, placed between the supply rail and the driver, avoids both problems but needs a sense amplifier rated for the full bus voltage as its common-mode input.</p>
+<p>Whichever side you choose, route the sense connections as a proper Kelvin pair: two separate traces from the amplifier straight to the resistor's sense pads, not shared with the traces carrying the load current. A shunt resistor's pads have their own contact resistance, and folding that into the main power path adds an error that swamps the careful gain and resolution numbers above. This is the detail most current-sensing writeups mention in a single sentence and most first-pass PCB layouts get wrong.</p>
+<p>Once the shunt, gain, and ADC resolution are sized this way, the resulting current reading feeds directly into a <a href="/blog/posts/torque-control-robot-arm-joints-current-sensing.html">torque-control loop, using the motor's torque constant</a> to convert measured current into commanded torque, or into a stall/collision detection threshold. The sensing hardware and the control loop that consumes it are worth designing as two separate steps: get the volts-per-amp chain right first, then tune the loop that reads it.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>
