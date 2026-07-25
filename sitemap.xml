@@ -103,6 +103,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://arcbotix.com/blog/posts/hand-eye-calibration-robot-arm-camera-worked-example.html</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://arcbotix.com/blog/posts/harmonic-drive-vs-planetary-gearbox.html</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>

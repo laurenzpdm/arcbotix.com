@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 25 Jul 2026 08:03:18 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 25 Jul 2026 13:49:47 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Hand-Eye Calibration for a Robot Arm Camera: A Worked Numeric Example</title>
+      <link>https://arcbotix.com/blog/posts/hand-eye-calibration-robot-arm-camera-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/hand-eye-calibration-robot-arm-camera-worked-example.html</guid>
+      <pubDate>Sat, 25 Jul 2026 13:49:17 +0000</pubDate>
+      <description>Hand-eye calibration explained with a worked eye-in-hand AX=XB example: real pose pairs, why one motion is degenerate, and how to solve for the camera offset.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Ackermann Steering Kinematics for Robots: A Worked Example</title>
       <link>https://arcbotix.com/blog/posts/ackermann-steering-kinematics-robot-worked-example.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Tue, 21 Jul 2026 08:54:12 +0000</pubDate>
       <description>Ball screw vs lead screw for a robot linear actuator, with a full worked torque sizing example for a SCARA Z-axis lift, including holding torque and backdrive behavior.</description>
       <category>Build Guides</category>
-    </item>
-    <item>
-      <title>Tool Center Point (TCP) Calibration for Robot Arms: A Worked Pivot Calibration Example</title>
-      <link>https://arcbotix.com/blog/posts/tool-center-point-calibration-robot-arm-pivot-method.html</link>
-      <guid>https://arcbotix.com/blog/posts/tool-center-point-calibration-robot-arm-pivot-method.html</guid>
-      <pubDate>Tue, 21 Jul 2026 00:50:01 +0000</pubDate>
-      <description>TCP calibration for robot arms explained with an actual worked pivot-calibration example: the least-squares math behind the offset, not just the procedure.</description>
-      <category>Control Systems</category>
     </item>
   </channel>
 </rss>
