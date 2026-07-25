@@ -5,8 +5,16 @@
     <link>https://arcbotix.com/blog/</link>
     <description>Practical robotics engineering guides and niche technical deep-dives</description>
     <language>en-us</language>
-    <lastBuildDate>Sat, 25 Jul 2026 00:00:33 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 25 Jul 2026 08:03:18 +0000</lastBuildDate>
     <atom:link href="https://arcbotix.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Ackermann Steering Kinematics for Robots: A Worked Example</title>
+      <link>https://arcbotix.com/blog/posts/ackermann-steering-kinematics-robot-worked-example.html</link>
+      <guid>https://arcbotix.com/blog/posts/ackermann-steering-kinematics-robot-worked-example.html</guid>
+      <pubDate>Sat, 25 Jul 2026 08:03:01 +0000</pubDate>
+      <description>Ackermann steering kinematics explained with a worked example: turning radius, inner/outer wheel angles, and why one steering angle causes tire scrub.</description>
+      <category>Control Systems</category>
+    </item>
     <item>
       <title>Current Sensing Circuit Design for Robot Motor Drivers: A Worked Shunt Resistor Sizing Example</title>
       <link>https://arcbotix.com/blog/posts/shunt-resistor-current-sensing-motor-driver-sizing-worked-example.html</link>
@@ -158,14 +166,6 @@
       <pubDate>Tue, 21 Jul 2026 00:50:01 +0000</pubDate>
       <description>TCP calibration for robot arms explained with an actual worked pivot-calibration example: the least-squares math behind the offset, not just the procedure.</description>
       <category>Control Systems</category>
-    </item>
-    <item>
-      <title>RS-485/Modbus for Robot Joint Networks: Wiring, Addressing, and Polling-Rate Budget</title>
-      <link>https://arcbotix.com/blog/posts/rs485-modbus-robot-joint-network-wiring-polling-budget.html</link>
-      <guid>https://arcbotix.com/blog/posts/rs485-modbus-robot-joint-network-wiring-polling-budget.html</guid>
-      <pubDate>Mon, 20 Jul 2026 16:46:12 +0000</pubDate>
-      <description>RS-485/Modbus robot joint network wiring, addressing, and the frame-time math that determines how fast you can actually poll N daisy-chained joint drivers.</description>
-      <category>Hardware</category>
     </item>
   </channel>
 </rss>
