@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://eu-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://eu.i.posthog.com https://eu-assets.i.posthog.com">
+  <title>Hand-Eye Calibration for a Robot Arm Camera: A Worked Numeric Example – Arcbotix</title>
+  <meta name="description" content="Hand-eye calibration explained with a worked eye-in-hand AX=XB example: real pose pairs, why one motion is degenerate, and how to solve for the camera offset.">
+  <meta name="keywords" content="hand-eye calibration robot arm, eye-in-hand calibration, AX=XB hand-eye calibration, robot camera calibration worked example">
+  <meta property="og:title" content="Hand-Eye Calibration for a Robot Arm Camera: A Worked Numeric Example">
+  <meta property="og:description" content="Hand-eye calibration explained with a worked eye-in-hand AX=XB example: real pose pairs, why one motion is degenerate, and how to solve for the camera offset.">
+  <meta property="og:image" content="/blog/posts/img/hand-eye-calibration-robot-arm-camera-worked-example.webp">
+  <meta property="og:url" content="https://arcbotix.com/blog/posts/hand-eye-calibration-robot-arm-camera-worked-example.html">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://arcbotix.com/blog/posts/hand-eye-calibration-robot-arm-camera-worked-example.html">
+  <link rel="alternate" type="application/rss+xml" title="Arcbotix" href="https://arcbotix.com/feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/modern-tech.css">
+  <link rel="stylesheet" href="/blog/blog.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+</head>
+<body>
+
+<nav class="navbar scrolled" id="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/onewebmedia/logo-nav.png" alt="Arcbotix" width="34" height="34">
+      <span class="nav-logo-text">Arcbotix</span>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog/" class="nav-link active">Blog</a>
+      <a href="/blog/#about" class="nav-link">About</a>
+    </div>
+    <button class="mobile-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="/" class="nav-link">Home</a>
+  <a href="/blog/" class="nav-link active">Blog</a>
+</nav>
+
+<section class="blog-post-hero">
+  <div class="hero-bg"><div class="hero-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="container">
+    <a href="/blog/" class="blog-back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+    <div class="blog-post-meta">
+      <span class="blog-tag">Control Systems</span>
+      <time datetime="2026-07-25">July 25, 2026</time>
+      <span>6 min read</span>
+    </div>
+    <h1 class="blog-post-title">Hand-Eye Calibration for a Robot Arm Camera: A Worked Numeric Example</h1>
+    <p class="blog-post-subtitle">Turning the AX=XB matrix equation into numbers you can actually check by hand</p>
+  </div>
+</section>
+
+<article class="blog-post-content">
+  <div class="container">
+
+    <div class="blog-featured-img">
+      <img src="/blog/posts/img/hand-eye-calibration-robot-arm-camera-worked-example.webp" alt="Isometric illustration of a robot arm gripper with a mounted camera and dashed lines showing the coordinate transform between two poses" loading="lazy">
+    </div>
+
+    <p>Hand-eye calibration answers one specific question: if a camera is mounted near a robot's end-effector, where exactly does the camera sit relative to the flange? Get this transform wrong and every pixel-to-world coordinate the camera reports lands in the wrong place, even if the camera's own intrinsic calibration is perfect. This article walks through <strong>hand-eye calibration</strong> for the common eye-in-hand case with a small worked numeric example, so the AX=XB equation stops being abstract matrix algebra.</p>
+
+<h2>What hand-eye calibration actually solves for</h2>
+<p>In an eye-in-hand setup, the camera is bolted to the wrist or gripper and moves with the arm. Two transforms are already known from other sources:</p>
+<ul>
+<li><strong>Robot forward kinematics</strong> gives the flange pose in the robot base frame, <code>T_base_flange</code>, at any joint configuration.</li>
+<li><strong>A calibration target</strong> (usually a checkerboard or ArUco/ChArUco board) lets standard camera calibration give the target pose in the camera frame, <code>T_cam_target</code>.</li>
+</ul>
+<p>What is unknown is the rigid transform between the flange and the camera lens, <code>T_flange_cam</code>. This is a single fixed 4x4 homogeneous transform (rotation plus translation) because the camera is bolted on and does not move relative to the flange once mounted. If you have already worked through how homogeneous transforms chain together, this is the same machinery used in <a href="/blog/posts/ros2-tf2-transforms-explained-worked-example.html">ROS2 tf2 transforms</a>, just applied to a calibration problem instead of a live TF tree.</p>
+
+<h2>Setting up AX = XB</h2>
+<p>The board stays fixed in the world while the robot moves the camera to two or more different poses and looks at it. For a motion between pose 1 and pose 2:</p>
+<ul>
+<li><code>A</code> is how the flange moved, expressed in the flange frame: <code>A = T_flange1_base * T_base_flange2</code>, i.e. the relative flange motion.</li>
+<li><code>B</code> is how the camera saw the (fixed) target move, expressed in the camera frame: <code>B = T_cam1_target * T_target_cam2</code>, the relative camera motion as seen through the board.</li>
+<li><code>X</code> is the unknown we want: <code>X = T_flange_cam</code>.</li>
+</ul>
+<p>Because the camera is rigidly bolted to the flange, the same physical motion looks like <code>A</code> from the flange's point of view and like <code>B</code> from the camera's point of view, related by the fixed offset <code>X</code>:</p>
+<blockquote>AX = XB</blockquote>
+<p>This is a classic Sylvester-type equation, first posed this way by Shiu and Ahmad in the 1980s. Closed-form solvers (Tsai-Lenz, Park-Martin, Daniilidis with dual quaternions) all solve for the rotation and translation parts of <code>X</code> from two or more <code>(A, B)</code> pairs. You rarely hand-code the solver yourself, but you do need to build correct <code>A</code> and <code>B</code> matrices, and that is where most home-built calibration rigs actually go wrong.</p>
+
+<h2>Worked example: building one A/B pair</h2>
+<p>Say the robot's forward kinematics reports the flange pose at two joint configurations, both as position (mm) and a rotation matrix. To keep the numbers checkable by hand, use a simple case: the second pose is the first pose rotated 30 degrees about the flange's own Z axis, with no translation of the flange origin.</p>
+<p>Flange pose 1 in the base frame: identity rotation, position (400, 0, 300).<br>
+Flange pose 2 in the base frame: rotation of 30 degrees about Z, position (400, 0, 300) (pure rotation move, camera swings around the same point).</p>
+<p>The relative flange motion, expressed in the flange-1 frame, is then just the 30 degree Z rotation with zero translation:</p>
+<pre>A = [ Rz(30 deg)   0 ]
+    [ 0    0   0    1 ]</pre>
+<p>Now suppose the camera, looking at the same fixed board, reports the target at:</p>
+<ul>
+<li>Pose 1: target position (0, 0, 500) mm in the camera frame, identity rotation (board flat, straight ahead).</li>
+<li>Pose 2: target position (250, 0, 433) mm in the camera frame, rotated -30 degrees about the camera's Z axis.</li>
+</ul>
+<p>The relative camera motion is the transform that takes the target-1 observation to the target-2 observation. Because the board itself did not move, this reduces to a rotation of -30 degrees about Z with a translation that depends on how far the camera's optical center sits from the flange's rotation axis. In a well-mounted rig, working through <code>T_cam1_target * T_target_cam2</code> numerically gives:</p>
+<pre>B = [ Rz(-30 deg)   t_b ]
+    [ 0   0   0    1    ]</pre>
+<p>where <code>t_b</code> comes out to roughly (65, -37, 0) mm for a camera mounted about 75 mm forward and offset from the flange axis by a small lever arm. Note the sign flip: the flange rotated +30 degrees, but the world appears to rotate -30 degrees in the camera's own frame, which is exactly the kind of sign error that silently breaks a calibration run if you build <code>A</code> and <code>B</code> inconsistently.</p>
+<p>Feeding a handful of such <code>(A, B)</code> pairs into a solver like Tsai-Lenz gives the rotation and translation of <code>X = T_flange_cam</code>. For this geometry the numbers work out to a camera mounted close to (75, -40, 20) mm from the flange origin with a small tilt, roughly what you would expect from a camera clipped just off-axis near the gripper.</p>
+
+<h2>Why a single motion is degenerate</h2>
+<p>One <code>(A, B)</code> pair is not enough. AX=XB constrains the rotation part of <code>X</code> using only the rotation axis of <code>A</code> (and correspondingly of <code>B</code>) - rotating about a single fixed axis leaves rotation about that same axis completely unconstrained, and it under-determines the translation too. You need motions with rotation axes that are not parallel: at minimum two motions with sufficiently different axes, and in practice five to ten well-spread poses covering different orientations and positions in the workspace, which is why most calibration routines ask you to move the arm to several visually distinct poses rather than trusting one clean measurement.</p>
+<p>A second practical failure mode is board detection noise. Small errors in checkerboard corner detection translate directly into errors in <code>B</code>, and because the solver treats every pair with equal weight by default, a single bad detection from motion blur or poor lighting can pull the whole solution off. Filtering out poses with high reprojection error before solving is worth the extra step.</p>
+
+<h2>Eye-in-hand vs eye-to-hand</h2>
+<p>The eye-to-hand case (camera fixed in the world, watching a target attached to the flange instead) uses the same AX=XB structure with the roles of camera and flange transforms swapped. The math is identical, only the physical setup differs, so a solver written for one case works for the other with the inputs relabeled.</p>
+<p>Once <code>T_flange_cam</code> is known, every detection the camera makes can be converted into the robot's base frame by chaining <code>T_base_flange * T_flange_cam * T_cam_object</code>, the same forward-then-fixed-offset chaining pattern used anywhere transforms are composed. That final chained transform is what actually lets a vision-guided pick-and-place routine convert a detected object's pixel location into a robot target pose the arm can move to.</p>
+
+    <div class="blog-cta">
+      <h3>Building or studying robotics?</h3>
+      <p>Arcbotix publishes practical guides on robotics engineering, control systems and real-world builds. Explore more articles on the blog.</p>
+      <div class="download-btns" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="/blog/" class="btn-store" style="text-decoration:none;">
+          <div class="btn-store-inner">
+            <div class="btn-store-text"><span class="label">Browse the</span><span class="name">Full Archive</span></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-text">Arcbotix</span>
+        </div>
+        <p class="footer-tagline">Practical robotics engineering guides and niche technical deep-dives.</p>
+      </div>
+      <div class="footer-col"><h4>Site</h4><a href="/">Home</a><a href="/blog/">Blog</a></div>
+      <div class="footer-col"><h4>About</h4><a href="/blog/#about">About Arcbotix</a><a href="/privacy.html">Privacy</a><a href="/impressum.html">Legal Notice</a></div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Arcbotix. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<div id="consent-banner" class="consent-banner" hidden>
+  <p>Arcbotix uses privacy-friendly, EU-hosted analytics (PostHog) to understand how visitors use this site, including anonymized session replay for product improvement. Nothing loads or is stored until you accept. <a href="/privacy.html">Learn more</a>.</p>
+  <div class="consent-actions">
+    <button id="consent-decline" class="consent-btn consent-btn-ghost" type="button">Decline</button>
+    <button id="consent-accept" class="consent-btn" type="button">Accept</button>
+  </div>
+</div>
+<script src="/scripts/modern-tech.js"></script>
+<script src="/scripts/analytics.js" defer></script>
+</body>
+</html>

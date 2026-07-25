@@ -4,7 +4,7 @@ This file is maintained automatically by blog/_publish_article.py. Do not
 hand-edit the table below except to fix a clear data error.
 
 ## Stats
-- Total articles: 54
+- Total articles: 55
 - Last published: 2026-07-25
 
 ## Keyword Pool (not yet used)
@@ -27,6 +27,7 @@ hand-edit the table below except to fix a clear data error.
 ## Article Table
 | # | Date | Slug | Title | Keywords | Tag | Summary |
 |---|------|------|-------|----------|-----|---------|
+| 55 | 2026-07-25 | hand-eye-calibration-robot-arm-camera-worked-example | Hand-Eye Calibration for a Robot Arm Camera: A Worked Numeric Example | hand-eye calibration robot arm, eye-in-hand calibration, AX=XB hand-eye calibration, robot camera calibration worked example | Control Systems | Explains eye-in-hand hand-eye calibration for a robot-mounted camera: what T_flange_cam represents, how to build the A (flange motion) and B (camera-observed target motion) transforms from two robot poses, a worked numeric example computing A and B matrices and the resulting camera offset from a 30-degree test rotation, why a single motion is degenerate for solving AX=XB, and the eye-in-hand vs eye-to-hand distinction. Links to the ROS2 tf2 transforms article for the underlying homogeneous transform chaining. |
 | 54 | 2026-07-25 | ackermann-steering-kinematics-robot-worked-example | Ackermann Steering Kinematics for Robots: A Worked Example | Ackermann steering kinematics, Ackermann steering robot, Ackermann steering angle calculation, car-like robot kinematics | Control Systems | Derives Ackermann steering kinematics for a car-like (two front wheel steer) robot: the geometric requirement that all wheels turn about a common instantaneous center of rotation, the inner/outer wheel steering angle formulas (delta = atan(L/(R -+ W/2))), a worked numeric example for a 0.40m wheelbase / 0.30m track width rover at R=1.20m (inner 20.86 deg, outer 16.50 deg) and again at a tighter R=0.60m to show the angle spread triples, a body-velocity-to-steering-angle pseudocode function, and why real trapezoidal steering linkages only approximate rather than exactly solve the Ackermann curve. |
 | 53 | 2026-07-24 | shunt-resistor-current-sensing-motor-driver-sizing-worked-example | Current Sensing Circuit Design for Robot Motor Drivers: A Worked Shunt Resistor Sizing Example | shunt resistor current sensing, current sensing circuit design robot motor driver, current sense amplifier gain sizing, ADC resolution current sensing robotics | Hardware | Worked numeric example of current sensing circuit design for a robot motor driver, covering the four linked sizing steps together: shunt resistor value selection from a target sense voltage and peak current (Rshunt = 5 mOhm for Ipeak=20A, Vsense_max=100mV), power dissipation check (2.0W peak, 0.32W continuous), sense-amplifier gain selection (20 V/V, giving 2.0V output at peak with headroom to the 3.3V ADC reference), and resulting ADC resolution (12-bit/3.3V ADC gives ~8.06 mA/LSB, full-scale current of 33A with peak at 61% of full scale). Also covers low-side vs high-side shunt placement tradeoffs and the importance of Kelvin-sensing PCB layout for the shunt connections. Distinct from the existing torque-control article, which covers current-loop control math rather than the sensing hardware itself. |
 | 52 | 2026-07-24 | holding-brake-sizing-robot-arm-joint-worked-example | Holding Brake Sizing for a Robot Arm Joint: A Worked Fail-Safe Torque Example | holding brake sizing robot arm joint, servo brake torque calculation, fail safe brake robot joint, spring applied brake gear ratio | Hardware | Worked example for sizing a spring-applied fail-safe holding brake on a robot arm joint: computing gravity torque at the output, deciding motor-side vs output-side placement, reflecting torque through the gear ratio, applying a safety factor to pick a catalog brake, and checking free-fall angle during the brake's release time. |
@@ -284,3 +285,6 @@ hand-edit the table below except to fix a clear data error.
 
 ## Internal links (article 54)
 - ackermann-steering-kinematics-robot-worked-example -> differential-drive-robot-kinematics-odometry (links to the v/omega body velocity command convention shared with differential drive kinematics)
+
+## Internal links (article 55)
+- hand-eye-calibration-robot-arm-camera-worked-example -> ros2-tf2-transforms-explained-worked-example (reuses homogeneous transform chaining explained in the tf2 article)

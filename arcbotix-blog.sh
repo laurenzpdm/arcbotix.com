@@ -15,9 +15,14 @@ LOG_FILE="$REPO_DIR/auto-blog.log"
 LAUNCH_MARKER="$REPO_DIR/blog/_LAUNCH_DATE.txt"
 
 # Posting cadence: 2 posts/day for the first 7 days after first launch, then
-# 3 posts/day from day 8 onward. Expressed as an interval between cycles.
-WEEK1_INTERVAL_SECONDS=43200   # 86400 / 2 = every 12h -> 2 posts/day
-STEADY_INTERVAL_SECONDS=28800  # 86400 / 3 = every 8h  -> 3 posts/day
+# 2 posts/day from day 8 onward. Expressed as an interval between cycles.
+#
+# Kadenz-Aenderung 2026-07-25: steady war 8h (3 Posts/Tag). Gemessen ueber
+# 14 Tage kostete ein Cycle ~2,7 Mio Tokens; drei Cycles/Tag waren damit der
+# zweitgroesste Posten auf dem Server. Auf 12h reduziert (-33% Cycles).
+# Ueberschreibbar per Environment, falls die Frequenz wieder hoch soll.
+WEEK1_INTERVAL_SECONDS="${WEEK1_INTERVAL_SECONDS:-43200}"   # 12h -> 2 posts/day
+STEADY_INTERVAL_SECONDS="${STEADY_INTERVAL_SECONDS:-43200}" # 12h -> 2 posts/day
 
 current_interval_seconds() {
     if [ ! -f "$LAUNCH_MARKER" ]; then
@@ -216,7 +221,9 @@ run_blog_cycle() {
     #   ~8k Tokens (verifiziert 2026-07-23) — ~70% weniger statischer Overhead pro Turn,
     #   ohne jede Verhaltensaenderung.
     claude --dangerously-skip-permissions --strict-mcp-config \
-        --tools Bash Read Write Edit Grep Glob WebSearch WebFetch TodoWrite \
+        --tools Bash Read Write Edit Grep Glob WebSearch WebFetch \
+        --model "${BLOG_MODEL:-claude-sonnet-5}" \
+        --effort "${BLOG_EFFORT:-medium}" \
         -p "$BLOG_PROMPT" 2>&1 | tee -a "$LOG_FILE"
 
     local exit_code=$?
